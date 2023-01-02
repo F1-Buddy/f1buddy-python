@@ -40,7 +40,7 @@ async def schedule_command(interaction):
         out_string = ('It is currently off season! :crying_cat_face:')
         message_embed.set_image(url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
     message_embed.description = out_string
-    message_embed.set_thumbnail(url='https://github.com/F1-Buddy/f1buddy-python/blob/dev-rakib/botPics/f1python128.png')
+    message_embed.set_thumbnail(url='https://github.com/F1-Buddy/f1buddy-python/blob/dev-rakib/botPics/f1python192.png?raw=true')
     await interaction.response.send_message(embed=message_embed)
 
 
