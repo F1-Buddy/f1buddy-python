@@ -20,27 +20,54 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 ########################################
 
+# Next Command
 
-# Next command
+
 @tree.command(name="schedule", description="Get race schedule")
 async def schedule_command(interaction):
-    message_embed= discord.Embed(title="Race Schedule", description="")
-    schedule2022 = fastf1.get_event_schedule(2022, include_testing=False)
-    next_event = 0
     now = pd.Timestamp.now()
-    test_time = pd.Timestamp(year=2021,month=1,day=1)
+    message_embed = discord.Embed(title="Race Schedule", description="")
+    #########################################
+    #
+    #   change this
+    #
+    schedule = fastf1.get_event_schedule(2022, include_testing=False)
+    #
+    #   to this:
+    #
+    #       schedule = fastf1.get_event_schedule(now.year, include_testing=False)
+    #
+    #   before 2023 season!
+    #
+    #########################################
+    next_event = 0
+    test_time = pd.Timestamp(year=2021, month=1, day=1)
     out_string = ""
 
-    for i in range(len(schedule2022)):
-        if schedule2022.iloc[i].values[4] < now:
+    for i in range(len(schedule)):
+        if schedule.iloc[i].values[4] < now:
             next_event = i+1
     try:
-        out_string = '{} {}'.format('Next event is the ',schedule2022.iloc[next_event].values[3])
+
+        date = str(schedule.iloc[next_event].values[4].month) + "/"+ str(schedule.iloc[next_event].values[4].day)+"/"+ str(schedule.iloc[next_event].values[4].year)
+        time = str(schedule.iloc[next_event].values[4])[str(schedule.iloc[next_event].values[4]).index(":")-2:]
+        print(time)
+        out_string = ''.join([
+            'Next event is the \n',
+            str(schedule.iloc[next_event].values[3]),
+            '\non **',
+            date,
+            '**\nat **',
+            time,
+            "**"
+        ])
     except IndexError:
         out_string = ('It is currently off season! :crying_cat_face:')
-        message_embed.set_image(url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
+        message_embed.set_image(
+            url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
     message_embed.description = out_string
-    message_embed.set_thumbnail(url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/dev-rakib/botPics/f1python128.png?token=GHSAT0AAAAAAB46RSSG54J2PSZTMQF35PE6Y5S26UQ')
+    message_embed.set_thumbnail(
+        url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     await interaction.response.send_message(embed=message_embed)
 
 
