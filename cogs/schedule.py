@@ -11,15 +11,21 @@ class Schedule(commands.Cog):
     async def on_ready(self):
         print('schedule cog loaded')
 
-    @commands.command()
-    async def sync(self, ctx) -> None:
-        fmt = await ctx.bot.tree.sync()
-        await ctx.send(f'Synced')
+    # @commands.command()
+    # async def sync(self, ctx) -> None:
+    #     fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+    #     await ctx.send(f'Synced {len(fmt)}')
 
     @app_commands.command(name='schedule', description='get race schedule')
     async def schedule(self, interaction: discord.Interaction, question: str):
-        await interaction.response.send_message(f"message recieved = ", question)
+        #######################################################################
+        # Put schedule command here from other branch + improvements
+        # Remove question field
+        #######################################################################
+        outstring = 'message received = ' + question
+        # print(outstring)
+        await interaction.response.send_message(outstring)
 
 
 async def setup(bot):
-    await bot.add_cog(Schedule(bot))
+    await bot.add_cog(Schedule(bot), guilds=[discord.Object(id=884602392249770084)])
