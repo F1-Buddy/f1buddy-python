@@ -6,6 +6,7 @@ Rewritten in python to use fastf1 since ergast goes down too often
 ## To-do
 
 - [ ] Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
+- [ ] Add other sessions (Practice,Quali,Sprint) to /schedule command
 - [ ] port everything else (...)
 
 ## Issues
