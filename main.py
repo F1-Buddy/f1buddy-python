@@ -2,6 +2,7 @@ import fastf1
 import discord
 import pandas as pd
 from discord import app_commands
+from discord.app_commands import Choice
 from fastf1 import plotting
 # from matplotlib import pyplot as plt
 from geopy.geocoders import Nominatim
@@ -149,7 +150,38 @@ async def schedule_command(interaction):
         url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     await interaction.response.send_message(embed=message_embed)
 
+@app_commands.command(name="laptimes", description="Syntax: /laptimes <driver 1 code> <driver 2 code> <round number>")
+@app_commands.describe(drivers='drivers to choose from')
+@app_commands.choices(drivers=[
+    Choice(name='HAM', value=1),
+    Choice(name='RUS', value=2),
+    Choice(name='VER', value=3),
+    Choice(name='PER', value=4),
+    Choice(name='LEC', value=5),
+    Choice(name='SAI', value=6),
+    Choice(name='NOR', value=7),
+    Choice(name='RIC', value=8),
+    Choice(name='VET', value=9),
+    Choice(name='STR', value=10),
+    Choice(name='MAG', value=11),
+    Choice(name='MSC', value=12),
+    Choice(name='ALB', value=13),
+    Choice(name='LAT', value=14),
+    Choice(name='ALO', value=15),
+    Choice(name='OCO', value=16),
+    Choice(name='ZHO', value=17),
+    Choice(name='BOT', value=18),
+    Choice(name='GAS', value=19),
+    Choice(name='RSU', value=20),
+])
+async def laptimes_command(interaction,drivers:Choice[int],d2:Choice[int],round:int):
+    message_embed = discord.Embed(title="Lap Times", description="")
+    await interaction.response.send_message(f'inputs = {drivers.name} {d2.name} {round}.')
 
+
+async def fruit(interaction: discord.Interaction, fruits: Choice[int]):
+    await interaction.response.send_message(f'Your favourite fruit is {fruits.name}.')
+    
 # On Ready
 @client.event
 async def on_ready():
