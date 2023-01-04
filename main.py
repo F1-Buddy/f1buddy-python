@@ -24,6 +24,7 @@ tree = app_commands.CommandTree(client)
 # Next Command
 
 
+# function used to test next command without logging into discord each time bc my internet is horse shit rn
 def test_next():
     # now = pd.Timestamp.now()
     # message_embed = discord.Embed(title="Race Schedule", description="")
@@ -77,7 +78,7 @@ def test_next():
         out_string = ('It is currently off season! :crying_cat_face:')
     print(out_string)
 
-test_next()
+# test_next()
 
 @tree.command(name="schedule", description="Get race schedule")
 async def schedule_command(interaction):
@@ -101,7 +102,7 @@ async def schedule_command(interaction):
     out_string = ""
 
     for i in range(len(schedule)):
-        if schedule.iloc[i].values[4] < now:
+        if schedule.iloc[i].values[4] < now: # swap now with test_time to test specific GPs, also change line 101 accordingly
             next_event = i+1
     try:
         # TIME IS IN LOCAL NOT UTC
