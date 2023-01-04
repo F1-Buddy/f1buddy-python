@@ -32,6 +32,10 @@ async def load():
         if file.endswith('.py'):
             await bot.load_extension(f'cogs.{file[:-3]}')
 
+    # race = fastf1.get_session(2022, 10, 'R')
+    # racename = '' + str(race.date.year)+' '+str(race.event.EventName)
+    # print(racename)
+
 async def main():
     await load()
     await bot.start(config.TOKEN)
