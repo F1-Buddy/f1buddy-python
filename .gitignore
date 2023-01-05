@@ -1,2 +1,4 @@
 token.txt
 config.py
+# cache/
+/cache/

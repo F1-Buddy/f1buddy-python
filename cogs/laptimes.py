@@ -24,6 +24,9 @@ class Laptimes(commands.Cog):
         fmt = await ctx.bot.tree.sync(guild=ctx.guild)
         await ctx.send(f'Synced {len(fmt)}')
 
+
+    
+
     @app_commands.command(name='laptimes', description='compare laptimes of two drivers in a race')
     @app_commands.describe(driver1='Drivers')
     @app_commands.describe(driver2='Drivers')
@@ -73,8 +76,30 @@ class Laptimes(commands.Cog):
         discord.app_commands.Choice(name="STR",value=20)
     ])
     async def laptimes(self, interaction: discord.Interaction, driver1: discord.app_commands.Choice[int], driver2: discord.app_commands.Choice[int], round: int):
+        await interaction.response.defer()
         now = pd.Timestamp.now()
-        
+        team_colors = {
+        'LEC':'red',
+        'SAI':'red',
+        'HAM':'turquoise',
+        'RUS':'turquoise',
+        'VER':'mediumblue',
+        'PER':'mediumblue',
+        'OCO':'fuchsia',
+        'ALO':'fuchsia',
+        'NOR':'darkorange',
+        'RIC':'darkorange',
+        'VET':'gren',
+        'STR':'green',
+        'ALB':'royalblue',
+        'LAT':'royalblue',
+        'BOT':'maroon',
+        'ZHO':'maroon',
+        'MAG':'white',
+        'MSC':'white',
+        'TSU':'lightsteelblue',
+        'GAS':'lightsteelblue'
+        }
         # comment this line out later
         now = pd.Timestamp(year=2022,month=1,day=1,hour=1)
 
@@ -84,13 +109,13 @@ class Laptimes(commands.Cog):
         message_embed.set_thumbnail(
         url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         if not os.path.exists("cogs/plots/"+str(now.year)+"laptimes"+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png'):
-            await interaction.response.send_message("Please try again later! Generating the data!!!")
+            # await interaction.response.send_message("Please try again later! Generating the data!!!")
             race.load()
             d1 = race.laps.pick_driver(str(driver1.name))
             d2 = race.laps.pick_driver(str(driver2.name))
             fig, ax = plt.subplots()
-            ax.plot(d1['LapNumber'], d1['LapTime'], color='red')
-            ax.plot(d2['LapNumber'], d2['LapTime'], color='cyan')
+            ax.plot(d1['LapNumber'], d1['LapTime'], color=team_colors[str(driver1.name)])
+            ax.plot(d2['LapNumber'], d2['LapTime'], color=team_colors[str(driver2.name)])
             ax.set_title(racename+ ' '+str(driver1.name)+" vs "+str(driver2.name))
             ax.set_xlabel("Lap Number")
             ax.set_ylabel("Lap Time")
@@ -101,8 +126,8 @@ class Laptimes(commands.Cog):
         # fig.savefig('/plots/'+'laptimes'+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png')
         message_embed.set_image(url='')
         outstring = 'message received = ' + str(driver1.name) + ' ' + str(driver2.name) + ' ' + str(round)
-        # print(outstring)
-        await interaction.response.send_message(embed=message_embed, file=file)
+        # print(outstring) 
+        await interaction.followup.send(embed=message_embed, file=file)
 
 
 async def setup(bot):
