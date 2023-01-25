@@ -18,6 +18,19 @@ bot = commands.Bot(command_prefix='f1$',intents=intents,application_id='10594057
 ########################################
 
 
+########################################
+# testing schedule
+########################################
+
+# https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.Event
+# https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.EventSchedule
+eventT = fastf1.get_event(2022,13)
+print(eventT.get_session(3).date)
+
+
+
+
+
 
 
 # On Ready
@@ -38,7 +51,7 @@ async def load():
 
 async def main():
     await load()
-    await bot.start(config.TOKEN)
+########################################    await bot.start(config.TOKEN)
 
 asyncio.run(main())
 
