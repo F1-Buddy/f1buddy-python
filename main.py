@@ -25,8 +25,26 @@ bot = commands.Bot(command_prefix='f1$',intents=intents,application_id='10594057
 # https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.Event
 # https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.EventSchedule
 eventT = fastf1.get_event(2022,13)
-print(eventT.get_session(3).date)
+# Round 13
+# DTSTART;TZID=Europe/London:20220731T140000
+# DTEND;TZID=Europe/London:20220731T160000
+# SUMMARY:FORMULA 1 MAGYAR NAGYDÍJ 2022 - Race
+# Output = 2022-07-31 15:00:00
 
+# Round 14
+# DTSTART;TZID=Europe/London:20220828T140000
+# DTEND;TZID=Europe/London:20220828T160000
+# SUMMARY:FORMULA 1 ROLEX BELGIAN GRAND PRIX 2022 - Race
+# Output = 2022-08-28 15:00:00
+
+# Round 18
+# DTSTART;TZID=Europe/London:20221009T060000
+# DTEND;TZID=Europe/London:20221009T080000
+# SUMMARY:FORMULA 1 JAPANESE GRAND PRIX 2022 - Race
+# Output = 2022-10-09 14:00:00
+
+# for i in range(5):
+    # print(eventT.get_session(i+1).date.tz_localize('UTC'))
 
 
 
@@ -51,11 +69,14 @@ async def load():
 
 async def main():
     await load()
-########################################    await bot.start(config.TOKEN)
+
+    ########################################
+    # START BOT
+    await bot.start(config.TOKEN)
+    ########################################
 
 asyncio.run(main())
 
-# bot.start(config.TOKEN)
 
 
 ########################################
