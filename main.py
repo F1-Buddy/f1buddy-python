@@ -5,14 +5,16 @@ import os
 import asyncio
 import pandas as pd
 from discord.ext import commands
-
+from geopy.geocoders import Nominatim
+from timezonefinder import TimezoneFinder
 
 # basic bot setup
 ########################################
 # token = open('token.txt').readline()
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='f1$',intents=intents,application_id='1059405703116242995')
+bot = commands.Bot(command_prefix='f1$', intents=intents,
+                   application_id='1059405703116242995')
 
 
 # tree = app_commands.CommandTree(client)
@@ -25,35 +27,87 @@ bot = commands.Bot(command_prefix='f1$',intents=intents,application_id='10594057
 
 # https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.Event
 # https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.EventSchedule
-test_event = fastf1.get_event(2022,13)
+test_event = fastf1.get_event(2022, 13)
 test_2022_schedule = fastf1.get_event_schedule(2022, include_testing=False)
 
-print(test_2022_schedule)
+# print(test_2022_schedule)
 
 # for i in range(len(test_2022_schedule)):
 #     print("\nevent time = ")
 #     print(test_2022_schedule.iloc[i].values[4])
 #     now = pd.Timestamp.now()
-test_time = pd.Timestamp(year=2022, month=9, day=1)
+test_time = pd.Timestamp(year=2022, month=9, day=3)
 #     print(test_time-test_2022_schedule.iloc[i].values[4])
 
 index = 0
 # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
-for i in range(2,len(test_2022_schedule)):
-    if test_2022_schedule.loc[i,"Session1Date"] < test_time:
+# find round number of next event
+for i in range(2, len(test_2022_schedule)):
+    if test_2022_schedule.loc[i, "Session1Date"] < test_time:
         index = i+1
-eventName = test_2022_schedule.loc[index,"EventName"]
-print(eventName)
-session_15_p1_time = test_2022_schedule.loc[index,"Session1Date"]
-print(session_15_p1_time)
-print(test_time)
-print(session_15_p1_time-test_time)
+
+# print(test_2022_schedule.loc[index,"EventName"])
+
+# get nearest FP1 session including past
+# check if race event has passed, if not then set index back by 1
+if ((test_2022_schedule.loc[index, "Session5Date"]-test_time).total_seconds() > 0):
+    index -= 1
+
+
+# gets session times for weekend
+session_times = {
+    "fp1_time": test_2022_schedule.loc[index, "Session1Date"],
+    "fp2_time": test_2022_schedule.loc[index, "Session2Date"],
+    "fp3_time": test_2022_schedule.loc[index, "Session3Date"],
+    "quali_time": test_2022_schedule.loc[index, "Session4Date"],
+    "race_time": test_2022_schedule.loc[index, "Session5Date"]
+}
+
+
+print("session_times")
+print(session_times)
+
+try:
+    converted_session_times = {
+        "fp1_time": test_2022_schedule.loc[index, "Session1Date"],
+        "fp2_time": test_2022_schedule.loc[index, "Session2Date"],
+        "fp3_time": test_2022_schedule.loc[index, "Session3Date"],
+        "quali_time": test_2022_schedule.loc[index, "Session4Date"],
+        "race_time": test_2022_schedule.loc[index, "Session5Date"]
+    }
+
+    # TIME IS IN LOCAL NOT UTC
+    # date_object = test_2022_schedule.iloc[index].values[16]
+    g = Nominatim(user_agent='f1pythonbottesting')
+    location = test_2022_schedule.loc[index,"Location"]
+    print(location)
+    coords = g.geocode(location)
+    # print(coords)
+    tf = TimezoneFinder()
+    tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
+    print(tz)
+    for value in converted_session_times.values():
+        date_object = value.tz_localize(
+            tz).tz_convert('America/New_York')
+        print(date_object)
+
+    # print(converted_session_times)
+
+except IndexError:
+    out_string = ('It is currently off season! :crying_cat_face:')
+
+# eventName = test_2022_schedule.loc[index,"EventName"]
+# print(eventName)
+# session_15_p1_time = test_2022_schedule.loc[index,"Session1Date"]
+# print(session_15_p1_time)
+# print(test_time)
+# print(session_15_p1_time-test_time)
 
 # print(test_2022_schedule.loc[15,"Session2Date"])
 # print(test_2022_schedule.loc[15,"Session3Date"])
 # print(test_2022_schedule.loc[15,"Session4Date"])
 # print(test_2022_schedule.loc[15,"Session5Date"])
-    
+
 
 # Round 1
 # DTSTART;TZID=Europe/London:20220320T150000
@@ -83,15 +137,12 @@ print(session_15_p1_time-test_time)
     # print(eventT.get_session(i+1).date.tz_localize('UTC'))
 
 
-
-
-
-
 # On Ready
 @bot.event
 async def on_ready():
     # await tree.sync()  # guild=discord.Object(id=884602392249770084))
     print(f'Logged in as {bot.user}')
+
 
 @bot.event
 async def load():
@@ -103,6 +154,7 @@ async def load():
     # racename = '' + str(race.date.year)+' '+str(race.event.EventName)
     # print(racename)
 
+
 async def main():
     await load()
 
@@ -112,7 +164,6 @@ async def main():
     ########################################
 
 asyncio.run(main())
-
 
 
 ########################################

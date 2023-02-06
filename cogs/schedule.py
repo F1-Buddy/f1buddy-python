@@ -34,26 +34,56 @@ class Schedule(commands.Cog):
         schedule = fastf1.get_event_schedule(2022, include_testing=False)
 
         next_event = 0
-        # test_time = pd.Timestamp(year=2022, month=9, day=3)
+        test_time = pd.Timestamp(year=2022, month=9, day=3)
         out_string = ""
 
         
-        for i in range(len(schedule)):
-            if schedule.iloc[i].values[4] < now:
-                next_event = i+1
-        try:        
-            # TIME IS IN LOCAL NOT UTC
-            date_object = schedule.iloc[next_event].values[16]
-            # print('race start = ',date_object, ' local time')
-            # session = fastf1.get_session(date_object.year,schedule.iloc[next_event].values[0],'R')
-            g = Nominatim(user_agent='f1pythonbottesting')
-            location = schedule.iloc[next_event].values[2]
-            coords = g.geocode(location)
-            # print(coords)
-            tf = TimezoneFinder()
-            tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
-            date_object = date_object.tz_localize(tz).tz_convert('America/New_York')
+        # for i in range(len(schedule)):
+        #     if schedule.iloc[i].values[4] < now:
+        #         next_event = i+1
 
+        # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
+        # find round number of next event
+        for i in range(2,len(schedule)):
+            if schedule.loc[i,"Session1Date"] < test_time:
+                next_event = i+1
+        
+        # get nearest FP1 session including past
+        # check if race event has passed, if not then set index back by 1
+        if ((schedule.loc[next_event,"Session5Date"]-test_time).total_seconds()>0):
+            next_event -= 1
+
+        # gets session times for weekend
+        session_times = {
+            "fp1_time": schedule.iloc[next_event].values[8],
+            "fp2_time": schedule.iloc[next_event].values[10],
+            "fp3_time": schedule.iloc[next_event].values[12],
+            "quali_time": schedule.iloc[next_event].values[14],
+            "race_time": schedule.iloc[next_event].values[16]
+        }
+        print(session_times)
+        
+        try:        
+            converted_session_times = {
+                "fp1_time": schedule.iloc[next_event].values[8],
+                "fp2_time": schedule.iloc[next_event].values[10],
+                "fp3_time": schedule.iloc[next_event].values[12],
+                "quali_time": schedule.iloc[next_event].values[14],
+                "race_time": schedule.iloc[next_event].values[16]
+            }
+
+            for value in converted_session_times.values():
+                date_object = value
+                g = Nominatim(user_agent='f1pythonbottesting')
+                location = schedule.iloc[next_event].values[2]
+                coords = g.geocode(location)
+                # print(coords)
+                tf = TimezoneFinder()
+                tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
+                date_object = date_object.tz_localize(tz).tz_convert('America/New_York')
+                value = date_object
+
+            print(converted_session_times)
             date = str(schedule.iloc[next_event].values[4].month) + "/"+ str(schedule.iloc[next_event].values[4].day)+"/"+ str(schedule.iloc[next_event].values[4].year)
             time = str(date_object)[str(date_object).index(":")-2:]
             time = time[:time.index("-")]
@@ -67,6 +97,30 @@ class Schedule(commands.Cog):
                 time,
                 " EST** "
             ])
+
+            # # TIME IS IN LOCAL NOT UTC
+            # date_object = schedule.iloc[next_event].values[16]
+            # g = Nominatim(user_agent='f1pythonbottesting')
+            # location = schedule.iloc[next_event].values[2]
+            # coords = g.geocode(location)
+            # # print(coords)
+            # tf = TimezoneFinder()
+            # tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
+            # date_object = date_object.tz_localize(tz).tz_convert('America/New_York')
+
+            # date = str(schedule.iloc[next_event].values[4].month) + "/"+ str(schedule.iloc[next_event].values[4].day)+"/"+ str(schedule.iloc[next_event].values[4].year)
+            # time = str(date_object)[str(date_object).index(":")-2:]
+            # time = time[:time.index("-")]
+
+            # out_string = ''.join([
+            #     'Next event is the \n',
+            #     str(schedule.iloc[next_event].values[3]),
+            #     '\non **',
+            #     date,
+            #     '**\nat **',
+            #     time,
+            #     " EST** "
+            # ])
         except IndexError:
             out_string = ('It is currently off season! :crying_cat_face:')
         # print(out_string)
