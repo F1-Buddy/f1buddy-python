@@ -1,3 +1,6 @@
+# https://github.com/theOehrly/Fast-F1/issues/253
+# fast-f1 lacks standardized time zones for events, all events are listed in local track time
+
 import discord
 import fastf1
 import pandas as pd
@@ -54,14 +57,6 @@ class Schedule(commands.Cog):
             date = str(schedule.iloc[next_event].values[4].month) + "/"+ str(schedule.iloc[next_event].values[4].day)+"/"+ str(schedule.iloc[next_event].values[4].year)
             time = str(date_object)[str(date_object).index(":")-2:]
             time = time[:time.index("-")]
-            # print(date_object)
-            # print(date_object.tz_convert('America/New_York'))
-            # print(tz)
-            # session.load()
-            # print(session.date)
-            # print(date_object)
-            # print('country = ',schedule.iloc[next_event].values[1])
-            # print('location = ',schedule.iloc[next_event].values[2])
 
             out_string = ''.join([
                 'Next event is the \n',

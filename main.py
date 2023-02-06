@@ -3,6 +3,7 @@ import discord
 import config
 import os
 import asyncio
+import pandas as pd
 from discord.ext import commands
 
 
@@ -24,7 +25,42 @@ bot = commands.Bot(command_prefix='f1$',intents=intents,application_id='10594057
 
 # https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.Event
 # https://theoehrly.github.io/Fast-F1/events.html#fastf1.events.EventSchedule
-eventT = fastf1.get_event(2022,13)
+test_event = fastf1.get_event(2022,13)
+test_2022_schedule = fastf1.get_event_schedule(2022, include_testing=False)
+
+print(test_2022_schedule)
+
+# for i in range(len(test_2022_schedule)):
+#     print("\nevent time = ")
+#     print(test_2022_schedule.iloc[i].values[4])
+#     now = pd.Timestamp.now()
+test_time = pd.Timestamp(year=2022, month=9, day=1)
+#     print(test_time-test_2022_schedule.iloc[i].values[4])
+
+index = 0
+# range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
+for i in range(2,len(test_2022_schedule)):
+    if test_2022_schedule.loc[i,"Session1Date"] < test_time:
+        index = i+1
+eventName = test_2022_schedule.loc[index,"EventName"]
+print(eventName)
+session_15_p1_time = test_2022_schedule.loc[index,"Session1Date"]
+print(session_15_p1_time)
+print(test_time)
+print(session_15_p1_time-test_time)
+
+# print(test_2022_schedule.loc[15,"Session2Date"])
+# print(test_2022_schedule.loc[15,"Session3Date"])
+# print(test_2022_schedule.loc[15,"Session4Date"])
+# print(test_2022_schedule.loc[15,"Session5Date"])
+    
+
+# Round 1
+# DTSTART;TZID=Europe/London:20220320T150000
+# DTEND;TZID=Europe/London:20220320T170000
+# SUMMARY:FORMULA 1 GULF AIR BAHRAIN GRAND PRIX 2022 - Race
+# Output = 2022-03-20 18:00:00
+
 # Round 13
 # DTSTART;TZID=Europe/London:20220731T140000
 # DTEND;TZID=Europe/London:20220731T160000
@@ -72,7 +108,7 @@ async def main():
 
     ########################################
     # START BOT
-    await bot.start(config.TOKEN)
+    # await bot.start(config.TOKEN)
     ########################################
 
 asyncio.run(main())
