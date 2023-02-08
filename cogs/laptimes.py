@@ -131,4 +131,6 @@ class Laptimes(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Laptimes(bot), guilds=[discord.Object(id=884602392249770084)])
+    await bot.add_cog(Laptimes(bot)
+    # , guilds=[discord.Object(id=884602392249770084)]
+    )

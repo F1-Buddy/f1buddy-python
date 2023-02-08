@@ -9,6 +9,9 @@ from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 
+fastf1.Cache.enable_cache('cache/')
+
+
 class Schedule(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -16,7 +19,7 @@ class Schedule(commands.Cog):
     # print('hi')
     @commands.Cog.listener()
     async def on_ready(self):
-        print('schedule cog loaded')
+        print('Schedule cog loaded')
 
     # @commands.command()
     # async def sync(self, ctx) -> None:
@@ -25,28 +28,33 @@ class Schedule(commands.Cog):
 
     @app_commands.command(name='schedule', description='get race schedule')
     async def schedule(self, interaction: discord.Interaction):
+        # defer response
         await interaction.response.defer()
+        # timestamp for now to find next event
         now = pd.Timestamp.now()
+        # setup embed
         message_embed = discord.Embed(title="Race Schedule", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
         # schedule object
         schedule = fastf1.get_event_schedule(2022, include_testing=False)
 
+        # index of next event (round number)
         next_event = 0
+        # timestamp to test function
         test_time = pd.Timestamp(year=2022, month=9, day=3)
+        # string to hold final message
         out_string = ""
-
-        
-        # for i in range(len(schedule)):
-        #     if schedule.iloc[i].values[4] < now:
-        #         next_event = i+1
 
         # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
         # find round number of next event
         for i in range(2,len(schedule)):
             if schedule.loc[i,"Session1Date"] < test_time:
                 next_event = i+1
+
+        # get name of event
+        race_name = schedule.loc[next_event-1,"EventName"]
+        message_embed.title = "Race Schedule for **" + race_name + "**"
         
         # get nearest FP1 session including past
         # check if race event has passed, if not then set index back by 1
@@ -61,75 +69,55 @@ class Schedule(commands.Cog):
             "quali_time": schedule.iloc[next_event].values[14],
             "race_time": schedule.iloc[next_event].values[16]
         }
-        print(session_times)
+        # print(session_times)
         
         try:        
+            # create a dictionary to store converted times
             converted_session_times = {
-                "fp1_time": schedule.iloc[next_event].values[8],
-                "fp2_time": schedule.iloc[next_event].values[10],
-                "fp3_time": schedule.iloc[next_event].values[12],
-                "quali_time": schedule.iloc[next_event].values[14],
-                "race_time": schedule.iloc[next_event].values[16]
+                "FP1": schedule.loc[next_event, "Session1Date"],
+                "FP2": schedule.loc[next_event, "Session2Date"],
+                "FP3": schedule.loc[next_event, "Session3Date"],
+                "Qualifying": schedule.loc[next_event, "Session4Date"],
+                "Race": schedule.loc[next_event, "Session5Date"]
             }
 
-            for value in converted_session_times.values():
-                date_object = value
-                g = Nominatim(user_agent='f1pythonbottesting')
-                location = schedule.iloc[next_event].values[2]
-                coords = g.geocode(location)
-                # print(coords)
-                tf = TimezoneFinder()
-                tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
-                date_object = date_object.tz_localize(tz).tz_convert('America/New_York')
-                value = date_object
+            # TIME IS IN LOCAL NOT UTC
+            # create coordinate finder object
+            g = Nominatim(user_agent='f1pythonbottesting')
+            # get location of track
+            location = schedule.loc[next_event,"Location"]
+            # get coordinates of track
+            coords = g.geocode(location)
 
-            print(converted_session_times)
-            date = str(schedule.iloc[next_event].values[4].month) + "/"+ str(schedule.iloc[next_event].values[4].day)+"/"+ str(schedule.iloc[next_event].values[4].year)
-            time = str(date_object)[str(date_object).index(":")-2:]
-            time = time[:time.index("-")]
+            # create timezone finder object
+            tf = TimezoneFinder()
+            # find track timezone using its coordinates
+            tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
 
-            out_string = ''.join([
-                'Next event is the \n',
-                str(schedule.iloc[next_event].values[3]),
-                '\non **',
-                date,
-                '**\nat **',
-                time,
-                " EST** "
-            ])
+            # update dictionary with converted times
+            for key in converted_session_times.keys():
+                date_object = converted_session_times.get(key).tz_localize(
+                    tz).tz_convert('America/New_York')
+                converted_session_times.update({key:date_object})
 
-            # # TIME IS IN LOCAL NOT UTC
-            # date_object = schedule.iloc[next_event].values[16]
-            # g = Nominatim(user_agent='f1pythonbottesting')
-            # location = schedule.iloc[next_event].values[2]
-            # coords = g.geocode(location)
-            # # print(coords)
-            # tf = TimezoneFinder()
-            # tz = tf.timezone_at(lng=coords.longitude, lat=coords.latitude)
-            # date_object = date_object.tz_localize(tz).tz_convert('America/New_York')
+            # print(converted_session_times)
 
-            # date = str(schedule.iloc[next_event].values[4].month) + "/"+ str(schedule.iloc[next_event].values[4].day)+"/"+ str(schedule.iloc[next_event].values[4].year)
-            # time = str(date_object)[str(date_object).index(":")-2:]
-            # time = time[:time.index("-")]
+            out_string += "**Times are displayed in EST**\n\n"
 
-            # out_string = ''.join([
-            #     'Next event is the \n',
-            #     str(schedule.iloc[next_event].values[3]),
-            #     '\non **',
-            #     date,
-            #     '**\nat **',
-            #     time,
-            #     " EST** "
-            # ])
+            # add times to string
+            for key in converted_session_times.keys():
+                out_string += key + ": \t`" + ((str)(converted_session_times.get(key)))[:-6] + "`\n"
+
         except IndexError:
             out_string = ('It is currently off season! :crying_cat_face:')
-        # print(out_string)
-        # Remove question field
+
         #######################################################################
-        # outstring = 'message received = ' + question
-        # print(outstring)
-        await interaction.followup.send(content=out_string)
+        # add final string to embed and send it
+        message_embed.description = out_string
+        await interaction.followup.send(embed=message_embed)
 
 
 async def setup(bot):
-    await bot.add_cog(Schedule(bot), guilds=[discord.Object(id=884602392249770084)])
+    await bot.add_cog(Schedule(bot)
+    # , guilds=[discord.Object(id=884602392249770084)]
+    )
