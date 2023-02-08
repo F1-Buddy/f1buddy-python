@@ -3,10 +3,7 @@ import discord
 import config
 import os
 import asyncio
-import pandas as pd
 from discord.ext import commands
-from geopy.geocoders import Nominatim
-from timezonefinder import TimezoneFinder
 
 
 fastf1.Cache.enable_cache('cache/')
