@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
+import country_converter as coco
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -54,7 +55,10 @@ class Schedule(commands.Cog):
 
         # get name of event
         race_name = schedule.loc[next_event-1,"EventName"]
-        message_embed.title = "Race Schedule for **" + race_name + "**"
+        # get emoji for country
+        emoji = ":flag_"+(coco.convert(names=schedule.loc[next_event-1,"Country"],to='ISO2')).lower()+":"
+        # Rename embed title
+        message_embed.title = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
         
         # get nearest FP1 session including past
         # check if race event has passed, if not then set index back by 1
@@ -74,11 +78,11 @@ class Schedule(commands.Cog):
         try:        
             # create a dictionary to store converted times
             converted_session_times = {
-                "FP1": schedule.loc[next_event, "Session1Date"],
-                "FP2": schedule.loc[next_event, "Session2Date"],
-                "FP3": schedule.loc[next_event, "Session3Date"],
-                "Qualifying": schedule.loc[next_event, "Session4Date"],
-                "Race": schedule.loc[next_event, "Session5Date"]
+                ":one: FP1": schedule.loc[next_event, "Session1Date"],
+                ":two: FP2": schedule.loc[next_event, "Session2Date"],
+                ":three: FP3": schedule.loc[next_event, "Session3Date"],
+                ":stopwatch: Qualifying": schedule.loc[next_event, "Session4Date"],
+                ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
             }
 
             # TIME IS IN LOCAL NOT UTC
