@@ -12,8 +12,7 @@ fastf1.Cache.enable_cache('cache/')
 # token = open('token.txt').readline()
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='f1$', intents=intents,
-                   application_id='1059405703116242995')
+bot = commands.Bot(command_prefix='f1$', intents=intents)
 ########################################
 
 

@@ -33,6 +33,7 @@ class Schedule(commands.Cog):
         await interaction.response.defer()
         # timestamp for now to find next event
         now = pd.Timestamp.now()
+        
         # setup embed
         message_embed = discord.Embed(title="Race Schedule", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
@@ -50,11 +51,14 @@ class Schedule(commands.Cog):
         # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
         # find round number of next event
         for i in range(2,len(schedule)):
-            if schedule.loc[i,"Session1Date"] < test_time:
+            if schedule.loc[i,"Session1Date"] < now:
                 next_event = i+1
 
+        print(schedule.loc[i,"Session1Date"])
+        print(now)
         # get name of event
         race_name = schedule.loc[next_event-1,"EventName"]
+        print(race_name)
         # get emoji for country
         emoji = ":flag_"+(coco.convert(names=schedule.loc[next_event-1,"Country"],to='ISO2')).lower()+":"
         # Rename embed title
@@ -66,13 +70,13 @@ class Schedule(commands.Cog):
             next_event -= 1
 
         # gets session times for weekend
-        session_times = {
-            "fp1_time": schedule.iloc[next_event].values[8],
-            "fp2_time": schedule.iloc[next_event].values[10],
-            "fp3_time": schedule.iloc[next_event].values[12],
-            "quali_time": schedule.iloc[next_event].values[14],
-            "race_time": schedule.iloc[next_event].values[16]
-        }
+        # session_times = {
+        #     "fp1_time": schedule.iloc[next_event].values[8],
+        #     "fp2_time": schedule.iloc[next_event].values[10],
+        #     "fp3_time": schedule.iloc[next_event].values[12],
+        #     "quali_time": schedule.iloc[next_event].values[14],
+        #     "race_time": schedule.iloc[next_event].values[16]
+        # }
         # print(session_times)
         
         try:        
@@ -114,6 +118,7 @@ class Schedule(commands.Cog):
 
         except IndexError:
             out_string = ('It is currently off season! :crying_cat_face:')
+            message_embed.set_image(url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
 
         #######################################################################
         # add final string to embed and send it
@@ -122,6 +127,4 @@ class Schedule(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Schedule(bot)
-    # , guilds=[discord.Object(id=884602392249770084)]
-    )
+    await bot.add_cog(Schedule(bot))
