@@ -44,30 +44,29 @@ class Schedule(commands.Cog):
         # index of next event (round number)
         next_event = 0
         # timestamp to test function
-        test_time = pd.Timestamp(year=2022, month=9, day=3)
+        # now = pd.Timestamp(year=2022, month=10, day=27)
+        
         # string to hold final message
-        out_string = ""
+        out_string = "It is currently " + now.strftime('%Y-%m-%d %X') + "\n\n"
 
         # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
         # find round number of next event
         for i in range(2,len(schedule)):
-            if schedule.loc[i,"Session1Date"] < now:
-                next_event = i+1
+            # if (fp1 < now < race) --> scenario where today is before the next race but after this weekend's fp1
+            # or
+            # if (fp1 > now > last race) --> scenario where today is after the last race but before upcoming race weekend's fp1
+            if ((schedule.loc[i,"Session1Date"] < now) and (schedule.loc[i,"Session5Date"] > now)) or ((schedule.loc[i,"Session1Date"] > now) and (schedule.loc[i-1,"Session5Date"] < now)):
+                # temp_race_name = schedule.loc[i,"EventName"]
+                # print("\n"+temp_race_name + " FP1 < now < "+temp_race_name+"?")
+                # print(((schedule.loc[i,"Session1Date"] < now) and (schedule.loc[i,"Session5Date"] > now)))
+                # print(temp_race_name + " FP1 > now > "+schedule.loc[i-1,"EventName"]+"?")
+                # print(((schedule.loc[i,"Session1Date"] > now) and (schedule.loc[i-1,"Session5Date"] < now)))
+                next_event = i
 
-        print(schedule.loc[i,"Session1Date"])
-        print(now)
-        # get name of event
-        race_name = schedule.loc[next_event-1,"EventName"]
-        print(race_name)
-        # get emoji for country
-        emoji = ":flag_"+(coco.convert(names=schedule.loc[next_event-1,"Country"],to='ISO2')).lower()+":"
-        # Rename embed title
-        message_embed.title = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
+
+        # print(schedule.loc[i,"Session1Date"])
+        # print(now)
         
-        # get nearest FP1 session including past
-        # check if race event has passed, if not then set index back by 1
-        if ((schedule.loc[next_event,"Session5Date"]-test_time).total_seconds()>0):
-            next_event -= 1
 
         # gets session times for weekend
         # session_times = {
@@ -79,7 +78,14 @@ class Schedule(commands.Cog):
         # }
         # print(session_times)
         
-        try:        
+        try:      
+            # get name of event
+            race_name = schedule.loc[next_event,"EventName"]
+            # print(race_name)
+            # get emoji for country
+            emoji = ":flag_"+(coco.convert(names=schedule.loc[next_event,"Country"],to='ISO2')).lower()+":"
+            # Rename embed title
+            message_embed.title = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji  
             # create a dictionary to store converted times
             converted_session_times = {
                 ":one: FP1": schedule.loc[next_event, "Session1Date"],
@@ -114,11 +120,12 @@ class Schedule(commands.Cog):
 
             # add times to string
             for key in converted_session_times.keys():
-                out_string += key + ": \t`" + ((str)(converted_session_times.get(key)))[:-6] + "`\n"
+                out_string += key + ": \t`" + (converted_session_times.get(key)).strftime('%Y/%m/%d %X') + "`\n"
 
-        except IndexError:
+        except:
             out_string = ('It is currently off season! :crying_cat_face:')
             message_embed.set_image(url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
+            message_embed.set_footer(text = "*probably*")
 
         #######################################################################
         # add final string to embed and send it
