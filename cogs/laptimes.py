@@ -14,7 +14,6 @@ class Laptimes(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    # print('hi')
     @commands.Cog.listener()
     async def on_ready(self):
         print('Laptimes cog loaded')

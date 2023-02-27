@@ -11,7 +11,6 @@ class Driver(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    # print('hi')
     @commands.Cog.listener()
     async def on_ready(self):
         print('Driver cog loaded')
@@ -21,6 +20,7 @@ class Driver(commands.Cog):
         await interaction.response.defer()
         message_embed = discord.Embed(title="temp_driver_title", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        await interaction.followup.send(embed=message_embed)
 
 
 async def setup(bot):
