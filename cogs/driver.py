@@ -1,4 +1,5 @@
 import discord
+import wikipedia
 # import fastf1
 # import pandas as pd
 from discord import app_commands
@@ -15,11 +16,27 @@ class Driver(commands.Cog):
     async def on_ready(self):
         print('Driver cog loaded')
 
+    driver_list = [
+        
+    ]
+
     @app_commands.command(name='driver', description='get driver info')
+    # @app_commands.describe(driver="Driver")
+    # @app_commands.choices(driver = driver_list)
     async def driver(self, interaction: discord.Interaction):
         await interaction.response.defer()
+
+        # driver list
+
+        # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        
+        # 
+        driver_article = wikipedia.page()
+
+
+        # send final embed
         await interaction.followup.send(embed=message_embed)
 
 
