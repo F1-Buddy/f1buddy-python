@@ -16,20 +16,6 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='f1$', intents=intents)
 ########################################
 
-################################################################################
-# testing schedule more
-################################################################################
-# schedule = fastf1.get_event_schedule(2023, include_testing=False)
-# now = pd.Timestamp.now()
-# bahrain2023 = schedule.loc[2,"Session1Date"]
-# locations = schedule["Location"].to_list()
-# for i in range(len(locations)):
-#     print(locations[i])
-# print(now)
-# print (now < bahrain2023)
-
-
-
 # On Ready
 @bot.event
 async def on_ready():
