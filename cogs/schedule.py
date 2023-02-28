@@ -15,7 +15,7 @@ fastf1.Cache.enable_cache('cache/')
 
 # fallback function to calculate timezone using lat/long if 
 # a suitable timezone is not found in timezones.py
-def convert_timezone_fallback(location, schedule, next_event, converted_session_times):
+def convert_timezone_fallback(location, converted_session_times):
     # TIME IS IN LOCAL NOT UTC
     # create coordinate finder object
     g = Nominatim(user_agent='f1pythonbottesting')
@@ -137,7 +137,7 @@ class Schedule(commands.Cog):
                 print("Using fallback timezone calculation")
                 print(e)
                 # calculate timezone using latitude/longitude
-                convert_timezone_fallback(location,schedule,next_event,converted_session_times)
+                convert_timezone_fallback(location,converted_session_times)
 
             out_string += "**Times are displayed in EST**\n\n"
 
