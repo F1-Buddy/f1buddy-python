@@ -140,7 +140,7 @@ class Schedule(commands.Cog):
                 # calculate timezone using latitude/longitude
                 convert_timezone_fallback(location,converted_session_times)
 
-            message_embed.set_footer(text="Times are displayed in EST\n\n") 
+            message_embed.set_footer(text="Times are displayed in EST") 
             # strings to store session names and times
             sessions_string = ''
             times_string = ''

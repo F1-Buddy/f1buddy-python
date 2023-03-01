@@ -141,7 +141,8 @@ class Laptimes(commands.Cog):
         # send embed
         try:
             message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + str(driver1.name)+" vs "+str(driver2.name)
-            await interaction.followup.send(embed=message_embed, file=file)
+            message_embed.set_image(url='attachment://image.png')
+            await interaction.followup.send(embed=message_embed,file=file)
         except:
             message_embed.description = "Error Occured :("            
             await interaction.followup.send(embed=message_embed)
