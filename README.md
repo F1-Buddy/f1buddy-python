@@ -11,11 +11,13 @@ Fixed schedule command
 
 
 ## To-do
-- [x] Use distance to next/last session and display schedule for weekend with lower distance
+- [x] LAPTIME: rewrite laptime logic, currently uses 7 try/catch to catch errors, bad!
+- [ ] LAPTIME: create team_colors.py file for teamcolors for different years
+- [x] SCHEDULE: Use distance to next/last session and display schedule for weekend with lower distance
     (for example if i use the command on saturday it should provide whole schedule for this weekend, not next week)
-- [ ] Rewrite the schedule command timezone conversion
-- [x] Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
-- [ ] port everything else (...)
+- [ ] SCHEDULE: Rewrite the schedule command timezone conversion
+- [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
+- [ ] General: port everything else (...)
 
 ## Issues
 

@@ -49,7 +49,7 @@ class Laptimes(commands.Cog):
         discord.app_commands.Choice(name="VET",value=19),
         discord.app_commands.Choice(name="STR",value=20)
     ]
-    @app_commands.command(name='laptimes', description='compare laptimes of two drivers in a race')
+    @app_commands.command(name='laptimes', description='Compare laptimes of two drivers in a race (2018 onwards)')
     @app_commands.describe(driver1='Drivers')
     @app_commands.describe(driver2='Drivers')
     @app_commands.describe(round='Round Number')
@@ -58,8 +58,16 @@ class Laptimes(commands.Cog):
     @app_commands.choices(driver2=driver_list)
     # @app_commands.option
     async def laptimes(self, interaction: discord.Interaction, driver1: discord.app_commands.Choice[int], driver2: discord.app_commands.Choice[int], round:int, year: typing.Optional[int]):
+        # defer reply for later
         await interaction.response.defer()
+        # get current time
         now = pd.Timestamp.now()
+        # setup embed
+        message_embed = discord.Embed(title="Lap Times", description="")
+        message_embed.set_thumbnail(
+        url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+
+        # map to hold team colors (correct as of 2022)
         team_colors = {
         'LEC':'red',
         'SAI':'red',
@@ -84,41 +92,26 @@ class Laptimes(commands.Cog):
         }
 
         race_year = 0
+        
 
         try:
-            # check validity of given year
-            if (now.year > year and year > 1950):
+            # year given is invalid
+            if (year == None or year > now.year or year < 2018):
+                # print("year not given/year given invalid")
+                race = fastf1.get_session(now.year, round, 'R')
+                race_year = now.year
+                while (race.date > now):
+                    race_year -= 1
+                    race = fastf1.get_session(race_year, round, 'R')
+                racename = '' + str(race.date.year)+' '+str(race.event.EventName)
+            
+            # use given year
+            else:
                 race = fastf1.get_session(year, round, 'R')
                 race_year = year
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-            # if given year is invalid, use this year (and if this year is invalid go back another year)
-            else:
-                race = fastf1.get_session(now.year, round, 'R')
-                race_year = now.year
-                while (race.date > now):
-                    race_year -= 1
-                    race = fastf1.get_session(race_year, round, 'R')
-                racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-        # except no year given
-        except:
-            try:
-                race = fastf1.get_session(now.year, round, 'R')
-                race_year = now.year
-                while (race.date > now):
-                    race_year -= 1
-                    race = fastf1.get_session(race_year, round, 'R')
-                racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-            except:
-                print("invalid argument passed")
-                race = None
-            
-        
-        message_embed = discord.Embed(title="Lap Times", description="")
-        message_embed.set_thumbnail(
-        url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png')) and (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver2.name)+'vs'+str(driver1.name)+'.png')):
-            # await interaction.response.send_message("Please try again later! Generating the data!!!")
-            try:
+            # check if graph already exists, if not create it
+            if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png')) and (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver2.name)+'vs'+str(driver1.name)+'.png')):
                 race.load()
                 d1 = race.laps.pick_driver(str(driver1.name))
                 d2 = race.laps.pick_driver(str(driver2.name))
@@ -129,19 +122,25 @@ class Laptimes(commands.Cog):
                 ax.set_xlabel("Lap Number")
                 ax.set_ylabel("Lap Time")
                 plt.savefig("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png')
-            except:
-                print("exception")
-
-        try:
-            file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png', filename="image.png")
-        except:
+            # try to access the graph
             try:
-                file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver2.name)+'vs'+str(driver1.name)+'.png', filename="image.png")
+                file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver1.name)+'vs'+str(driver2.name)+'.png', filename="image.png")
+            
             except:
-                message_embed.set_footer(text="Likely an unsupported input (year/round) was given")
-        # message_embed.set_image(url='attachment://image.png')
+                # try to access the graph by switching driver1 and driver2
+                try:
+                    file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+str(driver2.name)+'vs'+str(driver1.name)+'.png', filename="image.png")
+                # file does not exist and could not be created
+                except:
+                    message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
+        # 
+        except:
+            pass
+
+
+        # send embed
         try:
-            message_embed.description = racename = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + str(driver1.name)+" vs "+str(driver2.name)
+            message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + str(driver1.name)+" vs "+str(driver2.name)
             await interaction.followup.send(embed=message_embed, file=file)
         except:
             message_embed.description = "Error Occured :("            
