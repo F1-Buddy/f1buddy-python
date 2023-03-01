@@ -5,14 +5,15 @@ Rewritten in python to use fastf1 since ergast goes down too often
 
 ## Changelog
 
-Fixed schedule command
-* Added local list of timezones in timezones.py to make command faster
-* Moved old timezone calculation into a fallback function in case timezone not found in local list 
+Updated laptime 
+* takes optional year argument
+* tell user when given inputs are invalid
 
 
 ## To-do
 - [x] LAPTIME: rewrite laptime logic, currently uses 7 try/catch to catch errors, bad!
 - [ ] LAPTIME: create team_colors.py file for teamcolors for different years
+- [ ] SCHEDULE: Display time as 12 hour, possible timer to event? maybe another command (x days, y hours... until event)
 - [x] SCHEDULE: Use distance to next/last session and display schedule for weekend with lower distance
     (for example if i use the command on saturday it should provide whole schedule for this weekend, not next week)
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
