@@ -16,7 +16,6 @@ fastf1.Cache.enable_cache('cache/')
 # fallback function to calculate timezone using lat/long if 
 # a suitable timezone is not found in timezones.py
 def convert_timezone_fallback(location, converted_session_times):
-    # TIME IS IN LOCAL NOT UTC
     # create coordinate finder object
     g = Nominatim(user_agent='f1pythonbottesting')
     # get coordinates of track
@@ -62,12 +61,13 @@ class Schedule(commands.Cog):
         # index of next event (round number)
         next_event = 0
         ################################################################
-        # timestamp to test function
+        # TESTING TIMESTAMP
+        # change date to test schedule command on that date
         # now = pd.Timestamp(year=2023, month=4, day=29)
         ################################################################
 
         # string to hold final message
-        out_string = "It is currently " + now.strftime('%Y-%m-%d %X') + "\n\n"
+        out_string = "It is currently `" + now.strftime('%I:%M%p on %Y/%m/%d') + "`\n\n"
 
         # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
         # find round number of next event
@@ -78,7 +78,7 @@ class Schedule(commands.Cog):
             # if (fp1 > now > last race) --> scenario where today is after the last race but before upcoming race weekend's fp1
             if ((schedule.loc[i, "Session1Date"] < now) and (schedule.loc[i, "Session5Date"] > now)) or ((schedule.loc[i, "Session1Date"] > now)) or ((schedule.loc[i, "Session1Date"] > now) and (schedule.loc[i-1, "Session5Date"] < now)):
                 next_event -= 1
-                # testing
+                # print statements for testing
                 # temp_race_name = schedule.loc[i,"EventName"]
                 # print("\n"+temp_race_name + " FP1 < now < "+temp_race_name+"?")
                 # print(((schedule.loc[i,"Session1Date"] < now) and (schedule.loc[i,"Session5Date"] > now)))
@@ -104,7 +104,7 @@ class Schedule(commands.Cog):
             message_embed.title = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
 
             # create a dictionary to store converted times
-            # adjust emojis/message according to weekend format
+            # adjust emojis/session name according to weekend format
             if (schedule.loc[next_event, "EventFormat"] == 'conventional'):
                 converted_session_times = {
                     ":one: FP1": schedule.loc[next_event, "Session1Date"],
@@ -123,11 +123,12 @@ class Schedule(commands.Cog):
                 }
             
             try:
-                # get location of track
+                # get location of race
                 location = schedule.loc[next_event, "Location"]
                 # try to get timezone from list
                 local_tz = timezones.timezones_list[location]
-                print("Getting timezone from timezones.py")
+                # print("Getting timezone from timezones.py")
+                # convert times to EST
                 for key in converted_session_times.keys():
                     date_object = converted_session_times.get(key).tz_localize(
                         local_tz).tz_convert('America/New_York')
@@ -139,25 +140,34 @@ class Schedule(commands.Cog):
                 # calculate timezone using latitude/longitude
                 convert_timezone_fallback(location,converted_session_times)
 
-            out_string += "**Times are displayed in EST**\n\n"
+            message_embed.set_footer(text="Times are displayed in EST\n\n") 
+            # strings to store session names and times
+            sessions_string = ''
+            times_string = ''
 
-            # add times to string
+            # setup strings to be added to fields
             for key in converted_session_times.keys():
-                out_string += key + ": \t`" + \
-                    (converted_session_times.get(key)).strftime(
-                        '%Y/%m/%d %X') + "`\n"
+                times_string += '`'+(converted_session_times.get(key)).strftime('%I:%M%p on %Y/%m/%d') + "`\n"
+                sessions_string += key + '\n'
 
+            # add fields to embed
+            message_embed.add_field(name="Session", value=sessions_string,inline=True)
+            message_embed.add_field(name="Time", value=times_string,inline=True)
+            
+        # probably off season / unsure
         except IndexError:
             out_string = ('It is currently off season! :crying_cat_face:')
             message_embed.set_image(
                 url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
             message_embed.set_footer(text="*probably*")
+        # all other errors
         except Exception as e:
             print(e)
             out_string = "Unknown error occured! Uh-Oh! Bad! :thermometer_face:"
 
         #######################################################################
         # add final string to embed and send it
+        #  ***3/1/2023 ^^ no longer needed since out_string doesnt contain info other than the current time
         message_embed.description = out_string
         await interaction.followup.send(embed=message_embed)
 

@@ -1,7 +1,7 @@
 # manually added timezones :(
 # fast f1 please add standardized tz's
 
-# uses locations from fastf1 schedule["Locations"]
+# uses location naming from fastf1 EventSchedule["Locations"]
 timezones_list = {
     "Sakhir": "Asia/Bahrain",
     "Jeddah": "Etc/GMT+3",
