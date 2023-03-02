@@ -1,6 +1,8 @@
 import discord
 # import wikipedia as wk
-import mediawiki as wk
+import mediawiki
+import requests
+import json
 # import fastf1
 # import pandas as pd
 from discord import app_commands
@@ -34,14 +36,27 @@ class Driver(commands.Cog):
         message_embed = discord.Embed(title="temp_driver_title", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         
-        # 
-        # print wikipedias suggested article based on user input
-        driver_article = wk.MediaWiki.page(title=driver)
-        print(driver_article.title)
-        # returning nothing
-        print(driver_article.sections)
+        # get wikipedia article
+        wk = mediawiki.MediaWiki()
+        driver_article = wk.page(title=driver,auto_suggest=True)
 
-        # message_embed.set_image(url=driver_article.images[0])
+        # get driver image
+        article_url = "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=" + (str)(driver_article.title)
+        article_json = requests.get(article_url)
+        response = json.loads(article_json.content)
+        driver_image_url = (response['query']['pages'][driver_article.pageid]['original']['source'])
+
+
+
+        # page_html = driver_article.html
+        # image_index = driver_article.html.index("class=\"infobox-image\">")
+        # page_html = page_html[image_index:image_index+61]
+        # print(driver_article.html.index("class=\"infobox-image\">"))
+        # print(page_html)
+
+        message_embed.set_image(url=driver_image_url)
+        message_embed.title = driver_article.title
+        
 
 
         # send final embed
