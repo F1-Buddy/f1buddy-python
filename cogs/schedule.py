@@ -3,7 +3,7 @@
 
 import discord
 import fastf1
-import timezones
+import timezones as timezones
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
