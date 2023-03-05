@@ -20,7 +20,7 @@ Updated laptime
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
 - [ ] General: port everything else (...)
-
+- [ ] STANDINGS: Add driver & constructor standings command to bot. Could use more features.
 ## Issues
 
 1.  Next Command: Timezone is calculated using latitude and longitude calculated from city name of circuit location (lol)

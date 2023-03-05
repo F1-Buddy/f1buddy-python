@@ -3,7 +3,7 @@
 
 import discord
 import fastf1
-import timezones
+import timezones as timezones
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
@@ -52,6 +52,7 @@ class Schedule(commands.Cog):
 
         # setup embed
         message_embed = discord.Embed(title="Schedule", description="")
+        message_embed.colour = discord.Colour.dark_red()
         message_embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
