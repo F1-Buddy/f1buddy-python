@@ -59,23 +59,27 @@ class driverStandings(commands.Cog):
         # set embed color and title
         message_embed = discord.Embed(title=f"{year} Driver Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
-        
-        # print("emojis:")
-        # for i in self.bot.emojis:
-        #     print(i)
             
         for i in range(0,driver_total):
             driver_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i])
             driver_data = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Driver'])
             driver_constructor = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Constructors'][0])
+                
+            try:
+                if (driver_total <= 24):
+                    driver_name.append((str)(self.bot.get_emoji(team_emoji_ids[driver_constructor['name']]))+ ' ' + driver_data['givenName'] + ' ' + driver_data['familyName'])
+                else:
+                    driver_name.append((str)(self.bot.get_emoji(team_emoji_ids[driver_constructor['name']]))+ ' ' + driver_data['givenName'][0] + "." + ' ' + driver_data['familyName'])
+            except:
+                driver_name.append((driver_data['givenName']) + ' ' + (driver_data['familyName']))
+
             driver_position.append(driver_standings['position'])
-            driver_name.append((str)(self.bot.get_emoji(team_emoji_ids[driver_constructor['name']])) + " " + driver_data['givenName'] + ' ' + driver_data['familyName'])
             driver_points.append(driver_standings['points'])
         
         driver_positions_string = '\n'.join(driver_position)
         driver_names_string = '\n'.join(driver_name)
         if (len(driver_names_string) >= 1024):
-            driver_names_string = driver_names_string[:1024-len(driver_names_string)-1] + '.'
+            driver_names_string = driver_names_string[:1024 - len(driver_names_string) - 1] + '.'
         driver_points_string = '\n'.join(driver_points)
         
         message_embed.add_field(name="Position", value= driver_positions_string,inline=True)
