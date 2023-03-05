@@ -20,11 +20,13 @@ class constructorStandings(commands.Cog):
     @app_commands.describe(year = "WCC name")
     
     async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
-        await interaction.response.defer() 
+        await interaction.response.defer()
         url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year > now.year) else f"https://ergast.com/api/f1/{'year'}/constructorStandings.json"
         constructorStandings = requests.get(url)
         response = json.loads(constructorStandings.content)
-        message_embed = discord.Embed(title="Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        year = (response['MRData']['StandingsTable']['season']) 
+        message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        message_embed.colour = discord.Colour.dark_red()
         
         for i in range(0,10):
             constructor_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i])

@@ -35,6 +35,7 @@ class Driver(commands.Cog):
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        message_embed.colour = discord.Colour.dark_red()
         
         # get wikipedia article
         wk = mediawiki.MediaWiki()
