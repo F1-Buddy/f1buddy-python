@@ -23,7 +23,7 @@ class constructorStandings(commands.Cog):
     async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
         await interaction.response.defer()
         team_names, team_position, team_points = [], [], [] # nice this would also break eventually hypothetically if i left it outside on top lol
-        url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year > now.year) else f"https://ergast.com/api/f1/{year}/constructorStandings.json"
+        url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year >= now.year) else f"https://ergast.com/api/f1/{year}/constructorStandings.json"
         constructorStandings = requests.get(url)
         response = json.loads(constructorStandings.content)
         year = (response['MRData']['StandingsTable']['season']) 

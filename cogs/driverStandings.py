@@ -50,7 +50,7 @@ class driverStandings(commands.Cog):
         driver_name, driver_position, driver_points = [], [], []
         await interaction.response.defer()
         # get standings JSON
-        url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year > now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
+        url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year >= now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
         driverStandings = requests.get(url)
         response = json.loads(driverStandings.content)
         # get season year
