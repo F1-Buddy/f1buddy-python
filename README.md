@@ -18,7 +18,7 @@ Fixed WDC command to show emojis
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
 - [ ] WCC: Add emojis to WCC similar to WDC, can use same map (move map into a separate file)
-- [ ] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except)
+- [ ] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except) (i implemented this in wcc try it in wdc)
 - [ ] WDC: Instead of looping over 20, loop over however many drivers are in a given season
 
 

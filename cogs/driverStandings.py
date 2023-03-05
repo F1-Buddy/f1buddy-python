@@ -1,5 +1,5 @@
 import discord
-import mediawiki
+# import mediawiki
 import requests
 import json
 import fastf1
@@ -7,6 +7,7 @@ import typing
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
+from emojiid import team_emoji_ids
 now = pd.Timestamp.now()
 
 # team_emojis = {
@@ -33,18 +34,7 @@ now = pd.Timestamp.now()
 #     "Williams":"w_",
 #     "Haas F1 Team":"haas"
 # }
-team_emoji_ids = {
-    "Red Bull":1081767515790770247,
-    "Mercedes":1081767514620571749,
-    "Ferrari":1081767510019411978,
-    "McLaren":1081767512733126736,
-    "Alpine F1 Team":1081767507209224192,
-    "Aston Martin":1081767508287176734,
-    "Alfa Romeo":1081767504617148417,
-    "AlphaTauri":1081767505539903508,
-    "Williams":1081767613283176579,
-    "Haas F1 Team":1081767511424520313
-}
+
 
 
 class driverStandings(commands.Cog):
@@ -59,10 +49,13 @@ class driverStandings(commands.Cog):
     async def driverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
         driver_name, driver_position, driver_points = [], [], []
         await interaction.response.defer()
+        # get standings JSON
         url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year > now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
         driverStandings = requests.get(url)
         response = json.loads(driverStandings.content)
+        # get season year
         year = (response['MRData']['StandingsTable']['season']) 
+        # set embed color and title
         message_embed = discord.Embed(title=f"{year} Driver Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
         
