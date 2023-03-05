@@ -16,7 +16,7 @@ class constructorStandings(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('Constructor Standings cog loaded')  
-    @app_commands.command(name='wcc', description='Get driver info')
+    @app_commands.command(name='wcc', description='Get constructor standings')
     @app_commands.describe(year = "WCC name")
     
     async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
