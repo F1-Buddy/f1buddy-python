@@ -7,54 +7,41 @@ import typing
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
+now = pd.Timestamp.now()
+driver_name, driver_position, driver_points, driver_team = [], [], [], []
 
 class driverStandings(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Standings cog loaded')
-        
-    @app_commands.command(name='wcc', description='Get driver info')
-    @app_commands.describe(year = "WCC name")
-    # @app_commands.describe(driver="Driver")
-    # @app_commands.choices(driver = driver_list)
+        print('Driver Standings cog loaded')
+    @app_commands.command(name='wdc', description='Get driver info')
+    @app_commands.describe(year = "WDC name")
     
     async def driverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
         await interaction.response.defer()
-        
-        now = pd.Timestamp.now()
-        if ((year == None) or (year < 1957 and year > now.year)):
-            url = "https://ergast.com/api/f1/current/driverStandings.json"
-        else:
-            url = "https://ergast.com/api/f1/" + (str)(year) + "/driverStandings.json"
-            
+        url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year > now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
         driverStandings = requests.get(url)
         response = json.loads(driverStandings.content)
+        message_embed = discord.Embed(title="Driver Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         
-        driver_names, driver_position, driver_points, = [], [], []
-        message_embed = discord.Embed(title="Driver Standings", description="")
-        message_embed.set_thumbnail(
-            url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        
-        for i in range(0,10):
+        for i in range(0,20):
             driver_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i])
             driver_data = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Driver'])
-            driver_team = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Driver']['Constructors'][i])
-            driver_names.append(driver_data['givenName'])
-            driver_names.append(driver_data['familyName'])
+            driver_constructor = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Constructors'][0])
             driver_position.append(driver_standings['position'])
+            driver_name.append(driver_data['givenName'] + ' ' + driver_data['familyName'])
             driver_points.append(driver_standings['points'])
+            driver_team.append(driver_constructor['name'])
             
-        message_embed.add_field(name="Position", value='\n'.join(team_position),inline=True)
-        message_embed.add_field(name="Driver", value='\n'.join(team_names),inline=True)
-        message_embed.add_field(name="Points", value='\n'.join(team_points),inline=True)
-        
+        message_embed.add_field(name="Position", value='\n'.join(driver_position),inline=True)
+        message_embed.add_field(name="Driver", value='\n'.join(driver_name),inline=True)
+        message_embed.add_field(name="Points", value='\n'.join(driver_points),inline=True)
+        message_embed.add_field(name="Team", value='\n'.join(driver_team),inline=True)
         # send final embed
         await interaction.followup.send(embed=message_embed)
 
 async def setup(bot):
-    await bot.add_cog(Standings(bot)
-    # , guilds=[discord.Object(id=884602392249770084)]
-    )
+    await bot.add_cog(driverStandings(bot)) # , guilds=[discord.Object(id=884602392249770084)]
+    

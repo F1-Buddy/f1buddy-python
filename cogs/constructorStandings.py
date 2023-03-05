@@ -7,36 +7,24 @@ import typing
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
+now = pd.Timestamp.now()
+team_names, team_position, team_points = [], [], []
 
 class constructorStandings(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Constructor Standings cog loaded')
-        
+        print('Constructor Standings cog loaded')  
     @app_commands.command(name='wcc', description='Get driver info')
     @app_commands.describe(year = "WCC name")
-    # @app_commands.describe(driver="Driver")
-    # @app_commands.choices(driver = driver_list)
     
     async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
-        await interaction.response.defer()
-        
-        now = pd.Timestamp.now()
-        if ((year == None) or (year < 1957 and year > now.year)):
-            url = "https://ergast.com/api/f1/current/constructorStandings.json"
-        else:
-            url = "https://ergast.com/api/f1/" + (str)(year) + "/constructorStandings.json"
-            
+        await interaction.response.defer() 
+        url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year > now.year) else f"https://ergast.com/api/f1/{'year'}/constructorStandings.json"
         constructorStandings = requests.get(url)
         response = json.loads(constructorStandings.content)
-        
-        team_names, team_position, team_points = [], [], []
-        message_embed = discord.Embed(title="Constructor Standings", description="")
-        message_embed.set_thumbnail(
-            url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        message_embed = discord.Embed(title="Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         
         for i in range(0,10):
             constructor_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i])
@@ -48,14 +36,9 @@ class constructorStandings(commands.Cog):
         message_embed.add_field(name="Position", value='\n'.join(team_position),inline=True)
         message_embed.add_field(name="Team Name", value='\n'.join(team_names),inline=True)
         message_embed.add_field(name="Points", value='\n'.join(team_points),inline=True)
-        
-        # print(standings_data['DriverStandings'])
-
-        
         # send final embed
         await interaction.followup.send(embed=message_embed)
 
-async def setup(bot):
-    await bot.add_cog(Standings(bot)
-    # , guilds=[discord.Object(id=884602392249770084)]
-    )
+    async def setup(bot):
+        await bot.add_cog(constructorStandings(bot) # , guilds=[discord.Object(id=884602392249770084)] 
+                          )
