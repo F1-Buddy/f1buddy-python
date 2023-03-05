@@ -33,7 +33,7 @@ now = pd.Timestamp.now()
 #     "Williams":"w_",
 #     "Haas F1 Team":"haas"
 # }
-team_emojis_ids = {
+team_emoji_ids = {
     "Red Bull":1081767515790770247,
     "Mercedes":1081767514620571749,
     "Ferrari":1081767510019411978,
@@ -75,7 +75,7 @@ class driverStandings(commands.Cog):
             driver_data = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Driver'])
             driver_constructor = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Constructors'][0])
             driver_position.append(driver_standings['position'])
-            driver_name.append((str)(self.bot.get_emoji(team_emojis_ids[driver_constructor['name']])) + " " + driver_data['givenName'] + ' ' + driver_data['familyName'])
+            driver_name.append((str)(self.bot.get_emoji(team_emoji_ids[driver_constructor['name']])) + " " + driver_data['givenName'] + ' ' + driver_data['familyName'])
             driver_points.append(driver_standings['points'])
         
         driver_positions_string = '\n'.join(driver_position)

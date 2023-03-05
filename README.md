@@ -5,9 +5,7 @@ Rewritten in python to use fastf1 since ergast goes down too often
 
 ## Changelog
 
-Updated laptime 
-* takes optional year argument
-* tell user when given inputs are invalid
+Fixed WDC command to show emojis
 
 
 ## To-do
@@ -19,8 +17,12 @@ Updated laptime
     (for example if i use the command on saturday it should provide whole schedule for this weekend, not next week)
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
+- [ ] WCC: Add emojis to WCC similar to WDC, can use same map (move map into a separate file)
+- [ ] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except)
+- [ ] WDC: Instead of looping over 20, loop over however many drivers are in a given season
+
+
 - [ ] General: port everything else (...)
-- [ ] STANDINGS: Add driver & constructor standings command to bot. Could use more features.
 ## Issues
 
 1.  Next Command: Timezone is calculated using latitude and longitude calculated from city name of circuit location (lol)
