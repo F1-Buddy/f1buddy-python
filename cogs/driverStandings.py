@@ -43,5 +43,5 @@ class driverStandings(commands.Cog):
         await interaction.followup.send(embed=message_embed)
 
 async def setup(bot):
-    await bot.add_cog(driverStandings(bot)) # , guilds=[discord.Object(id=884602392249770084)]
-    
+    await bot.add_cog(driverStandings(bot) # , guilds=[discord.Object(id=884602392249770084)]
+                      )

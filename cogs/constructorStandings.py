@@ -39,6 +39,6 @@ class constructorStandings(commands.Cog):
         # send final embed
         await interaction.followup.send(embed=message_embed)
 
-    async def setup(bot):
-        await bot.add_cog(constructorStandings(bot) # , guilds=[discord.Object(id=884602392249770084)] 
-                          )
+async def setup(bot):
+    await bot.add_cog(constructorStandings(bot) # , guilds=[discord.Object(id=884602392249770084)]
+                      )
