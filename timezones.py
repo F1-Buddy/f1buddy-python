@@ -4,7 +4,7 @@
 # uses location naming from fastf1 EventSchedule["Locations"]
 timezones_list = {
     "Sakhir": "Asia/Bahrain",
-    "Jeddah": "Etc/GMT+3",
+    "Jeddah": "Asia/Riyadh",
     "Melbourne": "Australia/Melbourne",
     "Baku": "Asia/Baku",
     "Miami": "EST",

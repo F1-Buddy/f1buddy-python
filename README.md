@@ -16,6 +16,7 @@ Fixed WDC command to show emojis
 - [x] SCHEDULE: Use distance to next/last session and display schedule for weekend with lower distance
     (for example if i use the command on saturday it should provide whole schedule for this weekend, not next week)
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
+- [ ] SCHEDULE: Fix timezones for each race
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
 - [x] WCC: Add emojis to WCC similar to WDC, can use same map (move map into a separate file)
 - [x] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except) (i implemented this in wcc try it in wdc)
