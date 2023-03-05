@@ -35,16 +35,10 @@ class constructorStandings(commands.Cog):
             constructor_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i])
             constructor_data = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i]['Constructor'])
             
-            
-            
-            ##################################################################################################################################
-            # do this in wdc
-            ##################################################################################################################################
             try:
-                team_names.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' +constructor_data['name'])
+                team_names.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
             except:
                 team_names.append(constructor_data['name'])
-                
                 
             team_position.append(constructor_standings['position'])
             team_points.append(constructor_standings['points'])

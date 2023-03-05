@@ -17,9 +17,9 @@ Fixed WDC command to show emojis
     (for example if i use the command on saturday it should provide whole schedule for this weekend, not next week)
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
-- [ ] WCC: Add emojis to WCC similar to WDC, can use same map (move map into a separate file)
-- [ ] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except) (i implemented this in wcc try it in wdc)
-- [ ] WDC: 2017 is a problem year, 25 drivers with emojis > 1024 in length --> exceeds embed field text limit and throws error, come up with a better solution
+- [x] WCC: Add emojis to WCC similar to WDC, can use same map (move map into a separate file)
+- [x] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except) (i implemented this in wcc try it in wdc)
+- [x] WDC: 2017 is a problem year, 25 drivers with emojis > 1024 in length --> exceeds embed field text limit and throws error, come up with a better solution
 - [x] WDC/WCC: Instead of looping over 20, loop over however many drivers are in a given season
 
 
