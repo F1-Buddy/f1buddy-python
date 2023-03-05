@@ -53,6 +53,7 @@ class driverStandings(commands.Cog):
         url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year >= now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
         driverStandings = requests.get(url)
         response = json.loads(driverStandings.content)
+        driver_total = (int)(response['MRData']['total'])
         # get season year
         year = (response['MRData']['StandingsTable']['season']) 
         # set embed color and title
@@ -63,7 +64,7 @@ class driverStandings(commands.Cog):
         # for i in self.bot.emojis:
         #     print(i)
             
-        for i in range(0,20):
+        for i in range(0,driver_total):
             driver_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i])
             driver_data = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Driver'])
             driver_constructor = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Constructors'][0])
@@ -73,6 +74,8 @@ class driverStandings(commands.Cog):
         
         driver_positions_string = '\n'.join(driver_position)
         driver_names_string = '\n'.join(driver_name)
+        if (len(driver_names_string) >= 1024):
+            driver_names_string = driver_names_string[:1024-len(driver_names_string)-1] + '.'
         driver_points_string = '\n'.join(driver_points)
         
         message_embed.add_field(name="Position", value= driver_positions_string,inline=True)
