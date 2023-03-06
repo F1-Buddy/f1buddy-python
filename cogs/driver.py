@@ -59,16 +59,22 @@ class Driver(commands.Cog):
         # get other driver info like stats
         driver_full_name = driver_article.title
         driver_info = json.loads(requests.get("https://ergast.com/api/f1/drivers/"+(str)(driver_full_name[driver_full_name.index(' ')+1:])+".json").content)
-        # print(driver_info)
-        driver_code = driver_info["MRData"]["DriverTable"]["Drivers"][0]["code"]
-        # print(driver_code)
+        try:
+            driver_code = driver_names[driver_full_name]
+        except:
+            driver_code = driver_info["MRData"]["DriverTable"]["Drivers"][0]["code"]
+
+        # get F1Stats (wins,points,starts, etc.)
         for x in stat_map:
             stat_url = ("https://en.wikipedia.org/w/api.php?action=expandtemplates&format=json&text={{F1stat|"
             +driver_code+"|"+ stat_map[x] +"}}&prop=wikitext")
-            print(stat_url)
-            
+            # print(stat_url)
             stat_json = json.loads(requests.get(stat_url).content)
-            description_string += x+": **"+stat_json['expandtemplates']['wikitext'] + "**\n"
+            if len((y := stat_json['expandtemplates']['wikitext'])) > 0:
+                description_string += x+": **"+ y + "**\n"
+            else:
+                break
+        
 
 
         message_embed.set_image(url=driver_image_url)

@@ -36,7 +36,6 @@ class driverStandings(commands.Cog):
         for i in range(0,driver_total):
             driver_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i])
             driver_data = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Driver'])
-            print("\""+driver_data['givenName'] + ' ' + driver_data['familyName']+"\":\""+driver_data['code']+"\",")
             driver_constructor = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i]['Constructors'][0])
                 
             try:
