@@ -22,11 +22,13 @@ class qualifying(commands.Cog):
     async def qualifying(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
         await interaction.response.defer()
         
-        # If user enters year without round, program crashes
-        if (year == None) or (year < 1994 and year >= now.year) or (round == None) or (round < 0) or (round > 23):
+        # If user enters year without round, program crashes. Is bugged currently. Will fix later.
+        if (year == None) or (year < 1994) or (year >= now.year) or (round < 0) or (round > 23):
             url = "https://ergast.com/api/f1/current/qualifying.json"
-        elif (round >= 0) or (round <= 23) or (year >=  1994) or (year <= now):
+        elif (round >= 0 and round <= 23) and (year >=  1994 and year <= now):
             url = f"https://ergast.com/api/f1/{year}/{round}/qualifying.json"
+        elif (year >=  1994 and year <= now) and (round == None):
+            url = f"https://ergast.com/api/f1/{year}/1/qualifying.json"
             
         driver_names, driver_position, driver_times = [], [], []
         
@@ -34,7 +36,7 @@ class qualifying(commands.Cog):
         response = json.loads(qualifying.content)
         all_qualifying_times = (int)(response['MRData']['total'])
         
-        # Handle when there are no qualifying sessions to be found (e.g. 1994, round 4)
+        # Handle when there are no qualifying sessions to be found (e.g. 1994, round 4). Not working well right now.
         if (all_qualifying_times == 0):
                 print("No qualifying session for this round.")
                 # setup(bot)
@@ -53,6 +55,7 @@ class qualifying(commands.Cog):
             constructor_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Constructor'])
             
             try:
+                # Emojis still seem to print out fine in most cases, so set this to 34 for now.
                 if (all_qualifying_times <= 34):
                     driver_names.append(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))) + ' ' + (driver_data['givenName']) + ' ' +  driver_data['familyName'])
                 else: 
