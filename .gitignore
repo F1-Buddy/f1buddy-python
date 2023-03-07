@@ -2,3 +2,5 @@ token.txt
 config.py
 # cache/
 /cache/
+/__pycache__/
+/cogs/__pycache__/
