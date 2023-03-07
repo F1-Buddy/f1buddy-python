@@ -18,10 +18,8 @@ Fixed WDC command to show emojis
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
 - [ ] SCHEDULE: Fix timezones for each race
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
-- [x] WCC: Add emojis to WCC similar to WDC, can use same map (move map into a separate file)
-- [x] WDC: Catch error where no emoji is available for constructor based on given year (Example: Renault 2018 = no emoji currently) (try except) (i implemented this in wcc try it in wdc)
-- [x] WDC: 2017 is a problem year, 25 drivers with emojis > 1024 in length --> exceeds embed field text limit and throws error, come up with a better solution
-- [x] WDC/WCC: Instead of looping over 20, loop over however many drivers are in a given season
+- [ ] QUALI: If user enters year without round, program crashes. 
+- [ ] QUALI: Handle when there are no qualifying sessions to be found (e.g. 1994, round 4)
 
 
 - [ ] General: port everything else (...)

@@ -18,11 +18,11 @@ class constructorStandings(commands.Cog):
     async def on_ready(self):
         print('Constructor Standings cog loaded')  
     @app_commands.command(name='wcc', description='Get constructor standings')
-    @app_commands.describe(year = "WCC name")
+    @app_commands.describe(year = "year")
     
-    async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
+    async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
         await interaction.response.defer()
-        team_names, team_position, team_points = [], [], [] # nice this would also break eventually hypothetically if i left it outside on top lol
+        team_names, team_position, team_points = [], [], []
         url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year >= now.year) else f"https://ergast.com/api/f1/{year}/constructorStandings.json"
         constructorStandings = requests.get(url)
         response = json.loads(constructorStandings.content)
