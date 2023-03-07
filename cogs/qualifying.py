@@ -7,7 +7,7 @@ import typing
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
-from emojiid import team_emoji_ids
+from lib.emojiid import team_emoji_ids
 now = pd.Timestamp.now()
 
 class qualifying(commands.Cog):
@@ -25,9 +25,9 @@ class qualifying(commands.Cog):
         # If user enters year without round, program crashes. Is bugged currently. Will fix later.
         if (year == None) or (year < 1994) or (year >= now.year) or (round < 0) or (round > 23):
             url = "https://ergast.com/api/f1/current/qualifying.json"
-        elif (round >= 0 and round <= 23) and (year >=  1994 and year <= now):
+        elif (round >= 0 and round <= 23) and (year >=  1994 and year <= now.year):
             url = f"https://ergast.com/api/f1/{year}/{round}/qualifying.json"
-        elif (year >=  1994 and year <= now) and (round == None):
+        elif (year >=  1994 and year <= now.year) and (round == None):
             url = f"https://ergast.com/api/f1/{year}/1/qualifying.json"
             
         driver_names, driver_position, driver_times = [], [], []
