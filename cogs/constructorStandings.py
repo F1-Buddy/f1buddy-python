@@ -7,7 +7,7 @@ import typing
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
-from emojiid import team_emoji_ids
+from lib.emojiid import team_emoji_ids
 now = pd.Timestamp.now()
 
 

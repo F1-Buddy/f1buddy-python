@@ -4,3 +4,4 @@ config.py
 /cache/
 /__pycache__/
 /cogs/__pycache__/
+/lib/__pycache__/

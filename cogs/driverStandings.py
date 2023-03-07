@@ -7,35 +7,8 @@ import typing
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
-from emojiid import team_emoji_ids
+from lib.emojiid import team_emoji_ids
 now = pd.Timestamp.now()
-
-# team_emojis = {
-#     "Red Bull":"<:rb:1081767515790770247>",
-#     "Mercedes":"<:merc:1081767514620571749>",
-#     "Ferrari":"<:sf:1081767510019411978>",
-#     "McLaren":"<:mcl:1081767512733126736>",
-#     "Alpine F1 Team":"<:alp:1081767507209224192>",
-#     "Aston Martin":"<:ast:1081767508287176734>",
-#     "Alfa Romeo":"<:ar:1081767504617148417>",
-#     "AlphaTauri":"<:at:1081767505539903508>",
-#     "Williams":"<:w_:1081767613283176579>",
-#     "Haas F1 Team":"<:haas:1081767511424520313>"
-# }
-# team_emojis_2 = {
-#     "Red Bull":"rb",
-#     "Mercedes":"merc",
-#     "Ferrari":"sf",
-#     "McLaren":"mcl",
-#     "Alpine F1 Team":"alp",
-#     "Aston Martin":"ast",
-#     "Alfa Romeo":"ar",
-#     "AlphaTauri":"at",
-#     "Williams":"w_",
-#     "Haas F1 Team":"haas"
-# }
-
-
 
 class driverStandings(commands.Cog):
     def __init__(self, bot: commands.Bot):
