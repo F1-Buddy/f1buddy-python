@@ -18,8 +18,8 @@ Fixed WDC command to show emojis
 - [ ] SCHEDULE: Rewrite the schedule command timezone conversion
 - [ ] SCHEDULE: Fix timezones for each race
 - [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
-- [ ] QUALI: If user enters year without round, program crashes. 
-- [ ] QUALI: Handle when there are no qualifying sessions to be found (e.g. 1994, round 4)
+- [x] QUALI: If user enters year without round, program crashes. 
+- [x] QUALI: Handle when there are no qualifying sessions to be found (e.g. 1994, round 4)
 
 
 - [ ] General: port everything else (...)

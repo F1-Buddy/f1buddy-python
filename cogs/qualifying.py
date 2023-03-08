@@ -10,6 +10,7 @@ from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 now = pd.Timestamp.now()
 
+# check if given year and round number are valid
 def checkYear(year,round):
     if not(year == None) and not(1994 <= year and year <= now.year):
         return "bad year"
@@ -18,19 +19,19 @@ def checkYear(year,round):
     else:
         if (year == None and round == None):
             url =  "https://ergast.com/api/f1/current/qualifying.json"
-            print(url)
+            # print(url)
             return url
         elif (year == None):
             url = f"https://ergast.com/api/f1/{now.year}/{round}/qualifying.json"
-            print(url)
+            # print(url)
             return url
         elif (round == None):
             url =  f"https://ergast.com/api/f1/{year}/{1}/qualifying.json"
-            print(url)
+            # print(url)
             return url
         else: 
             url =  f"https://ergast.com/api/f1/{year}/{round}/qualifying.json"
-            print(url)
+            # print(url)
             return url
 
 class qualifying(commands.Cog):
@@ -66,44 +67,44 @@ class qualifying(commands.Cog):
             
             # Handle when there are no qualifying sessions to be found (e.g. 1994, round 4). Not working well right now.
             if (all_qualifying_times == 0):
-                    print("No qualifying session for this round.")
+                    # print("No qualifying session for this round.")
                     # setup(bot)
-                    message_embed = discord.Embed(title=f"No available times for this round.", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-                    
+                    description_string=f"No available times for this round."
                     # exit()
                     
-            year = (response['MRData']['RaceTable']['Races'][0]['season']) 
-            raceName = (response['MRData']['RaceTable']['Races'][0]['raceName'])  
-            message_embed.title = f"{year} {raceName} Qualifying Results"
-            
-            for i in range(0, all_qualifying_times):
+            else:
+                year = (response['MRData']['RaceTable']['Races'][0]['season']) 
+                raceName = (response['MRData']['RaceTable']['Races'][0]['raceName'])  
+                message_embed.title = f"{year} {raceName} Qualifying Results"
                 
-                qualifying_results = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i])
-                driver_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Driver'])
-                constructor_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Constructor'])
-                
-                try:
-                    # Emojis still seem to print out fine in most cases, so set this to 34 for now.
-                    if (all_qualifying_times <= 34):
-                        driver_names.append(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))) + ' ' + (driver_data['givenName']) + ' ' +  driver_data['familyName'])
-                    else: 
-                        driver_names.append((driver_data['givenName']) + ' ' +  driver_data['familyName'])
-                except:
-                    driver_names.append((driver_data['givenName']) + ' ' + driver_data['familyName'])
+                for i in range(0, all_qualifying_times):
                     
-                driver_position.append(qualifying_results['position'])
-                if 'Q3' in qualifying_results:
-                    driver_times.append("Q3: " + qualifying_results['Q3'])
-                elif 'Q2' in qualifying_results:
-                    driver_times.append("Q2: " + qualifying_results['Q2'])
-                elif 'Q1' in qualifying_results:
-                    driver_times.append("Q1: " + qualifying_results['Q1'])     
-                else: 
-                    driver_times.append("No time set.")
-                
-            message_embed.add_field(name="Position", value='\n'.join(driver_position),inline=True)
-            message_embed.add_field(name="Driver", value='\n'.join(driver_names),inline=True)
-            message_embed.add_field(name="Times", value='\n'.join(driver_times),inline=True)
+                    qualifying_results = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i])
+                    driver_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Driver'])
+                    constructor_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Constructor'])
+                    
+                    try:
+                        # Emojis still seem to print out fine in most cases, so set this to 34 for now.
+                        if (all_qualifying_times <= 34):
+                            driver_names.append(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))) + ' ' + (driver_data['givenName']) + ' ' +  driver_data['familyName'])
+                        else: 
+                            driver_names.append((driver_data['givenName']) + ' ' +  driver_data['familyName'])
+                    except:
+                        driver_names.append((driver_data['givenName']) + ' ' + driver_data['familyName'])
+                        
+                    driver_position.append(qualifying_results['position'])
+                    if 'Q3' in qualifying_results:
+                        driver_times.append("Q3: " + qualifying_results['Q3'])
+                    elif 'Q2' in qualifying_results:
+                        driver_times.append("Q2: " + qualifying_results['Q2'])
+                    elif 'Q1' in qualifying_results:
+                        driver_times.append("Q1: " + qualifying_results['Q1'])     
+                    else: 
+                        driver_times.append("No time set.")
+                    
+                message_embed.add_field(name="Position", value='\n'.join(driver_position),inline=True)
+                message_embed.add_field(name="Driver", value='\n'.join(driver_names),inline=True)
+                message_embed.add_field(name="Times", value='\n'.join(driver_times),inline=True)
         # send final embed
         message_embed.description = description_string
         await interaction.followup.send(embed=message_embed)
