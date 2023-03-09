@@ -66,6 +66,9 @@ class Laptimes(commands.Cog):
     # @app_commands.choices(driver2=driver_list)
     # @app_commands.option
     async def laptimes(self, interaction: discord.Interaction, driver1: str, driver2: str, round:int, year: typing.Optional[int]):
+        # make sure inputs uppercase
+        driver1 = driver1.upper()
+        driver2 = driver2.upper()
         # defer reply for later
         await interaction.response.defer()
         # get current time
@@ -80,9 +83,9 @@ class Laptimes(commands.Cog):
 
         race_year = 0
         
+        # get teamcolors json
         with open('lib/teamcolors.json') as f:
             colorsjson = json.load(f)
-        # colorsjson = json.load(open("lib/teamcolors.json"))
         try:
             # year given is invalid
             if (year == None or year > now.year or year < 2018):
@@ -100,16 +103,15 @@ class Laptimes(commands.Cog):
                 race_year = year
                 # print(team_colors)
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-            # check if graph already exists, if not create it
+            # get colors using year
             team_colors = colorsjson[(str)(race_year)]
-            if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')) and (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png')):
+            # check if graph already exists, if not create it
+            if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')) and (
+                not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png')):
                 race.load()
-                driver1 = driver1.upper()
-                driver2 = driver2.upper()
                 d1 = race.laps.pick_driver(driver1)
                 d2 = race.laps.pick_driver(driver2)
                 fig, ax = plt.subplots()
-                # print(driver1+" color = "+team_colors[driver1])
                 ax.plot(d1['LapNumber'], d1['LapTime'], color=team_colors[driver1])
                 ax.plot(d2['LapNumber'], d2['LapTime'], color=team_colors[driver2])
                 ax.set_title(racename+ ' '+driver1+" vs "+driver2)
