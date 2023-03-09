@@ -132,7 +132,7 @@ class Laptimes(commands.Cog):
                     message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
         # 
         except:
-            message_embed.set_footer(text = "Bad input given!")
+            message_embed.set_footer(text = "Bad input given! (2018+)")
 
 
         # send embed
