@@ -19,19 +19,15 @@ def checkYear(year,round):
     else:
         if (year == None and round == None):
             url =  "https://ergast.com/api/f1/current/qualifying.json"
-            # print(url)
             return url
         elif (year == None):
             url = f"https://ergast.com/api/f1/{now.year}/{round}/qualifying.json"
-            # print(url)
             return url
         elif (round == None):
             url =  f"https://ergast.com/api/f1/{year}/{1}/qualifying.json"
-            # print(url)
             return url
         else: 
             url =  f"https://ergast.com/api/f1/{year}/{round}/qualifying.json"
-            # print(url)
             return url
 
 class qualifying(commands.Cog):
@@ -47,13 +43,6 @@ class qualifying(commands.Cog):
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Qualifying Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
-        # If user enters year without round, program crashes. Is bugged currently. Will fix later.
-        # if (year == None) or (year < 1994) or (year >= now.year) or (round < 0) or (round > 23):
-        #     url = "https://ergast.com/api/f1/current/qualifying.json"
-        # elif (round >= 0 and round <= 23) and (year >=  1994 and year <= now.year):
-        #     url = f"https://ergast.com/api/f1/{year}/{round}/qualifying.json"
-        # elif (year >=  1994 and year <= now.year) and (round == None):
-        #     url = f"https://ergast.com/api/f1/{year}/1/qualifying.json"
         url = checkYear(year,round)
         description_string = ''
         if ('bad' in url):
@@ -65,20 +54,14 @@ class qualifying(commands.Cog):
             response = json.loads(qualifying.content)
             all_qualifying_times = (int)(response['MRData']['total'])
             
-            # Handle when there are no qualifying sessions to be found (e.g. 1994, round 4). Not working well right now.
             if (all_qualifying_times == 0):
-                    # print("No qualifying session for this round.")
-                    # setup(bot)
                     description_string=f"No available times for this round."
-                    # exit()
-                    
             else:
                 year = (response['MRData']['RaceTable']['Races'][0]['season']) 
                 raceName = (response['MRData']['RaceTable']['Races'][0]['raceName'])  
                 message_embed.title = f"{year} {raceName} Qualifying Results"
                 
                 for i in range(0, all_qualifying_times):
-                    
                     qualifying_results = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i])
                     driver_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Driver'])
                     constructor_data = (response['MRData']['RaceTable']['Races'][0]['QualifyingResults'][i]['Constructor'])
