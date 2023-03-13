@@ -8,7 +8,13 @@ import pandas as pd
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
+from pytube import Search
 now = pd.Timestamp.now()
+
+
+
+
+
 
 # check if given year and round number are valid
 def checkYear(year,round):
@@ -57,6 +63,7 @@ class results(commands.Cog):
                 if (year == None) or (1950 >= year and year >= now.year):
                     url = f"https://ergast.com/api/f1/current/results.json"
                     results = requests.get(url)
+                    round = 1
                     response = json.loads(results.content)
                 else:
                     url =  f"https://ergast.com/api/f1/{year}/{1}/results.json"
@@ -67,10 +74,20 @@ class results(commands.Cog):
             if (amount_of_drivers == 0):
                     description_string = f"No available times for this round."     
             else:
-                year = (response['MRData']['RaceTable']['Races'][0]['season']) 
+                year = int(response['MRData']['RaceTable']['Races'][0]['season']) 
                 raceName = (response['MRData']['RaceTable']['Races'][0]['raceName'])  
                 message_embed.title = f"{year} {raceName} Race Results"
-                
+                round_num =  int(response['MRData']['RaceTable']['Races'][0]['round']) 
+
+                # get youtube video
+                race = fastf1.get_event(year, round_num).iloc[5]
+                s = Search((str)(year) + " " + race + " Highlights")
+                v_url = 'https://www.youtube.com/watch?v='
+                t = (str)(s.results[0])
+                v_url += (t[t.index('videoId=')+8:-1])
+                # print(v_url)
+                description_string = (v_url)
+
                 for i in range(0, amount_of_drivers):
                     race_results = (response['MRData']['RaceTable']['Races'][0]['Results'][i])
                     driver_data = (response['MRData']['RaceTable']['Races'][0]['Results'][i]['Driver'])
