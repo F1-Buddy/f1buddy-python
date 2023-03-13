@@ -2,7 +2,7 @@ import discord
 # import mediawiki
 import requests
 import json
-import fastf1
+# import fastf1
 import typing
 import pandas as pd
 from discord import app_commands
