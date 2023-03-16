@@ -10,6 +10,7 @@ from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from lib.emojiid import nation_dictionary
+from lib.championship import constructor_championship
 import country_converter as coco
 now = pd.Timestamp.now()
 
@@ -57,7 +58,7 @@ class constructor(commands.Cog):
         if ('bad' in url):
             description_string = "Please try again with a different " + url[url.index('bad')+3:]
         else:
-            constructor_name, constructor_nationality, constructor_wikipedia = [], [], []
+            constructor_name, constructor_nationality, constructor_wikipedia, constructor_championships = [], [], [], []
             
             try:
                 constructor = requests.get(url)
@@ -91,19 +92,24 @@ class constructor(commands.Cog):
                         constructor_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
                     except:
                         constructor_name.append((constructor_data['name']))
+                        
+                    if constructor_data['name'] in constructor_championship:
+                        constructor_championships.append(constructor_championship[constructor_data['name']])
+                    else:
+                        constructor_championships.append("0")
                     emoji = ":flag_" + \
                         (coco.convert(
                         names=nationality_dict[constructor_data['nationality']], to='ISO2')).lower()+":"
                     constructor_nationality.append(emoji + " " + constructor_data['nationality'])
                     constructor_wikipedia.append(constructor_data['url'])
-                        
-                message_embed.add_field(name = "Name", value = '\n'.join(constructor_name),inline = True)
-                message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
                 
                 string = ""
                 for j in range(amount_of_teams):
-                    string += "[" + constructor_name[j] + "](" + constructor_wikipedia[j] + ")" + "\n"
-                message_embed.add_field(name="Wikipedia", value=string, inline=True)
+                    string += "[" + constructor_name[j] + "](" + constructor_wikipedia[j] + ")" + "\n"         
+                
+                message_embed.add_field(name="Team", value=string, inline=True)
+                message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
+                message_embed.add_field(name = "Championships", value = '\n'.join(constructor_championships),inline = True)
                 nation_dictionary()
 
                 
