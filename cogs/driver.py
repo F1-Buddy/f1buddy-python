@@ -31,7 +31,7 @@ class Driver(commands.Cog):
         print('Driver cog loaded')
 
     @app_commands.command(name='driver', description='Get driver info')
-    @app_commands.describe(driver = "Driver name")
+    @app_commands.describe(driver = "Driver full name")
     # @app_commands.describe(driver="Driver")
     # @app_commands.choices(driver = driver_list)
     async def driver(self, interaction: discord.Interaction, driver:str):
@@ -73,6 +73,7 @@ class Driver(commands.Cog):
             if len((y := stat_json['expandtemplates']['wikitext'])) > 0:
                 description_string += x+": **"+ y + "**\n"
             else:
+                print(driver_article.html)
                 break
         
 
