@@ -2,14 +2,15 @@ import discord
 # import mediawiki
 import requests
 import json
-import fastf1
+# import fastf1
 import typing
 import pandas as pd
-import csv
+# import csv
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
-from lib.nation import nation_dictionary
+from lib.emojiid import nation_dictionary
+import country_converter as coco
 now = pd.Timestamp.now()
 
 # check if given year and round number are valid
@@ -47,6 +48,12 @@ class constructor(commands.Cog):
         message_embed.colour = discord.Colour.dark_red()
         url = checkYear(year,round)
         description_string = ''
+        nationality_dict = nation_dictionary()
+
+        # with open('lib/nation.csv') as csv_file:
+        #     csv_read = csv.reader(csv_file, delimiter=',')
+
+
         if ('bad' in url):
             description_string = "Please try again with a different " + url[url.index('bad')+3:]
         else:
@@ -84,8 +91,10 @@ class constructor(commands.Cog):
                         constructor_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
                     except:
                         constructor_name.append((constructor_data['name']))
-                        
-                    constructor_nationality.append(constructor_data['nationality'])
+                    emoji = ":flag_" + \
+                        (coco.convert(
+                        names=nationality_dict[constructor_data['nationality']], to='ISO2')).lower()+":"
+                    constructor_nationality.append(emoji + " " + constructor_data['nationality'])
                     constructor_wikipedia.append(constructor_data['url'])
                         
                 message_embed.add_field(name = "Name", value = '\n'.join(constructor_name),inline = True)
