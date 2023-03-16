@@ -5,9 +5,11 @@ import json
 import fastf1
 import typing
 import pandas as pd
+import csv
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
+from lib.nation import nation_dictionary
 now = pd.Timestamp.now()
 
 # check if given year and round number are valid
@@ -69,22 +71,32 @@ class constructor(commands.Cog):
                     description_string = f"No teams for this round."     
             else:
                 year = int(response['MRData']['ConstructorTable']['season'])
-                message_embed.title = f"{year} Round {round} constructor information" 
-                
-                for i in range(0, amount_of_teams):
-                    constructor_data = (response['MRData']['ConstructorTable ']['Constructors'][0])
+                if (round == 0):
+                    round = int(response['MRData']['ConstructorTable']['round'])
+                    message_embed.title = f"{year} Round {round} Constructor Information" 
+                else:
+                    message_embed.title = f"{year} Constructor Information" 
                     
+                for i in range(amount_of_teams):
+                    constructor_data = (response['MRData']['ConstructorTable']['Constructors'][i])
+                        
                     try:
-                        constructor_name.append(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))))
+                        constructor_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
                     except:
                         constructor_name.append((constructor_data['name']))
                         
                     constructor_nationality.append(constructor_data['nationality'])
                     constructor_wikipedia.append(constructor_data['url'])
-                    
+                        
                 message_embed.add_field(name = "Name", value = '\n'.join(constructor_name),inline = True)
                 message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
-                message_embed.add_field(name = "Wikipedia", value = '\n'.join(constructor_wikipedia),inline = True)
+                
+                string = ""
+                for j in range(amount_of_teams):
+                    string += "[" + constructor_name[j] + "](" + constructor_wikipedia[j] + ")" + "\n"
+                message_embed.add_field(name="Wikipedia", value=string, inline=True)
+                nation_dictionary()
+
                 
         # send final embed
         message_embed.description = description_string
