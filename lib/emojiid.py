@@ -1,4 +1,9 @@
+import country_converter as coco
+import csv
+
+
 # currently supports ~2010-2023
+# team emojis
 team_emoji_ids = {
     "Red Bull":1081767515790770247,
     "Mercedes":1081767514620571749,
@@ -21,3 +26,22 @@ team_emoji_ids = {
     "Manor Marussia":1081822299671498792,
     "Marussia":1081822299671498792
 }
+
+def get_emoji(country_name):
+    emoji = ":flag_" + \
+                (coco.convert(
+                    names=country_name, to='ISO2')).lower()+":"
+    return emoji
+
+def nation_dictionary():
+    csv_filename = "lib/nation.csv"
+    with open(csv_filename, encoding='utf-8') as csvreader:
+        reader = csv.reader(csvreader)
+        next(reader)
+        nation_dict = {}
+        for row in reader:
+            if row[0] in nation_dict:
+                nation_dict[row[0]].append(row[1])
+            else:
+                nation_dict[row[0]] = [row[1]]
+    return nation_dict
