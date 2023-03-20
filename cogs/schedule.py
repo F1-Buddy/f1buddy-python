@@ -77,7 +77,17 @@ class Schedule(commands.Cog):
             # if (fp1 < now < race) --> scenario where today is before the next race but after this weekend's fp1
             # or
             # if (fp1 > now > last race) --> scenario where today is after the last race but before upcoming race weekend's fp1
-            if ((schedule.loc[i, "Session1Date"] < now) and (schedule.loc[i, "Session5Date"] > now)) or ((schedule.loc[i, "Session1Date"] > now)) or ((schedule.loc[i, "Session1Date"] > now) and (schedule.loc[i-1, "Session5Date"] < now)):
+            location_1 = schedule.loc[i, "Location"]
+            local_tz_1 =  timezones.timezones_list[location_1]
+            fp1_session = schedule.loc[i, "Session1Date"].tz_localize(local_tz_1).tz_convert('America/New_York')
+            race_session = schedule.loc[i, "Session5Date"].tz_localize(local_tz_1).tz_convert('America/New_York')
+            try:
+                location_2 = schedule.loc[i-1, "Location"]
+                local_tz_2 =  timezones.timezones_list[location_2]
+                last_race_session = schedule.loc[i-1, "Session5Date"].tz_localize(local_tz_2).tz_convert('America/New_York')
+            except:
+                continue
+            if ((fp1_session < now.tz_localize('America/New_York')) and (race_session > now.tz_localize('America/New_York'))) or ((fp1_session > now.tz_localize('America/New_York'))) or ((fp1_session > now.tz_localize('America/New_York')) and (last_race_session < now.tz_localize('America/New_York'))):
                 next_event -= 1
                 # print statements for testing
                 # temp_race_name = schedule.loc[i,"EventName"]

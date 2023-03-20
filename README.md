@@ -11,9 +11,9 @@ Fixed WDC command to show emojis
 ## To-do
 - [ ] DRIVER: fix wikipedia api, currently using pymediawiki
 - [ ] LAPTIME: create team_colors.py file for teamcolors for different years
-- [ ] SCHEDULE: FIX LINE 80, uses local timezones which are ahead of EST, doesn't update properly (ex: Saudi GP over, but saudi local time > est time --> still shows saudi as next)
+- [x] SCHEDULE: FIX LINE 80, uses local timezones which are ahead of EST, doesn't update properly (ex: Saudi GP over, but saudi local time > est time --> still shows saudi as next)
 - [x] SCHEDULE: Display time as 12 hour, possible timer to event? maybe another command (x days, y hours... until event)
-- [ ] SCHEDULE: Fix timezones for each race
+- [x] SCHEDULE: Fix timezones for each race
 - [ ] General: port everything else (...)
 ## Issues
 
