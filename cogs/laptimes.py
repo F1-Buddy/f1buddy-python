@@ -112,6 +112,7 @@ class Laptimes(commands.Cog):
                 d1 = race.laps.pick_driver(driver1)
                 d2 = race.laps.pick_driver(driver2)
                 fig, ax = plt.subplots()
+                ax.set_facecolor('gainsboro')
                 ax.plot(d1['LapNumber'], d1['LapTime'], color=team_colors[driver1])
                 ax.plot(d2['LapNumber'], d2['LapTime'], color=team_colors[driver2])
                 ax.set_title(racename+ ' '+driver1+" vs "+driver2)
@@ -131,7 +132,8 @@ class Laptimes(commands.Cog):
                 except:
                     message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
         # 
-        except:
+        except Exception as e:
+            print(e)
             message_embed.set_footer(text = "Bad input given! (2018+)")
 
 
