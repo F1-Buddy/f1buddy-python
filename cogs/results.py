@@ -50,12 +50,12 @@ class results(commands.Cog):
         message_embed = discord.Embed(title=f"Race Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
         url = checkYear(year,round)
+        # print(url)
         description_string = ''
         if ('bad' in url):
             description_string = "Please try again with a different " + url[url.index('bad')+3:]
         else:
             driver_points, driver_position, driver_names = [], [], []
-            
             try:
                 results = requests.get(url)
                 response = json.loads(results.content)
@@ -69,18 +69,20 @@ class results(commands.Cog):
                     url =  f"https://ergast.com/api/f1/{year}/{1}/results.json"
                     results = requests.get(url)
                     response = json.loads(results.content)
-                
-            amount_of_drivers = int(response['MRData']['total'])
+            # print(url)
+            round_num =  len(response['MRData']['RaceTable']['Races'])-1
+            amount_of_drivers = len(response['MRData']['RaceTable']['Races'][round_num]['Results'])
             if (amount_of_drivers == 0):
                     description_string = f"No available times for this round."     
             else:
-                year = int(response['MRData']['RaceTable']['Races'][0]['season']) 
-                raceName = (response['MRData']['RaceTable']['Races'][0]['raceName'])  
+                year = int(response['MRData']['RaceTable']['Races'][round_num]['season']) 
+                raceName = (response['MRData']['RaceTable']['Races'][round_num]['raceName'])  
                 message_embed.title = f"{year} {raceName} Race Results"
-                round_num =  int(response['MRData']['RaceTable']['Races'][0]['round']) 
+                
+
 
                 # get youtube video
-                race = fastf1.get_event(year, round_num).iloc[5]
+                race = fastf1.get_event(year, round_num+1).iloc[5]
                 s = Search((str)(year) + " " + race + " Highlights")
                 video_url = 'https://www.youtube.com/watch?v='
                 t = (str)(s.results[0])
@@ -88,16 +90,19 @@ class results(commands.Cog):
                 # print(video_url)
                 description_string = (video_url)
 
-                for i in range(0, amount_of_drivers):
-                    race_results = (response['MRData']['RaceTable']['Races'][0]['Results'][i])
-                    driver_data = (response['MRData']['RaceTable']['Races'][0]['Results'][i]['Driver'])
-                    constructor_data = (response['MRData']['RaceTable']['Races'][0]['Results'][i]['Constructor'])
+                for i in range(0, len(response['MRData']['RaceTable']['Races'][round_num]['Results'])):
+                    race_results = (response['MRData']['RaceTable']['Races'][round_num]['Results'][i])
+                    driver_data = (response['MRData']['RaceTable']['Races'][round_num]['Results'][i]['Driver'])
+                    constructor_data = (response['MRData']['RaceTable']['Races'][round_num]['Results'][i]['Constructor'])
                     
                     try:
+                        # print(amount_of_drivers)
                         if (amount_of_drivers <= 34):
                             driver_names.append(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))) + ' ' + (driver_data['givenName']) + ' ' +  driver_data['familyName'])
+                            # print("got emoji")
                         else: 
                             driver_names.append((driver_data['givenName']) + ' ' +  driver_data['familyName'])
+                            # print("didnt get emoji")
                     except:
                         driver_names.append((driver_data['givenName']) + ' ' + driver_data['familyName'])
                         
