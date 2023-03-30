@@ -70,7 +70,8 @@ class Driver(commands.Cog):
             # print(stat_url)
             stat_json = json.loads(requests.get(stat_url).content)
             if len((y := stat_json['expandtemplates']['wikitext'])) > 0:
-                description_string += x+": **"+ y + "**\n"
+                description_string += f"{x}: **{y}**\n"
+                # description_string += x+": **"+ y + "**\n"
             else:
                 print(driver_article.html)
                 break
