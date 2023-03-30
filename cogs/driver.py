@@ -9,6 +9,7 @@ from discord import app_commands
 from discord.ext import commands
 from lib.drivernames import driver_names
 import country_converter as coco
+from pyquery import PyQuery as pq
 # from geopy.geocoders import Nominatim
 # from timezonefinder import TimezoneFinder
 # import country_converter as coco
@@ -55,6 +56,25 @@ class Driver(commands.Cog):
         article_json = requests.get(article_url)
         response = json.loads(article_json.content)
         driver_image_url = (response['query']['pages'][driver_article.pageid]['original']['source'])
+        
+        ## TEST
+        driver_table = pq(url='https://en.wikipedia.org/wiki/List_of_Formula_One_drivers')('table.wikitable.sortable')
+        # Extract the column names from the first row of the <thead> section
+        column_names = [pq(cell).text() for cell in pq(driver_table)('thead tr th')]
+
+        # Extract the data from each row of the <tbody> section
+        rows = []
+        for row in pq(driver_table)('tbody tr'):
+            # Extract the data for each column in the row
+            columns = [pq(cell).text() for cell in pq(row)('td')]
+            rows.append(columns)
+
+        # Print the column names and data for each row
+        print(column_names)
+        for row in rows:
+            print(row)
+            
+        ## TEST
 
         # get other driver info like stats
         driver_full_name = driver_article.title

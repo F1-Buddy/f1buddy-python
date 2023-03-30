@@ -105,7 +105,7 @@ class constructor(commands.Cog):
                 
                 string = ""
                 for j in range(amount_of_teams):
-                    string += "[" + constructor_name[j] + "](" + constructor_wikipedia[j] + ")" + "\n"         
+                    string += f"[{constructor_name[j]}]({constructor_wikipedia[j]})\n"
                 
                 message_embed.add_field(name="Team", value=string, inline=True)
                 message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
