@@ -57,8 +57,10 @@ class Driver(commands.Cog):
         response = json.loads(article_json.content)
         driver_image_url = (response['query']['pages'][driver_article.pageid]['original']['source'])
         
-        ## TEST
+        '''
+        -------------------------- PyQuery Print Test --------------------------
         driver_table = pq(url='https://en.wikipedia.org/wiki/List_of_Formula_One_drivers')('table.wikitable.sortable')
+        
         # Extract the column names from the first row of the <thead> section
         column_names = [pq(cell).text() for cell in pq(driver_table)('thead tr th')]
 
@@ -73,8 +75,8 @@ class Driver(commands.Cog):
         print(column_names)
         for row in rows:
             print(row)
-            
-        ## TEST
+        -------------------------- PyQuery Print Test --------------------------
+        '''
 
         # get other driver info like stats
         driver_full_name = driver_article.title
