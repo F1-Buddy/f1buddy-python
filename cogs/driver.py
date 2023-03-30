@@ -51,14 +51,14 @@ class Driver(commands.Cog):
         # emoji = ":flag_" + (coco.convert(names='', to='ISO2')).lower()+":"
 
         # get driver image
-        article_url = "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=" + (str)(driver_article.title)
+        article_url = f"https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles={(str)(driver_article.title)}"
         article_json = requests.get(article_url)
         response = json.loads(article_json.content)
         driver_image_url = (response['query']['pages'][driver_article.pageid]['original']['source'])
 
         # get other driver info like stats
         driver_full_name = driver_article.title
-        driver_info = json.loads(requests.get("https://ergast.com/api/f1/drivers/"+(str)(driver_full_name[driver_full_name.index(' ')+1:])+".json").content)
+        driver_info = json.loads(requests.get(f"https://ergast.com/api/f1/drivers/{(str)(driver_full_name[driver_full_name.index(' ')+1:])}.json").content)
         try:
             driver_code = driver_names[driver_full_name]
         except:
@@ -66,8 +66,7 @@ class Driver(commands.Cog):
 
         # get F1Stats (wins,points,starts, etc.)
         for x in stat_map:
-            stat_url = ("https://en.wikipedia.org/w/api.php?action=expandtemplates&format=json&text={{F1stat|"
-            +driver_code+"|"+ stat_map[x] +"}}&prop=wikitext")
+            stat_url = f"https://en.wikipedia.org/w/api.php?action=expandtemplates&format=json&text={{{{F1stat|{driver_code}|{stat_map[x]}}}}}&prop=wikitext"
             # print(stat_url)
             stat_json = json.loads(requests.get(stat_url).content)
             if len((y := stat_json['expandtemplates']['wikitext'])) > 0:
@@ -75,18 +74,13 @@ class Driver(commands.Cog):
             else:
                 print(driver_article.html)
                 break
-        
-
 
         message_embed.set_image(url=driver_image_url)
         message_embed.title = driver_full_name
         message_embed.description = description_string
-        
-
 
         # send final embed
         await interaction.followup.send(embed=message_embed)
-
 
 async def setup(bot):
     await bot.add_cog(Driver(bot)
