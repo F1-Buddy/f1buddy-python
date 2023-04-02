@@ -57,12 +57,14 @@ class Driver(commands.Cog):
         response = json.loads(article_json.content)
         driver_image_url = (response['query']['pages'][driver_article.pageid]['original']['source'])
         
-        '''
-        -------------------------- PyQuery Print Test --------------------------
         driver_table = pq(url='https://en.wikipedia.org/wiki/List_of_Formula_One_drivers')('table.wikitable.sortable')
-        
+
         # Extract the column names from the first row of the <thead> section
-        column_names = [pq(cell).text() for cell in pq(driver_table)('thead tr th')]
+        # heading_names = []
+        # thead_row = pq(driver_table)('thead tr')
+        # headings = [pq(cell).text() for cell in pq(thead_row)('th')]
+        # heading_names.append(headings)
+
 
         # Extract the data from each row of the <tbody> section
         rows = []
@@ -71,12 +73,36 @@ class Driver(commands.Cog):
             columns = [pq(cell).text() for cell in pq(row)('td')]
             rows.append(columns)
 
-        # Print the column names and data for each row
-        print(column_names)
-        for row in rows:
-            print(row)
-        -------------------------- PyQuery Print Test --------------------------
-        '''
+        # Print the column headings and data rows
+        # for heading in heading_names:
+        #     print(heading)
+        # for row in rows:
+        #     print(row)
+
+        driver_row = None
+        for row in rows[1:]:
+            driver_name, driver_nationality, driver_years_active, wins, podiums, poles, fastest_laps, points, entries, championships, constructors_championships = row
+            # print(rows[1])
+            print("Driver name:", driver_name)
+            print("Driver nationality:", driver_nationality)
+            print("Years active:", driver_years_active)
+            print("Wins:", wins)
+            print("Podiums:", podiums)
+            print("Poles:", poles)
+            print("Fastest laps:", fastest_laps)
+            print("Points:", points)
+            print("Entries:", entries)
+            print("Championships:", championships)
+            print("Constructors championships:", constructors_championships)
+            # if row[0] == driver:
+            #     driver_row = row
+            #     break
+
+        if driver_row is not None:
+            # extract stats from the row
+            stats = dict(zip(stat_map.values(), driver_row[2:]))
+            description_string = '\n'.join([f"{k.capitalize()}: **{v}**" for k, v in stats.items()])
+
 
         # get other driver info like stats
         driver_full_name = driver_article.title
