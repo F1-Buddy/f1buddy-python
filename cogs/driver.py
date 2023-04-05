@@ -191,6 +191,7 @@ class Driver(commands.Cog):
         if index == -1:
             message_embed.title = "Driver not found"
         else:
+            # wiki image
             if wiki_image != 0:
                 message_embed.set_image(url=wiki_image)
 
