@@ -5,6 +5,7 @@ import requests
 import json
 # import fastf1
 # import pandas as pd
+from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands
 from lib.drivernames import driver_names
@@ -67,41 +68,75 @@ class Driver(commands.Cog):
 
 
         # Extract the data from each row of the <tbody> section
-        rows = []
-        for row in pq(driver_table)('tbody tr'):
-            # Extract the data for each column in the row
-            columns = [pq(cell).text() for cell in pq(row)('td')]
-            rows.append(columns)
+        # rows = []
+        # for row in pq(driver_table)('tbody tr'):
+        #     # Extract the data for each column in the row
+        #     columns = [pq(cell).text() for cell in pq(row)('td')]
+        #     rows.append(columns)
+        
+        url = 'https://en.wikipedia.org/wiki/List_of_Formula_One_drivers'
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
 
+        table = soup.find('table', {'class': 'wikitable sortable'})
+
+        driver_data = []
+        for row in table.find_all('tr')[1:]:
+            columns = row.find_all('td')
+            if columns:
+                driver = {
+                    'name': columns[0].text.strip(),
+                    'nationality': columns[1].text.strip(),
+                    'seasons_completed': columns[2].text.strip(),
+                    'championships': int(columns[3].text.strip()),
+                    'entries': columns[4].text.strip(),
+                    'starts': int(columns[5].text.strip()),
+                    'poles': int(columns[6].text.strip()),
+                    'wins': int(columns[7].text.strip()),
+                    'podiums': int(columns[8].text.strip()),
+                    'fastest_laps': int(columns[9].text.strip()),
+                    'points': columns[10].text.strip()
+                }
+                driver_data.append(driver)
+                
+        print(driver_data)
+        
+        def parse_championships(value):
+            if '-' in value:
+                start, end = value.split('-')
+                return int(end)
+            else:
+                return int(value)
+                
         # Print the column headings and data rows
         # for heading in heading_names:
         #     print(heading)
         # for row in rows:
         #     print(row)
 
-        driver_row = None
-        for row in rows[1:]:
-            driver_name, driver_nationality, driver_years_active, wins, podiums, poles, fastest_laps, points, entries, championships, constructors_championships = row
-            # print(rows[1])
-            print("Driver name:", driver_name)
-            print("Driver nationality:", driver_nationality)
-            print("Years active:", driver_years_active)
-            print("Wins:", wins)
-            print("Podiums:", podiums)
-            print("Poles:", poles)
-            print("Fastest laps:", fastest_laps)
-            print("Points:", points)
-            print("Entries:", entries)
-            print("Championships:", championships)
-            print("Constructors championships:", constructors_championships)
+        # driver_row = None
+        # for row in rows[1:]:
+        #     driver_name, driver_nationality, driver_years_active, wins, podiums, poles, fastest_laps, points, entries, championships, constructors_championships = row
+        #     # print(rows[1])
+        #     print("Driver name:", driver_name)
+        #     print("Driver nationality:", driver_nationality)
+        #     print("Years active:", driver_years_active)
+        #     print("Wins:", wins)
+        #     print("Podiums:", podiums)
+        #     print("Poles:", poles)
+        #     print("Fastest laps:", fastest_laps)
+        #     print("Points:", points)
+        #     print("Entries:", entries)
+        #     print("Championships:", championships)
+        #     print("Constructors championships:", constructors_championships)
             # if row[0] == driver:
             #     driver_row = row
             #     break
 
-        if driver_row is not None:
-            # extract stats from the row
-            stats = dict(zip(stat_map.values(), driver_row[2:]))
-            description_string = '\n'.join([f"{k.capitalize()}: **{v}**" for k, v in stats.items()])
+        # if driver_row is not None:
+        #     # extract stats from the row
+        #     stats = dict(zip(stat_map.values(), driver_row[2:]))
+        #     description_string = '\n'.join([f"{k.capitalize()}: **{v}**" for k, v in stats.items()])
 
 
         # get other driver info like stats
