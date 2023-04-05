@@ -1,3 +1,4 @@
+import re
 import discord
 # import wikipedia as wk
 import mediawiki
@@ -58,7 +59,7 @@ class Driver(commands.Cog):
         response = json.loads(article_json.content)
         driver_image_url = (response['query']['pages'][driver_article.pageid]['original']['source'])
         
-        driver_table = pq(url='https://en.wikipedia.org/wiki/List_of_Formula_One_drivers')('table.wikitable.sortable')
+        # driver_table = pq(url='https://en.wikipedia.org/wiki/List_of_Formula_One_drivers')('table.wikitable.sortable')
 
         # Extract the column names from the first row of the <thead> section
         # heading_names = []
@@ -81,33 +82,37 @@ class Driver(commands.Cog):
         table = soup.find('table', {'class': 'wikitable sortable'})
 
         driver_data = []
+        
+        def parse_driver_name(name):
+            return name.strip().replace("~", "").replace("*", "").replace("^", "")
+
+        def parse_championships(championships):
+            champ_val = championships.split('<')[0].strip()[0]
+            return int(champ_val) if champ_val.isdigit() else 0
+        
+        def parse_brackets(text):
+            return re.sub(r'\[.*?\]', '', text)
+        
         for row in table.find_all('tr')[1:]:
             columns = row.find_all('td')
             if columns:
                 driver = {
-                    'name': columns[0].text.strip(),
+                    'name': parse_driver_name(columns[0].text.strip()),
                     'nationality': columns[1].text.strip(),
                     'seasons_completed': columns[2].text.strip(),
-                    'championships': int(columns[3].text.strip()),
-                    'entries': columns[4].text.strip(),
-                    'starts': int(columns[5].text.strip()),
-                    'poles': int(columns[6].text.strip()),
-                    'wins': int(columns[7].text.strip()),
-                    'podiums': int(columns[8].text.strip()),
-                    'fastest_laps': int(columns[9].text.strip()),
-                    'points': columns[10].text.strip()
+                    'championships': parse_championships(columns[3].text.strip()),
+                    'entries': parse_brackets(columns[4].text.strip()),
+                    'starts': parse_brackets(columns[5].text.strip()),
+                    'poles': parse_brackets(columns[6].text.strip()),
+                    'wins': parse_brackets(columns[7].text.strip()),
+                    'podiums': parse_brackets(columns[8].text.strip()),
+                    'fastest_laps': parse_brackets(columns[9].text.strip()),
+                    'points': parse_brackets(columns[10].text.strip())
                 }
                 driver_data.append(driver)
                 
         print(driver_data)
         
-        def parse_championships(value):
-            if '-' in value:
-                start, end = value.split('-')
-                return int(end)
-            else:
-                return int(value)
-                
         # Print the column headings and data rows
         # for heading in heading_names:
         #     print(heading)
