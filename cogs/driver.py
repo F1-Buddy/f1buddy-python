@@ -1,22 +1,14 @@
 import re
 import discord
-# import wikipedia as wk
-# import mediawiki
 import wikipedia
 import requests
 import json
-# import fastf1
-# import pandas as pd
 from unidecode import unidecode
 from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands
 from lib.drivernames import driver_names
 import country_converter as coco
-# from pyquery import PyQuery as pq
-# from geopy.geocoders import Nominatim
-# from timezonefinder import TimezoneFinder
-# import country_converter as coco
 
 stat_map = {
     'Starts':'starts',
