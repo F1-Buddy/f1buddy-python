@@ -5,3 +5,4 @@ config.py
 /__pycache__/
 /cogs/__pycache__/
 /lib/__pycache__/
+/cogs/plots/

@@ -2,7 +2,7 @@ import discord
 # import mediawiki
 import requests
 import json
-import fastf1
+# import fastf1
 import typing
 import pandas as pd
 from discord import app_commands
@@ -42,7 +42,11 @@ class constructorStandings(commands.Cog):
                 
             team_position.append(constructor_standings['position'])
             team_points.append(constructor_standings['points'])
-            
+        
+        # Sets McLaren's position to EX, due to their disqualification in the 2007 constructor's championship. 
+        if (year == "2007"):
+            team_position[10] = "EX"
+        
         message_embed.add_field(name="Position", value='\n'.join(team_position),inline=True)
         message_embed.add_field(name="Team Name", value='\n'.join(team_names),inline=True)
         message_embed.add_field(name="Points", value='\n'.join(team_points),inline=True)

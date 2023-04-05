@@ -9,19 +9,14 @@ Fixed WDC command to show emojis
 
 
 ## To-do
-- [ ] DRIVER: fix wikipedia api, currently using pymediawiki
-- [x] LAPTIME: rewrite laptime logic, currently uses 7 try/catch to catch errors, bad!
+- [x] DRIVER: fix wikipedia api, currently using pymediawiki
+- [ ] DRIVER: Implement images for driver command, using new method
+- [x] DRIVER: Does not work if name is lowercase
+- [x] DRIVER: Names with special accents can only be accessed if user inputs their special accents (e.g. Kimi Räikkönen)
 - [ ] LAPTIME: create team_colors.py file for teamcolors for different years
+- [x] SCHEDULE: FIX LINE 80, uses local timezones which are ahead of EST, doesn't update properly (ex: Saudi GP over, but saudi local time > est time --> still shows saudi as next)
 - [x] SCHEDULE: Display time as 12 hour, possible timer to event? maybe another command (x days, y hours... until event)
-- [x] SCHEDULE: Use distance to next/last session and display schedule for weekend with lower distance
-    (for example if i use the command on saturday it should provide whole schedule for this weekend, not next week)
-- [ ] SCHEDULE: Rewrite the schedule command timezone conversion
-- [ ] SCHEDULE: Fix timezones for each race
-- [x] SCHEDULE: Fix the next command (fastf1 provides session start times in local time with no timezone information SEE ISSUES)
-- [x] QUALI: If user enters year without round, program crashes. 
-- [x] QUALI: Handle when there are no qualifying sessions to be found (e.g. 1994, round 4)
-
-
+- [x] SCHEDULE: Fix timezones for each race
 - [ ] General: port everything else (...)
 ## Issues
 
