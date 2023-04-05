@@ -2,6 +2,7 @@ import re
 import discord
 # import wikipedia as wk
 import mediawiki
+import wikipedia
 import requests
 import json
 # import fastf1
@@ -38,9 +39,10 @@ class Driver(commands.Cog):
     @app_commands.describe(driver = "Driver full name")
     # @app_commands.describe(driver="Driver")
     # @app_commands.choices(driver = driver_list)
+            
     async def driver(self, interaction: discord.Interaction, driver:str):
         await interaction.response.defer()
-
+        WIKI_REQUEST = 'http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='
         # driver list
 
         # setup embed
@@ -126,11 +128,23 @@ class Driver(commands.Cog):
         #     else:
         #         print(driver_article.html)
         #         break
-
+        
+        def get_wiki_image(search_term):
+            try:
+                result = wikipedia.search(search_term, results = 1)
+                wikipedia.set_lang('en')
+                wkpage = wikipedia.WikipediaPage(title = result[0])
+                title = wkpage.title
+                response  = requests.get(WIKI_REQUEST+title)
+                json_data = json.loads(response.text)
+                img_link = list(json_data['query']['pages'].values())[0]['original']['source']
+                return img_link        
+            except:
+                return 0
+            
         url = 'https://en.wikipedia.org/wiki/List_of_Formula_One_drivers'
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
-
         table = soup.find('table', {'class': 'wikitable sortable'})
         
         def parse_driver_name(name):
@@ -164,6 +178,8 @@ class Driver(commands.Cog):
                 driver_data.append(driver_dict)
                 
         normalized_input = unidecode(driver).casefold()
+        img_url = unidecode(driver).title()
+        wiki_image = get_wiki_image(driver)
 
         # iterate through driver data to find a match
         index = -1
@@ -175,7 +191,9 @@ class Driver(commands.Cog):
         if index == -1:
             message_embed.title = "Driver not found"
         else:
-            message_embed.title = driver_data[index]['name']
+            if wiki_image != 0:
+                message_embed.set_image(url=wiki_image)
+
             message_embed.add_field(name = "Nationality", value = (driver_data[index]['nationality']),inline = True)
             message_embed.add_field(name = "Seasons Completed", value = (driver_data[index]['seasons_completed']),inline = True)
             message_embed.add_field(name = "Championships", value = (driver_data[index]['championships']),inline = True)
@@ -186,7 +204,6 @@ class Driver(commands.Cog):
             message_embed.add_field(name = "Podiums", value = (driver_data[index]['podiums']),inline = True)
             message_embed.add_field(name = "Fastest Laps", value = (driver_data[index]['fastest_laps']),inline = True)
             message_embed.add_field(name = "Points", value = (driver_data[index]['points']),inline = True)
-
             
             
         # message_embed.set_image(url=driver_image_url)
