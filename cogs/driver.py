@@ -1,7 +1,7 @@
 import re
 import discord
 # import wikipedia as wk
-import mediawiki
+# import mediawiki
 import wikipedia
 import requests
 import json
@@ -49,11 +49,11 @@ class Driver(commands.Cog):
         message_embed = discord.Embed(title="temp_driver_title", description="")
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
-        description_string = ''
+        # description_string = ''
         
         # get wikipedia article
-        wk = mediawiki.MediaWiki()
-        driver_article = wk.page(title=driver,auto_suggest=True)
+        # wk = mediawiki.MediaWiki()
+        # driver_article = wk.page(title=driver,auto_suggest=True)
         # emoji = ":flag_" + (coco.convert(names='', to='ISO2')).lower()+":"
 
         # get driver image
