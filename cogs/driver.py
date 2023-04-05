@@ -191,10 +191,9 @@ class Driver(commands.Cog):
         if index == -1:
             message_embed.title = "Driver not found"
         else:
-            # wiki image
             if wiki_image != 0:
                 message_embed.set_image(url=wiki_image)
-
+            message_embed.title = driver_data[index]['name']
             message_embed.add_field(name = "Nationality", value = (driver_data[index]['nationality']),inline = True)
             message_embed.add_field(name = "Seasons Completed", value = (driver_data[index]['seasons_completed']),inline = True)
             message_embed.add_field(name = "Championships", value = (driver_data[index]['championships']),inline = True)
