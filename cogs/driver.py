@@ -13,7 +13,7 @@ from discord import app_commands
 from discord.ext import commands
 from lib.drivernames import driver_names
 import country_converter as coco
-from pyquery import PyQuery as pq
+# from pyquery import PyQuery as pq
 # from geopy.geocoders import Nominatim
 # from timezonefinder import TimezoneFinder
 # import country_converter as coco
@@ -194,7 +194,8 @@ class Driver(commands.Cog):
             # wiki image
             if wiki_image != 0:
                 message_embed.set_image(url=wiki_image)
-
+            message_embed.title = driver_data[index]['name']
+            message_embed.url = wikipedia.WikipediaPage(title = wikipedia.search(driver, results = 1)[0]).url
             message_embed.add_field(name = "Nationality", value = (driver_data[index]['nationality']),inline = True)
             message_embed.add_field(name = "Seasons Completed", value = (driver_data[index]['seasons_completed']),inline = True)
             message_embed.add_field(name = "Championships", value = (driver_data[index]['championships']),inline = True)
