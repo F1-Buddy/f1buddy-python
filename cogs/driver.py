@@ -71,10 +71,13 @@ class Driver(commands.Cog):
         
         for row in table.find_all('tr')[1:]:
             columns = row.find_all('td')
+            flags = row.find('img', {'class': 'thumbborder'})
+            if flags:
+                nationality = flags['src']
             if columns:
                 driver_dict = {
                     'name': parse_driver_name(columns[0].text.strip()),
-                    'nationality': columns[1].text.strip(),
+                    'nationality': nationality,
                     'seasons_completed': columns[2].text.strip(),
                     'championships': parse_championships(columns[3].text.strip()),
                     'entries': parse_brackets(columns[4].text.strip()),
@@ -105,7 +108,8 @@ class Driver(commands.Cog):
                 message_embed.set_image(url=wiki_image)
             message_embed.title = driver_data[index]['name']
             message_embed.url = wikipedia.WikipediaPage(title = wikipedia.search(driver, results = 1)[0]).url
-            message_embed.add_field(name = "Nationality", value = (driver_data[index]['nationality']),inline = True)
+            # message_embed.add_field(name = "Nationality", inline = True, image=f"https:{driver_data[index]['nationality']}")
+            message_embed.set_thumbnail(url=f"https:{driver_data[index]['nationality']}")
             message_embed.add_field(name = "Seasons Completed", value = (driver_data[index]['seasons_completed']),inline = True)
             message_embed.add_field(name = "Championships", value = (driver_data[index]['championships']),inline = True)
             message_embed.add_field(name = "Entries", value = (driver_data[index]['entries']),inline = True)

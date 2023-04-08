@@ -5,14 +5,16 @@ Rewritten in python to use fastf1 since ergast goes down too often
 
 ## Changelog
 
-Fixed WDC command to show emojis
+Rewrote the driver command to use the BeautifulSoup4 web scraping library
 
 
 ## To-do
 - [x] DRIVER: fix wikipedia api, currently using pymediawiki
-- [ ] DRIVER: Implement images for driver command, using new method
+- [x] DRIVER: Implement images for driver command, using new method
 - [x] DRIVER: Does not work if name is lowercase
 - [x] DRIVER: Names with special accents can only be accessed if user inputs their special accents (e.g. Kimi Räikkönen)
+- [ ] DRIVER: Clean up bot output, looks messy as is
+- [x] DRIVER: Replace Nationality with emoji
 - [ ] LAPTIME: create team_colors.py file for teamcolors for different years
 - [x] SCHEDULE: FIX LINE 80, uses local timezones which are ahead of EST, doesn't update properly (ex: Saudi GP over, but saudi local time > est time --> still shows saudi as next)
 - [x] SCHEDULE: Display time as 12 hour, possible timer to event? maybe another command (x days, y hours... until event)
