@@ -1,5 +1,7 @@
+import datetime
 import re
 import discord
+import pandas as pd
 import wikipedia
 import requests
 import json
@@ -36,7 +38,7 @@ class Driver(commands.Cog):
 
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
-        message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        # message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
         
         def get_wiki_image(search_term):
@@ -119,7 +121,8 @@ class Driver(commands.Cog):
             message_embed.add_field(name = "Podiums", value = (driver_data[index]['podiums']),inline = True)
             message_embed.add_field(name = "Fastest Laps", value = (driver_data[index]['fastest_laps']),inline = True)
             message_embed.add_field(name = "Points", value = (driver_data[index]['points']),inline = True)
-            
+            message_embed.timestamp = datetime.datetime.now()
+            message_embed.set_footer(text ='\u200b',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
 
         # send final embed
         await interaction.followup.send(embed=message_embed)
