@@ -79,13 +79,13 @@ class results(commands.Cog):
 
 
                 # get youtube video
-                race = fastf1.get_event(year, round_num+1).iloc[5]
-                s = Search((str)(year) + " " + race + " Highlights")
+                # race = fastf1.get_event(year, round_num+1).iloc[5]
+                s = Search((str)(year) + " " + raceName + " Highlights")
                 video_url = 'https://www.youtube.com/watch?v='
                 t = (str)(s.results[0])
                 video_url += (t[t.index('videoId=')+8:-1])
                 # print(video_url)
-                description_string = (video_url)
+                description_string = "Race Highlights:\n"+(video_url)
 
                 for i in range(0, len(response['MRData']['RaceTable']['Races'][round_num]['Results'])):
                     race_results = (response['MRData']['RaceTable']['Races'][round_num]['Results'][i])
