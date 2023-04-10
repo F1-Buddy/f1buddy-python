@@ -31,7 +31,7 @@ def checkYear(year,round):
             url =  f"https://ergast.com/api/f1/{year}/{round}/constructors.json"
             return url
 
-class constructor(commands.Cog):
+class Constructor(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     @commands.Cog.listener()
@@ -40,7 +40,7 @@ class constructor(commands.Cog):
     @app_commands.command(name = 'team', description = 'Get constructor information')
     @app_commands.describe(year = "Constructor information")
     
-    async def constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
+    async def Constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Constructor Information", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
@@ -115,5 +115,5 @@ class constructor(commands.Cog):
         await interaction.followup.send(embed = message_embed)
 
 async def setup(bot):
-    await bot.add_cog(constructor(bot) # , guilds=[discord.Object(id=884602392249770084)]
+    await bot.add_cog(Constructor(bot) # , guilds=[discord.Object(id=884602392249770084)]
                       )

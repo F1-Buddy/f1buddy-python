@@ -9,7 +9,7 @@ from lib.emojiid import team_emoji_ids
 now = pd.Timestamp.now()
 
 
-class constructorStandings(commands.Cog):
+class ConstructorStandings(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     @commands.Cog.listener()
@@ -19,7 +19,7 @@ class constructorStandings(commands.Cog):
     @app_commands.describe(year = "Constructor standings year")
     @app_commands.describe(round = "Constructor standings round")
     
-    async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
+    async def ConstructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
         await interaction.response.defer()
         team_names, team_position, team_points = [], [], []
         url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year >= now.year) else f"https://ergast.com/api/f1/{year}/constructorStandings.json"
@@ -53,5 +53,5 @@ class constructorStandings(commands.Cog):
         await interaction.followup.send(embed=message_embed)
 
 async def setup(bot):
-    await bot.add_cog(constructorStandings(bot) # , guilds=[discord.Object(id=884602392249770084)]
+    await bot.add_cog(ConstructorStandings(bot) # , guilds=[discord.Object(id=884602392249770084)]
                       )
