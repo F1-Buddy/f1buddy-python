@@ -38,7 +38,7 @@ class Driver(commands.Cog):
 
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
-        # message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        
         message_embed.colour = discord.Colour.dark_red()
         
         def get_wiki_image(search_term):
@@ -104,7 +104,11 @@ class Driver(commands.Cog):
                 index = i
                 break
         if index == -1:
-            message_embed.title = "Driver not found"
+            message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+            message_embed.title = "Driver \"" +driver+ "\" not found!"
+            message_embed.description = "Try a driver's full name"
+            message_embed.timestamp = datetime.datetime.now()
+            message_embed.set_footer(text ='\u200b',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
         else:
             if wiki_image != 0:
                 message_embed.set_image(url=wiki_image)
