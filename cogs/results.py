@@ -11,10 +11,7 @@ from lib.emojiid import team_emoji_ids
 from pytube import Search
 now = pd.Timestamp.now()
 
-
-
-
-
+fastf1.Cache.enable_cache('cache/')
 
 # check if given year and round number are valid
 def checkYear(year,round):
