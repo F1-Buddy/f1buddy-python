@@ -11,10 +11,7 @@ from lib.emojiid import team_emoji_ids
 from pytube import Search
 now = pd.Timestamp.now()
 
-
-
-
-
+fastf1.Cache.enable_cache('cache/')
 
 # check if given year and round number are valid
 def checkYear(year,round):
@@ -81,12 +78,16 @@ class results(commands.Cog):
 
 
                 # get youtube video
+<<<<<<< HEAD
+=======
+                # race = fastf1.get_event(year, round_num+1).iloc[5]
+>>>>>>> 7ce7aaec8062fb016800a36391e915325b5d4683
                 s = Search((str)(year) + " " + raceName + " Highlights")
                 video_url = 'https://www.youtube.com/watch?v='
                 t = (str)(s.results[0])
                 video_url += (t[t.index('videoId=')+8:-1])
                 # print(video_url)
-                description_string = (video_url)
+                description_string = "Race Highlights:\n"+(video_url)
 
                 for i in range(0, len(response['MRData']['RaceTable']['Races'][round_num]['Results'])):
                     race_results = (response['MRData']['RaceTable']['Races'][round_num]['Results'][i])
