@@ -78,10 +78,7 @@ class results(commands.Cog):
 
 
                 # get youtube video
-<<<<<<< HEAD
-=======
                 # race = fastf1.get_event(year, round_num+1).iloc[5]
->>>>>>> 7ce7aaec8062fb016800a36391e915325b5d4683
                 s = Search((str)(year) + " " + raceName + " Highlights")
                 video_url = 'https://www.youtube.com/watch?v='
                 t = (str)(s.results[0])
