@@ -78,12 +78,10 @@ class results(commands.Cog):
                 year = int(response['MRData']['RaceTable']['Races'][round_num]['season']) 
                 raceName = (response['MRData']['RaceTable']['Races'][round_num]['raceName'])  
                 message_embed.title = f"{year} {raceName} Race Results"
-                
 
 
                 # get youtube video
-                race = fastf1.get_event(year, round_num+1).iloc[5]
-                s = Search((str)(year) + " " + race + " Highlights")
+                s = Search((str)(year) + " " + raceName + " Highlights")
                 video_url = 'https://www.youtube.com/watch?v='
                 t = (str)(s.results[0])
                 video_url += (t[t.index('videoId=')+8:-1])
