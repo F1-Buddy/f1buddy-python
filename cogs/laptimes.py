@@ -2,8 +2,6 @@ import discord
 import fastf1
 import os
 import typing
-import pandas as pd
-# import lib.teamcolors as tc
 import json
 from fastf1 import plotting
 from discord import app_commands

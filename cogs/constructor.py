@@ -1,11 +1,8 @@
 import discord
-# import mediawiki
 import requests
 import json
-# import fastf1
 import typing
 import pandas as pd
-# import csv
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids

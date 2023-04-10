@@ -1,5 +1,4 @@
 import discord
-# import mediawiki
 import requests
 import json
 import fastf1
