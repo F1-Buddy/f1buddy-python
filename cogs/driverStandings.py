@@ -17,7 +17,7 @@ class driverStandings(commands.Cog):
     async def on_ready(self):
         print('Driver Standings cog loaded')
     @app_commands.command(name='wdc', description='Get driver standings')
-    @app_commands.describe(year = "WDC name")
+    @app_commands.describe(year = "Standings year")
     
     async def driverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
         driver_name, driver_position, driver_points = [], [], []

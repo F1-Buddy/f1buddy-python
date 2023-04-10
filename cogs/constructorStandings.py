@@ -18,7 +18,8 @@ class constructorStandings(commands.Cog):
     async def on_ready(self):
         print('Constructor Standings cog loaded')  
     @app_commands.command(name='wcc', description='Get constructor standings')
-    @app_commands.describe(year = "year")
+    @app_commands.describe(year = "Constructor standings year")
+    @app_commands.describe(round = "Constructor standings round")
     
     async def constructorStandings(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
         await interaction.response.defer()
