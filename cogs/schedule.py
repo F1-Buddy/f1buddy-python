@@ -5,11 +5,14 @@ import discord
 import fastf1
 import lib.timezones as timezones
 import pandas as pd
+import datetime
 from discord import app_commands
 from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 import country_converter as coco
+import requests
+from bs4 import BeautifulSoup
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -106,6 +109,7 @@ class Schedule(commands.Cog):
             # get name of event
             race_name = schedule.loc[next_event, "EventName"]
 
+
             # get emoji for country
             emoji = ":flag_" + \
                 (coco.convert(
@@ -160,10 +164,19 @@ class Schedule(commands.Cog):
             for key in converted_session_times.keys():
                 times_string += '`'+(converted_session_times.get(key)).strftime('%I:%M%p on %Y/%m/%d') + "`\n"
                 sessions_string += key + '\n'
-
+                
+            # get circuit png url from f1 site, using bs4 to parse through HTML
+            current_year = datetime.datetime.now().year
+            url = f"https://www.formula1.com/en/racing/{current_year}.html"
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            image = soup.find_all('picture', {'class': 'track'})
+            image_url = image[next_event-1].find('img')['data-src']
+            
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
             message_embed.add_field(name="Time", value=times_string,inline=True)
+            message_embed.set_image(url=image_url)
             
         # probably off season / unsure
         except IndexError:

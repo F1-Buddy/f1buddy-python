@@ -56,7 +56,7 @@ class Driver(commands.Cog):
             
         url = 'https://en.wikipedia.org/wiki/List_of_Formula_One_drivers'
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = BeautifulSoup(response.text, "lxml")
         table = soup.find('table', {'class': 'wikitable sortable'})
         
         def parse_driver_name(name):
@@ -93,7 +93,7 @@ class Driver(commands.Cog):
                 driver_data.append(driver_dict)
                 
         normalized_input = unidecode(driver).casefold()
-        img_url = unidecode(driver).title()
+        # img_url = unidecode(driver).title()
         wiki_image = get_wiki_image(driver)
 
         # iterate through driver data to find a match

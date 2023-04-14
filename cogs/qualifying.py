@@ -1,8 +1,6 @@
 import discord
-# import mediawiki
 import requests
 import json
-# import fastf1
 import typing
 import pandas as pd
 from discord import app_commands
@@ -30,7 +28,7 @@ def checkYear(year,round):
             url =  f"https://ergast.com/api/f1/{year}/{round}/qualifying.json"
             return url
 
-class qualifying(commands.Cog):
+class Qualifying(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     @commands.Cog.listener()
@@ -39,7 +37,7 @@ class qualifying(commands.Cog):
     @app_commands.command(name='quali', description='Get qualifying results')
     @app_commands.describe(year = "Qualifying")
     
-    async def qualifying(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
+    async def Qualifying(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Qualifying Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
@@ -93,5 +91,5 @@ class qualifying(commands.Cog):
         await interaction.followup.send(embed=message_embed)
 
 async def setup(bot):
-    await bot.add_cog(qualifying(bot) # , guilds=[discord.Object(id=884602392249770084)]
+    await bot.add_cog(Qualifying(bot) # , guilds=[discord.Object(id=884602392249770084)]
                       )

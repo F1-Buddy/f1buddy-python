@@ -1,8 +1,6 @@
 import discord
-# import mediawiki
 import requests
 import json
-# import fastf1
 import typing
 import pandas as pd
 from discord import app_commands
@@ -10,16 +8,16 @@ from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 now = pd.Timestamp.now()
 
-class driverStandings(commands.Cog):
+class DriverStandings(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     @commands.Cog.listener()
     async def on_ready(self):
         print('Driver Standings cog loaded')
     @app_commands.command(name='wdc', description='Get driver standings')
-    @app_commands.describe(year = "WDC name")
+    @app_commands.describe(year = "Standings year")
     
-    async def driverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
+    async def DriverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
         driver_name, driver_position, driver_points = [], [], []
         await interaction.response.defer()
         # get standings JSON
@@ -62,4 +60,4 @@ class driverStandings(commands.Cog):
         await interaction.followup.send(embed=message_embed)
 
 async def setup(bot):
-    await bot.add_cog(driverStandings(bot))
+    await bot.add_cog(DriverStandings(bot))

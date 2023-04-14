@@ -1,5 +1,4 @@
 import discord
-# import mediawiki
 import requests
 import json
 import fastf1
@@ -33,7 +32,7 @@ def checkYear(year,round):
             url =  f"https://ergast.com/api/f1/{year}/{round}/results.json"
             return url
 
-class results(commands.Cog):
+class Results(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     @commands.Cog.listener()
@@ -42,7 +41,7 @@ class results(commands.Cog):
     @app_commands.command(name = 'results', description = 'Get race results')
     @app_commands.describe(year = "Race results")
     
-    async def results(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
+    async def Results(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Race Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         message_embed.colour = discord.Colour.dark_red()
@@ -75,7 +74,6 @@ class results(commands.Cog):
                 year = int(response['MRData']['RaceTable']['Races'][round_num]['season']) 
                 raceName = (response['MRData']['RaceTable']['Races'][round_num]['raceName'])  
                 message_embed.title = f"{year} {raceName} Race Results"
-                
 
 
                 # get youtube video
@@ -115,5 +113,5 @@ class results(commands.Cog):
         await interaction.followup.send(embed = message_embed)
 
 async def setup(bot):
-    await bot.add_cog(results(bot) # , guilds=[discord.Object(id=884602392249770084)]
+    await bot.add_cog(Results(bot) # , guilds=[discord.Object(id=884602392249770084)]
                       )
