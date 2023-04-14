@@ -93,7 +93,7 @@ class Driver(commands.Cog):
                 driver_data.append(driver_dict)
                 
         normalized_input = unidecode(driver).casefold()
-        img_url = unidecode(driver).title()
+        # img_url = unidecode(driver).title()
         wiki_image = get_wiki_image(driver)
 
         # iterate through driver data to find a match
