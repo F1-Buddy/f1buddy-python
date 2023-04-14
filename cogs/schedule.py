@@ -170,8 +170,8 @@ class Schedule(commands.Cog):
             url = f"https://www.formula1.com/en/racing/{current_year}.html"
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
-            image = soup.find('picture', {'class': 'track'})
-            image_url = image.find('img')['data-src']
+            image = soup.find_all('picture', {'class': 'track'})
+            image_url = image[next_event-1].find('img')['data-src']
             
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
