@@ -5,6 +5,7 @@ import discord
 import fastf1
 import lib.timezones as timezones
 import pandas as pd
+import datetime
 from discord import app_commands
 from discord.ext import commands
 from geopy.geocoders import Nominatim
@@ -165,7 +166,8 @@ class Schedule(commands.Cog):
                 sessions_string += key + '\n'
                 
             # get circuit png url from f1 site, using bs4 to parse through HTML
-            url = f"https://www.formula1.com/en/racing/2023.html"
+            current_year = datetime.datetime.now().year
+            url = f"https://www.formula1.com/en/racing/{current_year}.html"
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
             image = soup.find('picture', {'class': 'track'})
