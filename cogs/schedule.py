@@ -11,7 +11,6 @@ from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 import country_converter as coco
 import requests
-import json
 from bs4 import BeautifulSoup
 
 fastf1.Cache.enable_cache('cache/')
@@ -165,16 +164,6 @@ class Schedule(commands.Cog):
                 times_string += '`'+(converted_session_times.get(key)).strftime('%I:%M%p on %Y/%m/%d') + "`\n"
                 sessions_string += key + '\n'
                 
-            # race_name_url = race_name.lower().replace(' ', '%20')
-            # circuit_image_query = f"{race_name_url}-layout-png"
-            # url = f"https://www.google.ch/search?site=webhp&tbm=isch&source=hp&q={circuit_image_query}&oq={circuit_image_query}biw=1280&bih=579&num=100"
-            # print(url)
-            # response = requests.get(url)
-            # soup = BeautifulSoup(response.content, 'html.parser')
-            # circuit_image = soup.find_all("img")
-            # circuit_image_url = circuit_image[0]['src']
-            # print(circuit_image_url)
-            
             # get circuit png url from f1 site, using bs4 to parse through HTML
             url = f"https://www.formula1.com/en/racing/2023.html"
             response = requests.get(url)
