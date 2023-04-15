@@ -6,12 +6,13 @@ import fastf1
 import lib.timezones as timezones
 import pandas as pd
 import datetime
+import country_converter as coco
+import requests
+import json
 from discord import app_commands
 from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
-import country_converter as coco
-import requests
 from bs4 import BeautifulSoup
 
 fastf1.Cache.enable_cache('cache/')
@@ -172,7 +173,22 @@ class Schedule(commands.Cog):
             soup = BeautifulSoup(response.content, 'html.parser')
             image = soup.find_all('picture', {'class': 'track'})
             image_url = image[next_event-1].find('img')['data-src']
-            
+
+            weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
+
+            querystring = {"station":"KJRB0","start":"2023-04-15","end":"2023-04-22","tz":"America/New_York"}
+
+            headers = {
+                "X-RapidAPI-Key": "914dd1ae73msha254d0d07a953f9p1f2d02jsn8b84f89cec75",
+                "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
+            }
+
+            response = requests.request("GET", weatherURL, headers=headers, params=querystring)
+            results = json.loads(response.content)
+            weather = []
+            for datapoint in results['data']:
+                print(datapoint['time'], datapoint['temp'])
+
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
             message_embed.add_field(name="Time", value=times_string,inline=True)
