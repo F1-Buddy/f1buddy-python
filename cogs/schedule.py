@@ -9,6 +9,7 @@ import datetime
 import country_converter as coco
 import requests
 import json
+import config
 from discord import app_commands
 from discord.ext import commands
 from geopy.geocoders import Nominatim
@@ -130,6 +131,11 @@ class Schedule(commands.Cog):
                     ":stopwatch: Qualifying": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
+                fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
+                fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
+                fp3_date = pd.Timestamp(converted_session_times[":three: FP3"]).strftime('%Y-%m-%d')
+                quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
+                race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             else:
                 converted_session_times = {
                     ":one: FP1": schedule.loc[next_event, "Session1Date"],
@@ -138,6 +144,11 @@ class Schedule(commands.Cog):
                     ":race_car: Sprint": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
+                fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
+                fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
+                quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
+                sprint_date = pd.Timestamp(converted_session_times[":race_car: Sprint"]).strftime('%Y-%m-%d')
+                race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             
             try:
                 # get location of race
@@ -176,18 +187,21 @@ class Schedule(commands.Cog):
             image_url = image[next_event-1].find('img')['data-src']
 
             weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
-            station_code = stations[race_name]   
-            querystring = {"station":station_code,"start":"2023-04-15","end":"2023-04-22","tz":"America/New_York"}
-
+            station_code = stations[race_name]
+            
+            
+            fp1_date = "2023-04-15"
+            race_date = "2023-04-22"
+            querystring = {"station":station_code,"start":fp1_date,"end":race_date,"tz":"America/New_York"}
             headers = {
-                "X-RapidAPI-Key": "914dd1ae73msha254d0d07a953f9p1f2d02jsn8b84f89cec75",
+                "X-RapidAPI-Key": config.KEY,
                 "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
             }
-
             response = requests.request("GET", weatherURL, headers=headers, params=querystring)
             results = json.loads(response.content)
             for datapoint in results['data']:
                 print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
+            # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
 
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
