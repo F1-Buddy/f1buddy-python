@@ -70,7 +70,7 @@ class Schedule(commands.Cog):
         ################################################################
         # TESTING TIMESTAMP
         # change date to test schedule command on that date
-        # now = pd.Timestamp(year=2023, month=4, day=29)
+        # now = pd.Timestamp(year=2023, month=3, day=30)
         ################################################################
 
         # string to hold final message
@@ -175,6 +175,7 @@ class Schedule(commands.Cog):
 
             # setup strings to be added to fields
             for key in converted_session_times.keys():
+                # print(key)
                 times_string += '`'+(converted_session_times.get(key)).strftime('%I:%M%p on %Y/%m/%d') + "`\n"
                 sessions_string += key + '\n'
                 
@@ -188,27 +189,38 @@ class Schedule(commands.Cog):
 
             weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
             station_code = stations[race_name]
+
             
             
-            fp1_date = "2023-04-15"
-            race_date = "2023-04-22"
-            querystring = {"station":station_code,"start":fp1_date,"end":race_date,"tz":"America/New_York"}
-            headers = {
-                "X-RapidAPI-Key": config.KEY,
-                "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
-            }
-            response = requests.request("GET", weatherURL, headers=headers, params=querystring)
-            results = json.loads(response.content)
-            for datapoint in results['data']:
-                print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
+            fp1_date = converted_session_times.get(":one: FP1").strftime('%Y-%m-%d') + ""
+            race_date = converted_session_times.get(":checkered_flag: Race").strftime('%Y-%m-%d')
+            # race_date = converted_session_times.get(":checkered_flag: Race")
+            time_to_race = converted_session_times.get(":checkered_flag: Race")-now.tz_localize('America/New_York')
+            # print(time_to_race)
+            print(time_to_race.total_seconds())
+            print(time_to_race.total_seconds() < 604800)
+            if (time_to_race.total_seconds() < 604800):
+                print('race is within a week')
+                querystring = {"station":station_code,"start":fp1_date,"end":race_date,"tz":"America/New_York"}
+                headers = {
+                    "X-RapidAPI-Key": config.KEY,
+                    "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
+                }
+                response = requests.request("GET", weatherURL, headers=headers, params=querystring)
+                results = json.loads(response.content)
+                for datapoint in results['data']:
+                    print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
             # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
+            else:
+                message_embed.set_footer(text="Weather forecast available within 1 week of race • Times are displayed in EST") 
 
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
             message_embed.add_field(name="Time", value=times_string,inline=True)
             message_embed.set_image(url=image_url)
             
-        # probably off season / unsure
+        # probably off season / unsure        
+        
         except IndexError:
             out_string = ('It is currently off season! :crying_cat_face:')
             message_embed.set_image(
