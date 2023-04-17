@@ -6,13 +6,16 @@ import fastf1
 import lib.timezones as timezones
 import pandas as pd
 import datetime
+import country_converter as coco
+import requests
+import json
+import config
 from discord import app_commands
 from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
-import country_converter as coco
-import requests
 from bs4 import BeautifulSoup
+from lib.station_codes import stations
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -128,6 +131,11 @@ class Schedule(commands.Cog):
                     ":stopwatch: Qualifying": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
+                fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
+                fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
+                fp3_date = pd.Timestamp(converted_session_times[":three: FP3"]).strftime('%Y-%m-%d')
+                quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
+                race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             else:
                 converted_session_times = {
                     ":one: FP1": schedule.loc[next_event, "Session1Date"],
@@ -136,6 +144,11 @@ class Schedule(commands.Cog):
                     ":race_car: Sprint": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
+                fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
+                fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
+                quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
+                sprint_date = pd.Timestamp(converted_session_times[":race_car: Sprint"]).strftime('%Y-%m-%d')
+                race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             
             try:
                 # get location of race
@@ -173,7 +186,10 @@ class Schedule(commands.Cog):
             soup = BeautifulSoup(response.content, 'html.parser')
             image = soup.find_all('picture', {'class': 'track'})
             image_url = image[next_event-1].find('img')['data-src']
-            
+
+            weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
+            station_code = stations[race_name]
+
             
             
             fp1_date = converted_session_times.get(":one: FP1").strftime('%Y-%m-%d') + ""
@@ -197,6 +213,7 @@ class Schedule(commands.Cog):
             # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
             else:
                 message_embed.set_footer(text="Weather forecast available within 1 week of race • Times are displayed in EST") 
+
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
             message_embed.add_field(name="Time", value=times_string,inline=True)

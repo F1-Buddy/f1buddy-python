@@ -13,7 +13,11 @@ now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
 
 # check if given year and round number are valid
-def checkYear(year,round):
+def checkYear(year, round):
+    # cast to int to stop TypeError
+    year = (int)(year)
+    round = (int)(round)
+    
     if not(year == None) and not(1950 <= year and year <= now.year):
         return "bad year"
     elif not(round == None) and not(round >= 1) and not(round < 25):
