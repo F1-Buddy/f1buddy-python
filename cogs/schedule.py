@@ -187,36 +187,63 @@ class Schedule(commands.Cog):
             image = soup.find_all('picture', {'class': 'track'})
             image_url = image[next_event-1].find('img')['data-src']
 
-            weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
-            station_code = stations[race_name]
 
+
+
+
+            # weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
+            # station_code = stations[race_name]
             
-            
+
+            weatherURL = "https://weatherapi-com.p.rapidapi.com/forecast.json"
             fp1_date = converted_session_times.get(":one: FP1").strftime('%Y-%m-%d') + ""
+
+
+
+            fp1_date = "2023-4-17"
+            # location = "baku"
+
+
+
             race_date = converted_session_times.get(":checkered_flag: Race").strftime('%Y-%m-%d')
+            # print(location)
             # race_date = converted_session_times.get(":checkered_flag: Race")
             time_to_race = converted_session_times.get(":checkered_flag: Race")-now.tz_localize('America/New_York')
-            # print(time_to_race)
-            print(time_to_race.total_seconds())
-            print(time_to_race.total_seconds() < 604800)
-            if (time_to_race.total_seconds() < 604800):
-                print('race is within a week')
-                querystring = {"station":station_code,"start":fp1_date,"end":race_date,"tz":"America/New_York"}
+            race_within_3days = time_to_race.total_seconds() < 259200
+            # race_within_3days = True
+            if (race_within_3days):
+                # print('race is within a week')
+                querystring = {"q":location,"days":"3"}
                 headers = {
-                    "X-RapidAPI-Key": config.KEY,
-                    "X-RapidAPI-Host": "meteostat.p.rapidapi.com"
+                    "X-RapidAPI-Key": config.weatherKEY,
+                    "X-RapidAPI-Host": 'weatherapi-com.p.rapidapi.com'
                 }
                 response = requests.request("GET", weatherURL, headers=headers, params=querystring)
                 results = json.loads(response.content)
-                for datapoint in results['data']:
-                    print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
+                # print(results)
+                # print(results['forecast']['forecastday'])
+                forecast = results['forecast']['forecastday']
+                weather_string = ""
+                precip_string = ""
+                for i in range(len(forecast)):
+                    weather_string += ((str)(forecast[i]['day']['avgtemp_c'])+' °C\n')
+                    precip_string += ((str)(forecast[i]['day']['totalprecip_mm'])+' mm\n')
+                    # print(forecast[i])
+                    # print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
             # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
             else:
-                message_embed.set_footer(text="Weather forecast available within 1 week of race • Times are displayed in EST") 
+                message_embed.set_footer(text="Weather forecast available within 3 days of race • Times are displayed in EST") 
 
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
             message_embed.add_field(name="Time", value=times_string,inline=True)
+            if (race_within_3days):
+                days = "Friday\nSaturday\nSunday"
+                message_embed.add_field(name="Weather:", value="",inline=False)
+                message_embed.add_field(name="Day", value=days,inline=True)
+                message_embed.add_field(name="Temperature", value=weather_string,inline=True)
+                message_embed.add_field(name="Precipitation", value=precip_string,inline=True)
+
             message_embed.set_image(url=image_url)
             
         # probably off season / unsure        
