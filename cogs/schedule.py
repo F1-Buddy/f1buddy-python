@@ -215,7 +215,7 @@ class Schedule(commands.Cog):
                 # print('race is within a week')
                 querystring = {"q":location,"days":"3"}
                 headers = {
-                    "X-RapidAPI-Key": config.weatherKEY,
+                    "X-RapidAPI-Key": config.weatherapiKEY,
                     "X-RapidAPI-Host": 'weatherapi-com.p.rapidapi.com'
                 }
                 response = requests.request("GET", weatherURL, headers=headers, params=querystring)
