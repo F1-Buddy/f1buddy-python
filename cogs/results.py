@@ -7,7 +7,7 @@ import pandas as pd
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
-from pytube import Search
+from pytube import Search, YouTube
 now = pd.Timestamp.now()
 
 fastf1.Cache.enable_cache('cache/')
@@ -15,26 +15,30 @@ fastf1.Cache.enable_cache('cache/')
 # check if given year and round number are valid
 def checkYear(year, round):
     # cast to int to stop TypeError
-    year = (int)(year)
-    round = (int)(round)
-    
-    if not(year == None) and not(1950 <= year and year <= now.year):
-        return "bad year"
-    elif not(round == None) and not(round >= 1) and not(round < 25):
-        return "bad round number"
-    else:
-        if (year == None and round == None):
-            url =  "https://ergast.com/api/f1/current/results.json"
-            return url
-        elif (year == None):
-            url = f"https://ergast.com/api/f1/{now.year}/{round}/results.json"
-            return url
-        elif (round == None):
-            url =  f"https://ergast.com/api/f1/{year}/{1}/results.json"
-            return url
-        else: 
-            url =  f"https://ergast.com/api/f1/{year}/{round}/results.json"
-            return url
+    try:
+        year = (int)(year)
+        round = (int)(round)
+        
+        if not(year == None) and not(1950 <= year and year <= now.year):
+            return "bad year"
+        elif not(round == None) and not(round >= 1) and not(round < 25):
+            return "bad round number"
+        else:
+            # if (year == None and round == None):
+            #     url =  "https://ergast.com/api/f1/current/results.json"
+            #     return url
+            if (year == None and round != None):
+                url = f"https://ergast.com/api/f1/{now.year}/{round}/results.json"
+                return url
+            elif (year != None and round == None):
+                url =  f"https://ergast.com/api/f1/{year}/{1}/results.json"
+                return url
+            else: 
+                url =  f"https://ergast.com/api/f1/{year}/{round}/results.json"
+                return url
+    except:
+        url =  "https://ergast.com/api/f1/current/results.json"
+        return url
 
 class Results(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -85,6 +89,7 @@ class Results(commands.Cog):
                 video_url = 'https://www.youtube.com/watch?v='
                 t = (str)(s.results[0])
                 video_url += (t[t.index('videoId=')+8:-1])
+                thumbnail = YouTube(video_url).thumbnail_url
                 description_string = "Race Highlights:\n"+(video_url)
 
                 for i in range(0, len(response['MRData']['RaceTable']['Races'][round_num]['Results'])):
@@ -109,9 +114,11 @@ class Results(commands.Cog):
                 message_embed.add_field(name = "Position", value = '\n'.join(driver_position),inline = True)
                 message_embed.add_field(name = "Driver", value = '\n'.join(driver_names),inline = True)
                 message_embed.add_field(name = "Points", value = '\n'.join(driver_points),inline = True)
-                
+                message_embed.add_field(name = "Race Highlights", value = video_url, inline = False)
+                message_embed.set_image(url=thumbnail)
+
         # send final embed
-        message_embed.description = description_string
+        # message_embed.description = description_string
         await interaction.followup.send(embed = message_embed)
 
 async def setup(bot):
