@@ -100,6 +100,7 @@ class Results(commands.Cog):
                     try:
                         # print(amount_of_drivers)
                         if (amount_of_drivers <= 34):
+                            print(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))) + ' ' + (driver_data['givenName']) + ' ' +  driver_data['familyName'])
                             driver_names.append(((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))) + ' ' + (driver_data['givenName']) + ' ' +  driver_data['familyName'])
                             # print("got emoji")
                         else: 

@@ -5,11 +5,11 @@ import csv
 # currently supports ~2010-2023
 # team emojis
 team_emoji_ids = {
-    "Red Bull":1081767515790770247,
+    "Red Bull Racing":1081767515790770247,
     "Mercedes":1081767514620571749,
     "Ferrari":1081767510019411978,
     "McLaren":1081767512733126736,
-    "Alpine F1 Team":1081767507209224192,
+    "Alpine":1081767507209224192,
     "Renault":1081819628906496063,
     "Lotus F1":1081821034564558878,
     "Lotus":1081821034564558878,
