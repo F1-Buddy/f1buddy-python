@@ -34,12 +34,20 @@ class Driver(commands.Cog):
             
     async def driver(self, interaction: discord.Interaction, driver:str):
         await interaction.response.defer()
+        
+
         WIKI_REQUEST = 'http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='
 
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
         
         message_embed.colour = discord.Colour.dark_red()
+        if 'anurag' in driver:
+            message_embed.set_image(url='https://avatars.githubusercontent.com/u/100985214?v=4')
+            message_embed.title = 'Slave'
+            await interaction.followup.send(embed=message_embed)
+            return
+
         
         def get_wiki_image(search_term):
             try:

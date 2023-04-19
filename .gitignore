@@ -8,3 +8,4 @@ config.py
 /lib/__pycache__/
 /cogs/plots/*
 !/cogs/plots/.gitkeep 
+test.py
