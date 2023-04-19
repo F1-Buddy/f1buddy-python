@@ -101,7 +101,7 @@ class Quali2(commands.Cog):
         raceName = result_session.event.EventName
         message_embed.title = f"{year} {raceName} Qualifying Results"
 
-        s = Search((str)(year) + " " + raceName + " Qualifying Highlights")
+        s = Search((str)(year) + " " + raceName + " Qualifying")
         video_url = 'https://www.youtube.com/watch?v='
         t = (str)(s.results[0])
         video_url += (t[t.index('videoId=')+8:-1])
