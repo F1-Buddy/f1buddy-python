@@ -31,7 +31,15 @@ class Results2(commands.Cog):
         if (year == None):
             year = now.year
         if (round == None):
-            round = 1
+            # get latest completed session by starting from the end and going back towards beginning of season
+            year_sched = fastf1.get_event_schedule(year,include_testing=False)
+            round = (year_sched.shape[0])
+            result_session = fastf1.get_session(year, round, 'Race')
+            result_session.load()
+            while result_session.results.empty:
+                round -= 1
+                result_session = fastf1.get_session(2023, round, 'Race')
+                result_session.load()
         # round given as number
         try:
             round_number = int(round)
