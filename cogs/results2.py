@@ -18,9 +18,9 @@ class Results2(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('Results V2 cog loaded')  
-    @app_commands.command(name = 'results', description = 'Get race results V2')
-    @app_commands.describe(year = "year")
-    @app_commands.describe(round = "round name or number")
+    @app_commands.command(name = 'results', description = 'Get results of a specific race')
+    @app_commands.describe(year = "Year")
+    @app_commands.describe(round = "Round name or number (Australia or 3)")
     
     async def Results2(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[str]):  
         await interaction.response.defer()
