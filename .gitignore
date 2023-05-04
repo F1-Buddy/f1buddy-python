@@ -1,8 +1,11 @@
 token.txt
 config.py
 # cache/
-/cache/
+/cache/*
+!/cache/.gitkeep
 /__pycache__/
 /cogs/__pycache__/
 /lib/__pycache__/
-/cogs/plots/
+/cogs/plots/*
+!/cogs/plots/.gitkeep 
+test.py

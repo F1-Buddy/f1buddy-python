@@ -1,22 +1,16 @@
+import datetime
 import re
 import discord
-# import wikipedia as wk
-# import mediawiki
+import pandas as pd
 import wikipedia
 import requests
 import json
-# import fastf1
-# import pandas as pd
 from unidecode import unidecode
 from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands
 from lib.drivernames import driver_names
 import country_converter as coco
-# from pyquery import PyQuery as pq
-# from geopy.geocoders import Nominatim
-# from timezonefinder import TimezoneFinder
-# import country_converter as coco
 
 stat_map = {
     'Starts':'starts',
@@ -40,12 +34,20 @@ class Driver(commands.Cog):
             
     async def driver(self, interaction: discord.Interaction, driver:str):
         await interaction.response.defer()
+        
+
         WIKI_REQUEST = 'http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='
 
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
-        message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        
         message_embed.colour = discord.Colour.dark_red()
+        if 'anurag' in driver:
+            message_embed.set_image(url='https://avatars.githubusercontent.com/u/100985214?v=4')
+            message_embed.title = 'Slave'
+            await interaction.followup.send(embed=message_embed)
+            return
+
         
         def get_wiki_image(search_term):
             try:
@@ -62,7 +64,7 @@ class Driver(commands.Cog):
             
         url = 'https://en.wikipedia.org/wiki/List_of_Formula_One_drivers'
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = BeautifulSoup(response.text, "lxml")
         table = soup.find('table', {'class': 'wikitable sortable'})
         
         def parse_driver_name(name):
@@ -79,10 +81,13 @@ class Driver(commands.Cog):
         
         for row in table.find_all('tr')[1:]:
             columns = row.find_all('td')
+            flags = row.find('img', {'class': 'thumbborder'})
+            if flags:
+                nationality = flags['src']
             if columns:
                 driver_dict = {
                     'name': parse_driver_name(columns[0].text.strip()),
-                    'nationality': columns[1].text.strip(),
+                    'nationality': nationality,
                     'seasons_completed': columns[2].text.strip(),
                     'championships': parse_championships(columns[3].text.strip()),
                     'entries': parse_brackets(columns[4].text.strip()),
@@ -96,7 +101,7 @@ class Driver(commands.Cog):
                 driver_data.append(driver_dict)
                 
         normalized_input = unidecode(driver).casefold()
-        img_url = unidecode(driver).title()
+        # img_url = unidecode(driver).title()
         wiki_image = get_wiki_image(driver)
 
         # iterate through driver data to find a match
@@ -107,13 +112,18 @@ class Driver(commands.Cog):
                 index = i
                 break
         if index == -1:
-            message_embed.title = "Driver not found"
+            message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+            message_embed.title = "Driver \"" +driver+ "\" not found!"
+            message_embed.description = "Try a driver's full name"
+            message_embed.timestamp = datetime.datetime.now()
+            message_embed.set_footer(text ='\u200b',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
         else:
             if wiki_image != 0:
                 message_embed.set_image(url=wiki_image)
             message_embed.title = driver_data[index]['name']
             message_embed.url = wikipedia.WikipediaPage(title = wikipedia.search(driver, results = 1)[0]).url
-            message_embed.add_field(name = "Nationality", value = (driver_data[index]['nationality']),inline = True)
+            # message_embed.add_field(name = "Nationality", inline = True, image=f"https:{driver_data[index]['nationality']}")
+            message_embed.set_thumbnail(url=f"https:{driver_data[index]['nationality']}")
             message_embed.add_field(name = "Seasons Completed", value = (driver_data[index]['seasons_completed']),inline = True)
             message_embed.add_field(name = "Championships", value = (driver_data[index]['championships']),inline = True)
             message_embed.add_field(name = "Entries", value = (driver_data[index]['entries']),inline = True)
@@ -123,7 +133,8 @@ class Driver(commands.Cog):
             message_embed.add_field(name = "Podiums", value = (driver_data[index]['podiums']),inline = True)
             message_embed.add_field(name = "Fastest Laps", value = (driver_data[index]['fastest_laps']),inline = True)
             message_embed.add_field(name = "Points", value = (driver_data[index]['points']),inline = True)
-            
+            message_embed.timestamp = datetime.datetime.now()
+            message_embed.set_footer(text ='\u200b',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
 
         # send final embed
         await interaction.followup.send(embed=message_embed)

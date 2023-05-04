@@ -6,9 +6,11 @@ import csv
 # team emojis
 team_emoji_ids = {
     "Red Bull":1081767515790770247,
+    "Red Bull Racing":1081767515790770247,
     "Mercedes":1081767514620571749,
     "Ferrari":1081767510019411978,
     "McLaren":1081767512733126736,
+    "Alpine":1081767507209224192,
     "Alpine F1 Team":1081767507209224192,
     "Renault":1081819628906496063,
     "Lotus F1":1081821034564558878,
@@ -16,6 +18,7 @@ team_emoji_ids = {
     "Team Lotus":1081821034564558878,
     "Aston Martin":1081767508287176734,
     "Alfa Romeo":1081767504617148417,
+    "Alfa Romeo Racing":1081767504617148417,
     "Sauber":1081820021497544704,
     "AlphaTauri":1081767505539903508,
     "Toro Rosso":1081767505539903508,

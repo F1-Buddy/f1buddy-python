@@ -2,13 +2,12 @@ import discord
 import fastf1
 import os
 import typing
-import pandas as pd
-# import lib.teamcolors as tc
 import json
 from fastf1 import plotting
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+import pandas as pd
 
 fastf1.Cache.enable_cache('cache/')
 plotting.setup_mpl()
