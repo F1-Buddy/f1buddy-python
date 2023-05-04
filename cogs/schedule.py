@@ -1,9 +1,6 @@
-# https://github.com/theOehrly/Fast-F1/issues/253
-# fast-f1 lacks standardized time zones for events, all events are listed in local track time
-
 import discord
 import fastf1
-import lib.timezones as timezones
+# import lib.timezones as timezones
 import pandas as pd
 import datetime
 import country_converter as coco
@@ -15,7 +12,7 @@ from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 from bs4 import BeautifulSoup
-from lib.station_codes import stations
+# from lib.station_codes import stations
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -83,14 +80,14 @@ class Schedule(commands.Cog):
             # if (fp1 < now < race) --> scenario where today is before the next race but after this weekend's fp1
             # or
             # if (fp1 > now > last race) --> scenario where today is after the last race but before upcoming race weekend's fp1
-            location_1 = schedule.loc[i, "Location"]
-            local_tz_1 =  timezones.timezones_list[location_1]
-            fp1_session = schedule.loc[i, "Session1Date"].tz_localize(local_tz_1).tz_convert('America/New_York')
-            race_session = schedule.loc[i, "Session5Date"].tz_localize(local_tz_1).tz_convert('America/New_York')
+            # location_1 = schedule.loc[i, "Location"]
+            # local_tz_1 =  timezones.timezones_list[location_1]
+            fp1_session = schedule.loc[i, "Session1Date"].tz_convert('America/New_York')
+            race_session = schedule.loc[i, "Session5Date"].tz_convert('America/New_York')
             try:
-                location_2 = schedule.loc[i-1, "Location"]
-                local_tz_2 =  timezones.timezones_list[location_2]
-                last_race_session = schedule.loc[i-1, "Session5Date"].tz_localize(local_tz_2).tz_convert('America/New_York')
+                # location_2 = schedule.loc[i-1, "Location"]
+                # local_tz_2 =  timezones.timezones_list[location_2]
+                last_race_session = schedule.loc[i-1, "Session5Date"].tz_convert('America/New_York')
             except:
                 continue
             if ((fp1_session < now.tz_localize('America/New_York')) and (race_session > now.tz_localize('America/New_York'))) or ((fp1_session > now.tz_localize('America/New_York'))) or ((fp1_session > now.tz_localize('America/New_York')) and (last_race_session < now.tz_localize('America/New_York'))):
@@ -154,12 +151,11 @@ class Schedule(commands.Cog):
                 # get location of race
                 location = schedule.loc[next_event, "Location"]
                 # try to get timezone from list
-                local_tz = timezones.timezones_list[location]
+                # local_tz = timezones.timezones_list[location]
                 # print("Getting timezone from timezones.py")
                 # convert times to EST
                 for key in converted_session_times.keys():
-                    date_object = converted_session_times.get(key).tz_localize(
-                        local_tz).tz_convert('America/New_York')
+                    date_object = converted_session_times.get(key).tz_convert('America/New_York')
                     converted_session_times.update({key: date_object})
             # timezone not found in timezones.py
             except Exception as e:
@@ -232,7 +228,7 @@ class Schedule(commands.Cog):
                     # print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
             # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
             else:
-                message_embed.set_footer(text="Weather forecast available within 3 days of race • Times are displayed in EST") 
+                message_embed.set_footer(text="Weather forecast available within 72 hours of race • Times are displayed in EST") 
 
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
