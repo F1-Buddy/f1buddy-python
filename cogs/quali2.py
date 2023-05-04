@@ -31,10 +31,25 @@ class Quali2(commands.Cog):
         if (year == None):
             year = now.year
         if (round == None):
-            round = 1
+            # get latest completed session by starting from the end and going back towards beginning of season
+            year_sched = fastf1.get_event_schedule(year,include_testing=False)
+            round = (year_sched.shape[0])
+            # print(round)
+            # print(year_sched.loc[round, "Session5Date"].tz_convert('America/New_York'))
+            sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
+            while (now.tz_localize('America/New_York') < sessionTime):
+                round -= 1
+                sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
+            result_session = fastf1.get_session(year, round, 'Race')
+            result_session.load()
         # round given as number
         try:
             round_number = int(round)
+            if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).loc[round_number, "Session5Date"].tz_convert('America/New_York')):
+                message_embed.title = "Qualifying Session not found!"
+                message_embed.description = "Round " + (str)(round_number) + " not found!"
+                await interaction.followup.send(embed = message_embed)
+                return
             result_session = fastf1.get_session(year, round_number, 'Qualifying')
             # message_embed.description = "Round number given: " + (str)(round_number)
             # print("Round number given: " + (str)(round_number))
@@ -110,7 +125,7 @@ class Quali2(commands.Cog):
         message_embed.add_field(name = "Position", value = position_string,inline = True)
         message_embed.add_field(name = "Driver", value = driver_names,inline = True)
         message_embed.add_field(name = "Time", value = time_string,inline = True)
-        message_embed.add_field(name = "Quali Highlights", value = video_url,inline = False)
+        message_embed.add_field(name = "Qualifying Highlights", value = video_url,inline = False)
         message_embed.set_image(url=thumbnail)
         # message_embed.add_field(name = "Status", value = status_string, inline = True)               
         # send final embed
