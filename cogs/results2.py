@@ -1,6 +1,6 @@
 import discord
-import requests
-import json
+# import requests
+# import json
 import fastf1
 import typing
 import pandas as pd
@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from pytube import Search, YouTube
+import os
 now = pd.Timestamp.now()
 
 fastf1.Cache.enable_cache('cache/')
@@ -34,15 +35,22 @@ class Results2(commands.Cog):
             # get latest completed session by starting from the end and going back towards beginning of season
             year_sched = fastf1.get_event_schedule(year,include_testing=False)
             round = (year_sched.shape[0])
+            # print(round)
+            # print(year_sched.loc[round, "Session5Date"].tz_convert('America/New_York'))
+            sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
+            while (now.tz_localize('America/New_York') < sessionTime):
+                round -= 1
+                sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
             result_session = fastf1.get_session(year, round, 'Race')
             result_session.load()
-            while result_session.results.empty:
-                round -= 1
-                result_session = fastf1.get_session(2023, round, 'Race')
-                result_session.load()
         # round given as number
         try:
             round_number = int(round)
+            if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).loc[round_number, "Session5Date"].tz_convert('America/New_York')):
+                message_embed.title = "Race not found!"
+                message_embed.description = "Round " + (str)(round_number) + " not found!"
+                await interaction.followup.send(embed = message_embed)
+                return
             result_session = fastf1.get_session(year, round_number, 'Race')
             # message_embed.description = "Round number given: " + (str)(round_number)
             # print("Round number given: " + (str)(round_number))
@@ -63,7 +71,7 @@ class Results2(commands.Cog):
         resultsTable = result_session.results
 
         # test print
-        print(resultsTable)
+        # print(resultsTable)
         # print('\n\n')
         # print(resultsTable.columns.tolist())
         

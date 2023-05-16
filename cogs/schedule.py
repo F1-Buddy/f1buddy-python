@@ -1,9 +1,6 @@
-# https://github.com/theOehrly/Fast-F1/issues/253
-# fast-f1 lacks standardized time zones for events, all events are listed in local track time
-
 import discord
 import fastf1
-import lib.timezones as timezones
+# import lib.timezones as timezones
 import pandas as pd
 import datetime
 import country_converter as coco
@@ -15,7 +12,7 @@ from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 from bs4 import BeautifulSoup
-from lib.station_codes import stations
+# from lib.station_codes import stations
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -70,7 +67,7 @@ class Schedule(commands.Cog):
         ################################################################
         # TESTING TIMESTAMP
         # change date to test schedule command on that date
-        # now = pd.Timestamp(year=2023, month=3, day=30)
+        # now = pd.Timestamp(year=2023, month=4, day=30)
         ################################################################
 
         # string to hold final message
@@ -83,14 +80,14 @@ class Schedule(commands.Cog):
             # if (fp1 < now < race) --> scenario where today is before the next race but after this weekend's fp1
             # or
             # if (fp1 > now > last race) --> scenario where today is after the last race but before upcoming race weekend's fp1
-            location_1 = schedule.loc[i, "Location"]
-            local_tz_1 =  timezones.timezones_list[location_1]
-            fp1_session = schedule.loc[i, "Session1Date"].tz_localize(local_tz_1).tz_convert('America/New_York')
-            race_session = schedule.loc[i, "Session5Date"].tz_localize(local_tz_1).tz_convert('America/New_York')
+            # location_1 = schedule.loc[i, "Location"]
+            # local_tz_1 =  timezones.timezones_list[location_1]
+            fp1_session = schedule.loc[i, "Session1Date"].tz_convert('America/New_York')
+            race_session = schedule.loc[i, "Session5Date"].tz_convert('America/New_York')
             try:
-                location_2 = schedule.loc[i-1, "Location"]
-                local_tz_2 =  timezones.timezones_list[location_2]
-                last_race_session = schedule.loc[i-1, "Session5Date"].tz_localize(local_tz_2).tz_convert('America/New_York')
+                # location_2 = schedule.loc[i-1, "Location"]
+                # local_tz_2 =  timezones.timezones_list[location_2]
+                last_race_session = schedule.loc[i-1, "Session5Date"].tz_convert('America/New_York')
             except:
                 continue
             if ((fp1_session < now.tz_localize('America/New_York')) and (race_session > now.tz_localize('America/New_York'))) or ((fp1_session > now.tz_localize('America/New_York'))) or ((fp1_session > now.tz_localize('America/New_York')) and (last_race_session < now.tz_localize('America/New_York'))):
@@ -131,11 +128,11 @@ class Schedule(commands.Cog):
                     ":stopwatch: Qualifying": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
-                fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
-                fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
-                fp3_date = pd.Timestamp(converted_session_times[":three: FP3"]).strftime('%Y-%m-%d')
-                quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
-                race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
+                # fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
+                # fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
+                # fp3_date = pd.Timestamp(converted_session_times[":three: FP3"]).strftime('%Y-%m-%d')
+                # quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
+                # race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             else:
                 converted_session_times = {
                     ":one: FP1": schedule.loc[next_event, "Session1Date"],
@@ -144,26 +141,26 @@ class Schedule(commands.Cog):
                     ":race_car: Sprint": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
-                fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
-                fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
-                quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
-                sprint_date = pd.Timestamp(converted_session_times[":race_car: Sprint"]).strftime('%Y-%m-%d')
-                race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
+                # fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
+                # fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
+                # quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
+                # sprint_date = pd.Timestamp(converted_session_times[":race_car: Sprint"]).strftime('%Y-%m-%d')
+                # race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             
             try:
-                # get location of race
                 location = schedule.loc[next_event, "Location"]
                 # try to get timezone from list
-                local_tz = timezones.timezones_list[location]
+                # local_tz = timezones.timezones_list[location]
                 # print("Getting timezone from timezones.py")
                 # convert times to EST
                 for key in converted_session_times.keys():
-                    date_object = converted_session_times.get(key).tz_localize(
-                        local_tz).tz_convert('America/New_York')
+                    date_object = converted_session_times.get(key).tz_convert('America/New_York')
                     converted_session_times.update({key: date_object})
-            # timezone not found in timezones.py
+            
+            # timezone not found in FastF1 <-- should not be possible anymore
             except Exception as e:
                 print("Using fallback timezone calculation")
+                # get location of race
                 print(e)
                 # calculate timezone using latitude/longitude
                 convert_timezone_fallback(location,converted_session_times)
@@ -187,23 +184,10 @@ class Schedule(commands.Cog):
             image = soup.find_all('picture', {'class': 'track'})
             image_url = image[next_event-1].find('img')['data-src']
 
-
-
-
-
             # weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
             # station_code = stations[race_name]
             
-
             weatherURL = "https://weatherapi-com.p.rapidapi.com/forecast.json"
-            fp1_date = converted_session_times.get(":one: FP1").strftime('%Y-%m-%d') + ""
-
-
-
-            fp1_date = "2023-4-17"
-            # location = "baku"
-
-
 
             race_date = converted_session_times.get(":checkered_flag: Race").strftime('%Y-%m-%d')
             # print(location)
@@ -232,7 +216,7 @@ class Schedule(commands.Cog):
                     # print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
             # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
             else:
-                message_embed.set_footer(text="Weather forecast available within 3 days of race • Times are displayed in EST") 
+                message_embed.set_footer(text="Weather forecast available within 72 hours of race • Times are displayed in EST") 
 
             # add fields to embed
             message_embed.add_field(name="Session", value=sessions_string,inline=True)
