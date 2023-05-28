@@ -12,6 +12,7 @@ from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 from bs4 import BeautifulSoup
+from lib.colors import colors
 # from lib.station_codes import stations
 
 fastf1.Cache.enable_cache('cache/')
@@ -55,7 +56,7 @@ class Schedule(commands.Cog):
 
         # setup embed
         message_embed = discord.Embed(title="Schedule", description="")
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.gold
         message_embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 

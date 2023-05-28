@@ -5,12 +5,13 @@ import pandas as pd
 import wikipedia
 import requests
 import json
+import country_converter as coco
 from unidecode import unidecode
 from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands
 from lib.drivernames import driver_names
-import country_converter as coco
+from lib.colors import colors
 
 stat_map = {
     'Starts':'starts',
@@ -41,7 +42,7 @@ class Driver(commands.Cog):
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
         
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.gold
         if 'anurag' in driver:
             message_embed.set_image(url='https://avatars.githubusercontent.com/u/100985214?v=4')
             message_embed.title = 'Slave'

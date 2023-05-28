@@ -6,8 +6,9 @@ import pandas as pd
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
-now = pd.Timestamp.now()
+from lib.colors import colors
 
+now = pd.Timestamp.now()
 
 class ConstructorStandings(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -28,7 +29,7 @@ class ConstructorStandings(commands.Cog):
         year = (response['MRData']['StandingsTable']['season']) 
         constructor_total = (int)(response['MRData']['total'])
         message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.gold
         
         for i in range(0,constructor_total):
             constructor_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i])

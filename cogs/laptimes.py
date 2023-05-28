@@ -7,6 +7,7 @@ from fastf1 import plotting
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from lib.colors import colors
 import pandas as pd
 
 fastf1.Cache.enable_cache('cache/')
@@ -74,7 +75,7 @@ class Laptimes(commands.Cog):
         now = pd.Timestamp.now()
         # setup embed
         message_embed = discord.Embed(title="Lap Times", description="")
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.gold
         message_embed.set_thumbnail(
         url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
