@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from pytube import Search, YouTube
+from lib.colors import colors
 import os
 now = pd.Timestamp.now()
 
@@ -26,7 +27,7 @@ class Results2(commands.Cog):
     async def Results2(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[str]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Race Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = discord.Colour.dark_red() 
+        message_embed.colour = colors.gold
         
         # check if args are valid
         if (year == None):
