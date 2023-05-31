@@ -42,7 +42,7 @@ class Driver(commands.Cog):
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
         
-        message_embed.colour = colors.gold
+        message_embed.colour = colors.default
         if 'anurag' in driver:
             message_embed.set_image(url='https://avatars.githubusercontent.com/u/100985214?v=4')
             message_embed.title = 'Slave'

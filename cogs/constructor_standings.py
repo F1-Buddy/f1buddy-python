@@ -29,7 +29,7 @@ class ConstructorStandings(commands.Cog):
         year = (response['MRData']['StandingsTable']['season']) 
         constructor_total = (int)(response['MRData']['total'])
         message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = colors.gold
+        message_embed.colour = colors.default
         
         for i in range(0,constructor_total):
             constructor_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i])

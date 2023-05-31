@@ -1,5 +1,6 @@
+
+
 class colors:
-    default = 0
     teal = 0x1abc9c
     dark_teal = 0x11806a
     green = 0x2ecc71
@@ -24,3 +25,6 @@ class colors:
     greyple = 0x99aab5
     aqua = 0x00ffff
     hot_pink = 0xff69b4
+    
+    # CHANGE THIS LINE TO CHANGE COLORS OF ALL COMMANDS IN UR BRANCH
+    default = dark_gold

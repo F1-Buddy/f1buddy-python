@@ -27,7 +27,7 @@ class Results2(commands.Cog):
     async def Results2(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[str]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Race Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = colors.gold
+        message_embed.colour = colors.default
         
         # check if args are valid
         if (year == None):
