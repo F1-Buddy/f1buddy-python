@@ -16,6 +16,8 @@ Changed laptimes to get team color from fastf1 instead of team_colors maps, remo
 ## Issues
 
 results, quali, wdc, and wcc are broken until ergast is fixed
+
 wdc and wcc is due to ssl certificate
+
 unsure of results and quali
 
