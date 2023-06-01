@@ -5,32 +5,16 @@ Rewritten in python to use fastf1 since ergast goes down too often
 
 ## Changelog
 
-Rewrote the driver command to use the BeautifulSoup4 web scraping library
+Fixed schedule image
+Changed laptimes to get team color from fastf1 instead of team_colors maps, removed team_colors.py
 
 
 ## To-do
-- [ ] Add searching by name to all commands
-- [x] DRIVER: fix wikipedia api, currently using pymediawiki
-- [x] DRIVER: Implement images for driver command, using new method
-- [x] DRIVER: Does not work if name is lowercase
-- [x] DRIVER: Names with special accents can only be accessed if user inputs their special accents (e.g. Kimi Räikkönen)
-- [x] DRIVER: Clean up bot output, looks messy as is
-- [x] DRIVER: Replace Nationality with emoji
-- [x] LAPTIME: create team_colors.py file for teamcolors for different years
-- [x] SCHEDULE: FIX LINE 80, uses local timezones which are ahead of EST, doesn't update properly (ex: Saudi GP over, but saudi local time > est time --> still shows saudi as next)
-- [x] SCHEDULE: Display time as 12 hour, possible timer to event? maybe another command (x days, y hours... until event)
-- [x] SCHEDULE: Add weather forecast for each day
-- [x] SCHEDULE: Embed track layout/circuit pictures
-- [x] SCHEDULE: Fix timezones for each race
-- [ ] General: Clean up code
-- [ ] General: Port everything else (...)
+
+
 ## Issues
 
-1.  Next Command: Timezone is calculated using latitude and longitude calculated from city name of circuit location (lol)
-
-    sometimes is inaccurate and doesnt always convert to EST/New York properly because of daylight savings (ik you got me jubayer)
-
-2. Not sure if schedule accounts for daylight savings/works properly for *every* location
-
-3. Currently no support for PreSeason Testing, add later
+results, quali, wdc, and wcc are broken until ergast is fixed
+wdc and wcc is due to ssl certificate
+unsure of results and quali
 
