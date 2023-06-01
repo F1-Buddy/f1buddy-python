@@ -3,6 +3,11 @@
 A python version of the discordjs-f1-bot! 
 Rewritten in python to use fastf1 since ergast goes down too often
 
+<img src="/images/schedule.png">
+<img src="/images/wdcwcc.png">
+<img src="/images/driver.png">
+<img src="/images/laptimes.png">
+
 ## Changelog
 
 Fixed schedule image
