@@ -10,7 +10,8 @@ Changed laptimes to get team color from fastf1 instead of team_colors maps, remo
 
 
 ## To-do
-
+- [ ] use fastf1 ergast implementation for wdc and wcc
+    - [ ] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
 
 ## Issues
 
