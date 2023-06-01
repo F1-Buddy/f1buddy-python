@@ -183,7 +183,7 @@ class Schedule(commands.Cog):
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
             image = soup.find_all('picture', {'class': 'track'})
-            image_url = image[next_event-1].find('img')['data-src']
+            image_url = image[next_event].find('img')['data-src']
 
             # weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
             # station_code = stations[race_name]
