@@ -24,6 +24,11 @@ class DriverStandings(commands.Cog):
         await interaction.response.defer()
         # get standings JSON
         url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year >= now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
+        # print(url)
+        ##############################################################################
+        # use this for TESTING ONLY, for use until ergast fixes their SSL certificate
+        # constructorStandings = requests.get(url,verify=False)
+        ##############################################################################
         driverStandings = requests.get(url)
         response = json.loads(driverStandings.content)
         driver_total = (int)(response['MRData']['total'])

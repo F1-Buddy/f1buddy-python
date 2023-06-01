@@ -24,6 +24,11 @@ class ConstructorStandings(commands.Cog):
         await interaction.response.defer()
         team_names, team_position, team_points = [], [], []
         url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year >= now.year) else f"https://ergast.com/api/f1/{year}/constructorStandings.json"
+        # print(url)
+        ##############################################################################
+        # use this for TESTING ONLY, for use until ergast fixes their SSL certificate
+        # constructorStandings = requests.get(url,verify=False)
+        ##############################################################################
         constructorStandings = requests.get(url)
         response = json.loads(constructorStandings.content)
         year = (response['MRData']['StandingsTable']['season']) 
