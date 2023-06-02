@@ -56,7 +56,7 @@ class Schedule(commands.Cog):
 
         # setup embed
         message_embed = discord.Embed(title="Schedule", description="")
-        message_embed.colour = colors.gold
+        message_embed.colour = colors.default
         message_embed.set_thumbnail(
             url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
@@ -183,7 +183,7 @@ class Schedule(commands.Cog):
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
             image = soup.find_all('picture', {'class': 'track'})
-            image_url = image[next_event-1].find('img')['data-src']
+            image_url = image[next_event].find('img')['data-src']
 
             # weatherURL = "https://meteostat.p.rapidapi.com/stations/hourly"
             # station_code = stations[race_name]

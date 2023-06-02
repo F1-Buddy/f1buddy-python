@@ -65,7 +65,7 @@ class Laptimes(commands.Cog):
     # @app_commands.choices(driver1=driver_list)
     # @app_commands.choices(driver2=driver_list)
     # @app_commands.option
-    async def laptimes(self, interaction: discord.Interaction, driver1: str, driver2: str, round:int, year: typing.Optional[int]):
+    async def laptimes(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, year: typing.Optional[int]):
         # make sure inputs uppercase
         driver1 = driver1.upper()
         driver2 = driver2.upper()
@@ -75,7 +75,7 @@ class Laptimes(commands.Cog):
         now = pd.Timestamp.now()
         # setup embed
         message_embed = discord.Embed(title="Lap Times", description="")
-        message_embed.colour = colors.gold
+        message_embed.colour = colors.default
         message_embed.set_thumbnail(
         url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
@@ -92,9 +92,6 @@ class Laptimes(commands.Cog):
                 # print("year not given/year given invalid")
                 race = fastf1.get_session(now.year, round, 'R')
                 race_year = now.year
-                while (race.date > now):
-                    race_year -= 1
-                    race = fastf1.get_session(race_year, round, 'R')
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
             
             # use given year
@@ -109,12 +106,17 @@ class Laptimes(commands.Cog):
             if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')) and (
                 not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png')):
                 race.load()
+                # print(race.results)
                 d1 = race.laps.pick_driver(driver1)
                 d2 = race.laps.pick_driver(driver2)
                 fig, ax = plt.subplots()
                 ax.set_facecolor('gainsboro')
-                ax.plot(d1['LapNumber'], d1['LapTime'], color=team_colors[driver1])
-                ax.plot(d2['LapNumber'], d2['LapTime'], color=team_colors[driver2])
+                # print(race.results.filter(items=['ALO']))
+                df = race.results
+                d1number = df.where(df==driver1).dropna(how='all').dropna(axis=1).index[0]
+                d2number = df.where(df==driver2).dropna(how='all').dropna(axis=1).index[0]
+                ax.plot(d1['LapNumber'], d1['LapTime'], color=f"#{race.results.loc[d1number,'TeamColor']}")
+                ax.plot(d2['LapNumber'], d2['LapTime'], color=f"#{race.results.loc[d2number,'TeamColor']}")
                 ax.set_title(racename+ ' '+driver1+" vs "+driver2)
                 ax.set_xlabel("Lap Number")
                 ax.set_ylabel("Lap Time")
@@ -128,13 +130,14 @@ class Laptimes(commands.Cog):
                 print(e)
                 try:
                     file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png', filename="image.png")
+                    print("Swapped drivers around and found a file")
                 # file does not exist and could not be created
                 except:
                     message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
         # 
         except Exception as e:
             print(e)
-            message_embed.set_footer(text = "Bad input given! (2018+)")
+            message_embed.set_footer(text = "Error occured")
 
 
         # send embed

@@ -3,34 +3,26 @@
 A python version of the discordjs-f1-bot! 
 Rewritten in python to use fastf1 since ergast goes down too often
 
+<img src="/images/schedule.png">
+<img src="/images/wdcwcc.png">
+<img src="/images/driver.png">
+<img src="/images/laptimes.png">
+
 ## Changelog
 
-Rewrote the driver command to use the BeautifulSoup4 web scraping library
+Fixed schedule image
+Changed laptimes to get team color from fastf1 instead of team_colors maps, removed team_colors.py
 
 
 ## To-do
-- [ ] Add searching by name to all commands
-- [x] DRIVER: fix wikipedia api, currently using pymediawiki
-- [x] DRIVER: Implement images for driver command, using new method
-- [x] DRIVER: Does not work if name is lowercase
-- [x] DRIVER: Names with special accents can only be accessed if user inputs their special accents (e.g. Kimi Räikkönen)
-- [x] DRIVER: Clean up bot output, looks messy as is
-- [x] DRIVER: Replace Nationality with emoji
-- [x] LAPTIME: create team_colors.py file for teamcolors for different years
-- [x] SCHEDULE: FIX LINE 80, uses local timezones which are ahead of EST, doesn't update properly (ex: Saudi GP over, but saudi local time > est time --> still shows saudi as next)
-- [x] SCHEDULE: Display time as 12 hour, possible timer to event? maybe another command (x days, y hours... until event)
-- [x] SCHEDULE: Add weather forecast for each day
-- [x] SCHEDULE: Embed track layout/circuit pictures
-- [x] SCHEDULE: Fix timezones for each race
-- [ ] General: Clean up code
-- [ ] General: Port everything else (...)
+- [ ] use fastf1 ergast implementation for wdc and wcc
+    - [ ] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
+
 ## Issues
 
-1.  Next Command: Timezone is calculated using latitude and longitude calculated from city name of circuit location (lol)
+results, quali, wdc, and wcc are broken until ergast is fixed
 
-    sometimes is inaccurate and doesnt always convert to EST/New York properly because of daylight savings (ik you got me jubayer)
+wdc and wcc is due to ssl certificate
 
-2. Not sure if schedule accounts for daylight savings/works properly for *every* location
-
-3. Currently no support for PreSeason Testing, add later
+unsure of results and quali
 

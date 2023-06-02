@@ -24,12 +24,17 @@ class ConstructorStandings(commands.Cog):
         await interaction.response.defer()
         team_names, team_position, team_points = [], [], []
         url = "https://ergast.com/api/f1/current/constructorStandings.json" if (year == None) or (year < 1957 and year >= now.year) else f"https://ergast.com/api/f1/{year}/constructorStandings.json"
+        # print(url)
+        ##############################################################################
+        # use this for TESTING ONLY, for use until ergast fixes their SSL certificate
+        # constructorStandings = requests.get(url,verify=False)
+        ##############################################################################
         constructorStandings = requests.get(url)
         response = json.loads(constructorStandings.content)
         year = (response['MRData']['StandingsTable']['season']) 
         constructor_total = (int)(response['MRData']['total'])
         message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = colors.gold
+        message_embed.colour = colors.default
         
         for i in range(0,constructor_total):
             constructor_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'][i])
