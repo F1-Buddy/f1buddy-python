@@ -8,6 +8,7 @@ from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from lib.emojiid import nation_dictionary
 from lib.championship import constructor_championship
+from lib.colors import colors
 import country_converter as coco
 now = pd.Timestamp.now()
 
@@ -19,7 +20,7 @@ def checkYear(year,round):
         return "bad round number"
     else:
         if (year == None and round == None):
-            url =  "http://ergast.com/api/f1/constructors"
+            url =  f"http://ergast.com/api/f1/{now.year}/constructors.json"
             return url
         elif (year == None):
             url = f"https://ergast.com/api/f1/{now.year}/{round}/constructors.json"
@@ -43,8 +44,9 @@ class Constructor(commands.Cog):
     async def Constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Constructor Information", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.default
         url = checkYear(year,round)
+        # print(url)
         description_string = ''
         nationality_dict = nation_dictionary()
 

@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from pytube import Search, YouTube
+from lib.colors import colors
 now = pd.Timestamp.now()
 
 fastf1.Cache.enable_cache('./cache/')
@@ -25,7 +26,7 @@ class Quali2(commands.Cog):
     async def Quali2(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[str]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Quali Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = discord.Colour.dark_red() 
+        message_embed.colour = colors.default
         
         # check if args are valid
         if (year == None):
@@ -70,7 +71,7 @@ class Quali2(commands.Cog):
         resultsTable = result_session.results
 
         # test print
-        print(resultsTable)
+        # print(resultsTable)
         # print('\n\n')
         # print(resultsTable.columns.tolist())
         

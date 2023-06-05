@@ -7,6 +7,7 @@ from fastf1 import plotting
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from lib.colors import colors
 import pandas as pd
 
 fastf1.Cache.enable_cache('cache/')
@@ -59,12 +60,12 @@ class Laptimes(commands.Cog):
     @app_commands.command(name='laptimes', description='Compare laptimes of two drivers in a race (2018 onwards)')
     @app_commands.describe(driver1='3 Letter Code for Driver 1')
     @app_commands.describe(driver2='3 Letter Code for Driver 2')
-    @app_commands.describe(round='Round Number')
+    @app_commands.describe(round='Round name or number (Australia or 3)')
     @app_commands.describe(year = "Year")
     # @app_commands.choices(driver1=driver_list)
     # @app_commands.choices(driver2=driver_list)
     # @app_commands.option
-    async def laptimes(self, interaction: discord.Interaction, driver1: str, driver2: str, round:int, year: typing.Optional[int]):
+    async def laptimes(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, year: typing.Optional[int]):
         # make sure inputs uppercase
         driver1 = driver1.upper()
         driver2 = driver2.upper()
@@ -74,7 +75,7 @@ class Laptimes(commands.Cog):
         now = pd.Timestamp.now()
         # setup embed
         message_embed = discord.Embed(title="Lap Times", description="")
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.default
         message_embed.set_thumbnail(
         url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
@@ -83,17 +84,12 @@ class Laptimes(commands.Cog):
         race_year = 0
         
         # get teamcolors json
-        with open('lib/teamcolors.json') as f:
-            colorsjson = json.load(f)
         try:
             # year given is invalid
             if (year == None or year > now.year or year < 2018):
                 # print("year not given/year given invalid")
                 race = fastf1.get_session(now.year, round, 'R')
                 race_year = now.year
-                while (race.date > now):
-                    race_year -= 1
-                    race = fastf1.get_session(race_year, round, 'R')
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
             
             # use given year
@@ -102,38 +98,44 @@ class Laptimes(commands.Cog):
                 race_year = year
                 # print(team_colors)
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-            # get colors using year
-            team_colors = colorsjson[(str)(race_year)]
             # check if graph already exists, if not create it
-            if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')) and (
-                not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png')):
-                race.load()
+            race.load()
+            if (not os.path.exists("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')) and (
+                not os.path.exists("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png')):
+                # print(race.results)
+                # print(race.results)
                 d1 = race.laps.pick_driver(driver1)
                 d2 = race.laps.pick_driver(driver2)
                 fig, ax = plt.subplots()
                 ax.set_facecolor('gainsboro')
-                ax.plot(d1['LapNumber'], d1['LapTime'], color=team_colors[driver1])
-                ax.plot(d2['LapNumber'], d2['LapTime'], color=team_colors[driver2])
+                # print(race.results.filter(items=['ALO']))
+                df = race.results
+                d1number = df.where(df==driver1).dropna(how='all').dropna(axis=1).index[0]
+                d2number = df.where(df==driver2).dropna(how='all').dropna(axis=1).index[0]
+                ax.plot(d1['LapNumber'], d1['LapTime'], color=f"#{race.results.loc[d1number,'TeamColor']}")
+                ax.plot(d2['LapNumber'], d2['LapTime'], color=f"#{race.results.loc[d2number,'TeamColor']}")
                 ax.set_title(racename+ ' '+driver1+" vs "+driver2)
                 ax.set_xlabel("Lap Number")
                 ax.set_ylabel("Lap Time")
-                plt.savefig("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')
+                plt.savefig("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
+                # 
             # try to access the graph
             try:
-                file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png', filename="image.png")
+                file = discord.File("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png', filename="image.png")
             
             except Exception as e:
                 # try to access the graph by switching driver1 and driver2
                 print(e)
                 try:
-                    file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png', filename="image.png")
+                    file = discord.File("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png', filename="image.png")
+                    print("Swapped drivers around and found a file")
                 # file does not exist and could not be created
                 except:
                     message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
         # 
         except Exception as e:
             print(e)
-            message_embed.set_footer(text = "Bad input given! (2018+)")
+            message_embed.set_footer(text = "Error occured")
 
 
         # send embed

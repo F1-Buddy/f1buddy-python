@@ -6,6 +6,8 @@ import pandas as pd
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
+from lib.colors import colors
+
 now = pd.Timestamp.now()
 
 class DriverStandings(commands.Cog):
@@ -22,6 +24,11 @@ class DriverStandings(commands.Cog):
         await interaction.response.defer()
         # get standings JSON
         url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year >= now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
+        # print(url)
+        ##############################################################################
+        # use this for TESTING ONLY, for use until ergast fixes their SSL certificate
+        # constructorStandings = requests.get(url,verify=False)
+        ##############################################################################
         driverStandings = requests.get(url)
         response = json.loads(driverStandings.content)
         driver_total = (int)(response['MRData']['total'])
@@ -29,7 +36,7 @@ class DriverStandings(commands.Cog):
         year = (response['MRData']['StandingsTable']['season']) 
         # set embed color and title
         message_embed = discord.Embed(title=f"{year} Driver Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        message_embed.colour = discord.Colour.dark_red()
+        message_embed.colour = colors.default
             
         for i in range(0,driver_total):
             driver_standings = (response['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'][i])
