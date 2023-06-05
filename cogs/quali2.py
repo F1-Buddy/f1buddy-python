@@ -71,7 +71,7 @@ class Quali2(commands.Cog):
         resultsTable = result_session.results
 
         # test print
-        print(resultsTable)
+        # print(resultsTable)
         # print('\n\n')
         # print(resultsTable.columns.tolist())
         
