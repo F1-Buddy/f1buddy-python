@@ -92,8 +92,19 @@ class Results2(commands.Cog):
             except:
                 driver_names += resultsTable.loc[i,'FullName'] + "\n"
             temp = (str)(resultsTable.loc[i,'Position'])
-            position_string += temp[0:temp.index('.')] + "\n"
-            points_string += (str)(resultsTable.loc[i,'Points']) + "\n"
+            temp_position = temp[0:temp.index('.')]
+            match temp_position:
+                case '1':
+                    temp_position = ':first_place:'
+                case '2':
+                    temp_position = ':second_place:'
+                case '3':
+                    temp_position = ':third_place:'
+            position_string += temp_position + "\n"
+            temp_points = (str)(resultsTable.loc[i,'Points'])
+            if temp_points[temp_points.index('.'):] == '.0':
+                temp_points = temp_points[:temp_points.index('.')]
+            points_string += temp_points + "\n"
             # status_string += (str)(resultsTable.loc[i,'Status']) + "\n"
 
         # print(driver_names)
