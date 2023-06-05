@@ -60,7 +60,7 @@ class Laptimes(commands.Cog):
     @app_commands.command(name='laptimes', description='Compare laptimes of two drivers in a race (2018 onwards)')
     @app_commands.describe(driver1='3 Letter Code for Driver 1')
     @app_commands.describe(driver2='3 Letter Code for Driver 2')
-    @app_commands.describe(round='Round Number')
+    @app_commands.describe(round='Round name or number (Australia or 3)')
     @app_commands.describe(year = "Year")
     # @app_commands.choices(driver1=driver_list)
     # @app_commands.choices(driver2=driver_list)
@@ -84,8 +84,6 @@ class Laptimes(commands.Cog):
         race_year = 0
         
         # get teamcolors json
-        with open('lib/teamcolors.json') as f:
-            colorsjson = json.load(f)
         try:
             # year given is invalid
             if (year == None or year > now.year or year < 2018):
@@ -100,12 +98,11 @@ class Laptimes(commands.Cog):
                 race_year = year
                 # print(team_colors)
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-            # get colors using year
-            team_colors = colorsjson[(str)(race_year)]
             # check if graph already exists, if not create it
-            if (not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')) and (
-                not os.path.exists("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png')):
-                race.load()
+            race.load()
+            if (not os.path.exists("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')) and (
+                not os.path.exists("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png')):
+                # print(race.results)
                 # print(race.results)
                 d1 = race.laps.pick_driver(driver1)
                 d2 = race.laps.pick_driver(driver2)
@@ -120,16 +117,17 @@ class Laptimes(commands.Cog):
                 ax.set_title(racename+ ' '+driver1+" vs "+driver2)
                 ax.set_xlabel("Lap Number")
                 ax.set_ylabel("Lap Time")
-                plt.savefig("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png')
+                plt.savefig("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
+                # 
             # try to access the graph
             try:
-                file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver1+'vs'+driver2+'.png', filename="image.png")
+                file = discord.File("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png', filename="image.png")
             
             except Exception as e:
                 # try to access the graph by switching driver1 and driver2
                 print(e)
                 try:
-                    file = discord.File("cogs/plots/"+str(race_year)+"laptimes"+str(round)+driver2+'vs'+driver1+'.png', filename="image.png")
+                    file = discord.File("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png', filename="image.png")
                     print("Swapped drivers around and found a file")
                 # file does not exist and could not be created
                 except:
