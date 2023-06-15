@@ -10,11 +10,13 @@ Rewritten in python to use fastf1 since ergast goes down too often
 
 ## Changelog
 
-Fixed schedule image
-Changed laptimes to get team color from fastf1 instead of team_colors maps, removed team_colors.py
+added legend to laptimes and fixed round input as a number not working
+
+added positions command
 
 
 ## To-do
+- [ ] (maybe) make round an optional input for laptime and positions
 - [ ] use fastf1 ergast implementation for wdc and wcc
     - [ ] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
 
