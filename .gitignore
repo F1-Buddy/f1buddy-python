@@ -6,7 +6,8 @@ config.py
 /__pycache__/
 /cogs/__pycache__/
 /lib/__pycache__/
-/cogs/plots/*
+/cogs/plots/laptime/*
+/cogs/plots/positions/*
 !/cogs/plots/.gitkeep 
 !/cogs/plots/laptime/.gitkeep 
 !/cogs/plots/positions/.gitkeep
