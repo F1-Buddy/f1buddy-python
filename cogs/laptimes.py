@@ -87,47 +87,49 @@ class Laptimes(commands.Cog):
         try:
             # year given is invalid
             if (year == None or year > now.year or year < 2018):
-                # print("year not given/year given invalid")
-                race = fastf1.get_session(now.year, round, 'R')
-                race_year = now.year
+                try:
+                    race = fastf1.get_session(now.year, round, 'R')
+                except:
+                    race = fastf1.get_session(now.year, (int)(round), 'R')
+                race.load()
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
             
             # use given year
             else:
-                race = fastf1.get_session(year, round, 'R')
-                race_year = year
-                # print(team_colors)
+                try:
+                    race = fastf1.get_session(now.year, round, 'R')
+                except:
+                    race = fastf1.get_session(now.year, (int)(round), 'R')
                 racename = '' + str(race.date.year)+' '+str(race.event.EventName)
             # check if graph already exists, if not create it
             race.load()
-            if (not os.path.exists("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')) and (
-                not os.path.exists("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png')):
-                # print(race.results)
-                # print(race.results)
+            if (not os.path.exists("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')) and (
+                not os.path.exists("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png')):
+
                 d1 = race.laps.pick_driver(driver1)
                 d2 = race.laps.pick_driver(driver2)
                 fig, ax = plt.subplots()
                 ax.set_facecolor('gainsboro')
-                # print(race.results.filter(items=['ALO']))
                 df = race.results
-                d1number = df.where(df==driver1).dropna(how='all').dropna(axis=1).index[0]
-                d2number = df.where(df==driver2).dropna(how='all').dropna(axis=1).index[0]
-                ax.plot(d1['LapNumber'], d1['LapTime'], color=f"#{race.results.loc[d1number,'TeamColor']}")
-                ax.plot(d2['LapNumber'], d2['LapTime'], color=f"#{race.results.loc[d2number,'TeamColor']}")
+                # d1number = df.where(df==driver1).dropna(how='all').dropna(axis=1).index[0]
+                # d2number = df.where(df==driver2).dropna(how='all').dropna(axis=1).index[0]
+                ax.plot(d1['LapNumber'], d1['LapTime'], color=fastf1.plotting.driver_color(driver1), label = driver1)
+                ax.plot(d2['LapNumber'], d2['LapTime'], color=fastf1.plotting.driver_color(driver2), label = driver2)
                 ax.set_title(racename+ ' '+driver1+" vs "+driver2)
                 ax.set_xlabel("Lap Number")
                 ax.set_ylabel("Lap Time")
-                plt.savefig("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
+                ax.legend(loc="upper right")
+                plt.savefig("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
                 # 
             # try to access the graph
             try:
-                file = discord.File("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png', filename="image.png")
+                file = discord.File("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png', filename="image.png")
             
             except Exception as e:
                 # try to access the graph by switching driver1 and driver2
                 print(e)
                 try:
-                    file = discord.File("cogs/plots/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png', filename="image.png")
+                    file = discord.File("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver2+'vs'+driver1+'.png', filename="image.png")
                     print("Swapped drivers around and found a file")
                 # file does not exist and could not be created
                 except:
