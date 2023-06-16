@@ -3,14 +3,9 @@
 A python version of the discordjs-f1-bot! 
 Rewritten in python to use fastf1 since ergast goes down too often
 
-Schedule             |  Standings
-:-------------------------:|:-------------------------:
-![](/images/schedule.png)  |  ![](/images/wdcwcc.png)
-
-<img src="/images/schedule.png">
-<img src="/images/wdcwcc.png">
-<img src="/images/driver.png">
-<img src="/images/laptimes.png">
+Schedule             |  Standings|  Driver|  Laptimes|  Results|  Positions
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  ![](/images/laptimes.png)|  ![](/images/results.png)|  ![](/images/positions.png)
 
 ## Changelog
 
