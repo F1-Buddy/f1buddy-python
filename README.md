@@ -27,9 +27,5 @@ added positions command
 
 ## Issues
 
-results, quali, wdc, and wcc are broken until ergast is fixed
 
-wdc and wcc is due to ssl certificate
-
-unsure of results and quali
 
