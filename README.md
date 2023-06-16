@@ -1,3 +1,5 @@
+<img src="/botPics/f1python192.png">
+
 # f1buddy-python
 
 A python version of the discordjs-f1-bot! 
