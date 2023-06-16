@@ -81,6 +81,7 @@ class Positions(commands.Cog):
                 ax.xaxis.set_minor_locator(MultipleLocator(1))
                 plt.title('Position Changes during '+racename)
                 plt.grid(visible=False, which='both')
+                plt.rcParams['savefig.dpi'] = 300
                 plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
                 # 
             # try to access the graph

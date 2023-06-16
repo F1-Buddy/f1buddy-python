@@ -119,6 +119,7 @@ class Laptimes(commands.Cog):
                 ax.set_xlabel("Lap Number")
                 ax.set_ylabel("Lap Time")
                 ax.legend(loc="upper right")
+                plt.rcParams['savefig.dpi'] = 300
                 plt.savefig("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
                 # 
             # try to access the graph
