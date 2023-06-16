@@ -3,9 +3,13 @@
 A python version of the discordjs-f1-bot! 
 Rewritten in python to use fastf1 since ergast goes down too often
 
-Schedule             |  Standings|  Driver|  Laptimes|  Results|  Positions
-:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  ![](/images/laptimes.png)|  ![](/images/results.png)|  ![](/images/positions.png)
+Schedule             |  Standings|  Driver|  
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  
+
+Laptimes|  Results|  Positions
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/laptimes.png)|  ![](/images/results.png)|  ![](/images/positions.png)
 
 ## Changelog
 
