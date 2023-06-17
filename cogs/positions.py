@@ -27,7 +27,7 @@ class Positions(commands.Cog):
     @app_commands.describe(round='Round name or number (Australia or 3)')
     @app_commands.describe(year = "Year")
     async def laptimes(self, interaction: discord.Interaction, round:str, year: typing.Optional[int]):
-        
+        # pyplot setup
         f1plt.setup_mpl()
         f1plt.setup_mpl(misc_mpl_mods=False)
         fig, ax = plt.subplots(figsize=(8.0, 4.9))
@@ -75,8 +75,7 @@ class Positions(commands.Cog):
                     driver_color = f1plt.driver_color(driver_name)
                     plt.plot(driver_laps["LapNumber"],driver_laps["Position"], color = driver_color, label = driver_name)
 
-
-
+                # pyplot setup
                 ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2)
                 ax.minorticks_off()
                 ax.xaxis.set_major_locator(MultipleLocator(5))
@@ -84,11 +83,12 @@ class Positions(commands.Cog):
                 plt.title('Position Changes during '+racename)
                 plt.grid(visible=False, which='both')
                 plt.rcParams['savefig.dpi'] = 300
+                # save plot
                 plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
+                # clear plot
                 plt.clf()
                 plt.cla()
                 plt.close()
-                # 
             # try to access the graph
             try:
                 file = discord.File("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png', filename="image.png")

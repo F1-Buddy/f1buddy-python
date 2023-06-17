@@ -33,66 +33,55 @@ class Results2(commands.Cog):
         if (year == None):
             year = now.year
         if (round == None):
-            # get latest completed session by starting from the end and going back towards beginning of season
+            # get latest completed session by starting from the end of calendar and going back towards beginning of season
             year_sched = fastf1.get_event_schedule(year,include_testing=False)
             round = (year_sched.shape[0])
-            # print(round)
-            # print(year_sched.loc[round, "Session5Date"].tz_convert('America/New_York'))
             sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
             while (now.tz_localize('America/New_York') < sessionTime):
                 round -= 1
                 sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
             result_session = fastf1.get_session(year, round, 'Race')
+            # most recent session found, load it
             result_session.load()
-        # round given as number
+        # round was given as number
         try:
             round_number = int(round)
+            # inputs were valid, but the race hasnt happened yet
             if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).loc[round_number, "Session5Date"].tz_convert('America/New_York')):
                 message_embed.title = "Race not found!"
                 message_embed.description = "Round " + (str)(round_number) + " not found!"
                 await interaction.followup.send(embed = message_embed)
                 return
+            # inputs were valid, get session
             result_session = fastf1.get_session(year, round_number, 'Race')
-            # message_embed.description = "Round number given: " + (str)(round_number)
-            # print("Round number given: " + (str)(round_number))
             
-        # round given as name
+        # round was given as name
         except Exception as e:
             result_session = fastf1.get_session(year, round, 'Race')
-            # print(e)
-            # print("Round name given: " + round)
-            
-            # easter egg
-            # if ('anurag' in round):
-            #     message_embed.set_image(url='https://avatars.githubusercontent.com/u/100985214?v=4')
-            # message_embed.description = "Round name given: "+round
 
         # load session
         result_session.load()
         resultsTable = result_session.results
-
-        # test print
-        # print(resultsTable)
-        # print('\n\n')
-        # print(resultsTable.columns.tolist())
         
         # get driver names and team emojis 
         driver_names = ""
         position_string = ""
         points_string = ""
-        # status_string = ""
+        # table is empty if race hasnt happened yet
         if (resultsTable.empty):
             message_embed.description = "Race not found!"
             await interaction.followup.send(embed = message_embed)
             return
+        # get each drivers finishing position/points and put them in the strings
         for i in (resultsTable.DriverNumber.values):
+            # put team emoji before driver name if a matching emoji is found
             try:
-                # print(resultsTable.loc[i,'TeamName'])
                 driver_names += ((str)(self.bot.get_emoji(team_emoji_ids[resultsTable.loc[i,'TeamName']]))) + " " + resultsTable.loc[i,'FullName'] + "\n"
             except:
                 driver_names += resultsTable.loc[i,'FullName'] + "\n"
             temp = (str)(resultsTable.loc[i,'Position'])
             temp_position = temp[0:temp.index('.')]
+            # use medal emojis for top 3 positions
             match temp_position:
                 case '1':
                     temp_position = ':first_place:'
@@ -101,30 +90,29 @@ class Results2(commands.Cog):
                 case '3':
                     temp_position = ':third_place:'
             position_string += temp_position + "\n"
+            # get points and put in string
             temp_points = (str)(resultsTable.loc[i,'Points'])
             if temp_points[temp_points.index('.'):] == '.0':
                 temp_points = temp_points[:temp_points.index('.')]
             points_string += temp_points + "\n"
-            # status_string += (str)(resultsTable.loc[i,'Status']) + "\n"
 
-        # print(driver_names)
+        # get race name
         raceName = result_session.event.EventName
         message_embed.title = f"{year} {raceName} Race Results"
 
+        # get link to race highlights youtube video
         s = Search((str)(year) + " " + raceName + " Highlights")
         video_url = 'https://www.youtube.com/watch?v='
         t = (str)(s.results[0])
         video_url += (t[t.index('videoId=')+8:-1])
         thumbnail = YouTube(video_url).thumbnail_url
 
+        # build embed and send it
         message_embed.add_field(name = "Position", value = position_string,inline = True)
         message_embed.add_field(name = "Driver", value = driver_names,inline = True)
         message_embed.add_field(name = "Points", value = points_string,inline = True)
         message_embed.add_field(name = "Race Highlights", value = video_url,inline = False)
         message_embed.set_image(url=thumbnail)
-        # message_embed.add_field(name = "Status", value = status_string, inline = True)               
-        # send final embed
-        # message_embed.description = ""
         await interaction.followup.send(embed = message_embed)
 
 async def setup(bot):
