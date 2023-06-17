@@ -13,16 +13,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
 fastf1.Cache.enable_cache('cache/')
-f1plt.setup_mpl()
-f1plt.setup_mpl(misc_mpl_mods=False)
-fig, ax = plt.subplots(figsize=(8.0, 4.9))
-plt.ylabel("Position")
-plt.xlabel("Lap")
-plt.tight_layout()
-plt.subplots_adjust(right=0.85,top = 0.89)
-ax.set_facecolor('black')
-ax.set_ylim([21, 0])
-ax.set_yticks(range(1,21))
+
 
 class Positions(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -36,6 +27,17 @@ class Positions(commands.Cog):
     @app_commands.describe(round='Round name or number (Australia or 3)')
     @app_commands.describe(year = "Year")
     async def laptimes(self, interaction: discord.Interaction, round:str, year: typing.Optional[int]):
+        
+        f1plt.setup_mpl()
+        f1plt.setup_mpl(misc_mpl_mods=False)
+        fig, ax = plt.subplots(figsize=(8.0, 4.9))
+        plt.ylabel("Position")
+        plt.xlabel("Lap")
+        plt.tight_layout()
+        plt.subplots_adjust(right=0.85,top = 0.89)
+        ax.set_facecolor('black')
+        ax.set_ylim([21, 0])
+        ax.set_yticks(range(1,21))
         # defer reply for later
         await interaction.response.defer()
         # get current time
@@ -75,7 +77,7 @@ class Positions(commands.Cog):
 
 
 
-                ax.legend(bbox_to_anchor=(1.0, 1.02))
+                ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2)
                 ax.minorticks_off()
                 ax.xaxis.set_major_locator(MultipleLocator(5))
                 ax.xaxis.set_minor_locator(MultipleLocator(1))
@@ -83,6 +85,9 @@ class Positions(commands.Cog):
                 plt.grid(visible=False, which='both')
                 plt.rcParams['savefig.dpi'] = 300
                 plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
+                plt.clf()
+                plt.cla()
+                plt.close()
                 # 
             # try to access the graph
             try:
