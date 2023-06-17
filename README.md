@@ -7,7 +7,9 @@ Rewritten in python to use fastf1 since ergast goes down too often
 
 Invite it to your server!
 
-[![](https://logodownload.org/wp-content/uploads/2017/11/discord-logo-1-1.png)](https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=2147798016&scope=bot)
+<a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=2147798016&scope=bot">
+    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="313" height="225">
+</a>
 
 Schedule             |  Standings|  Driver|  
 :-------------------------:|:-------------------------:|:-------------------------:
