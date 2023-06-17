@@ -11,6 +11,8 @@ Invite it to your server!
     <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="157" height="112">
 </a>
 
+
+
 Schedule             |  Standings|  Driver|  
 :-------------------------:|:-------------------------:|:-------------------------:
 ![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  
