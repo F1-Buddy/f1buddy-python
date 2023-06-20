@@ -2,7 +2,6 @@ import discord
 import fastf1
 import os
 import typing
-import json
 from fastf1 import plotting
 from discord import app_commands
 from discord.ext import commands
@@ -20,11 +19,7 @@ class Laptimes(commands.Cog):
     async def on_ready(self):
         print('Laptimes cog loaded')
 
-    @commands.command()
-    async def sync(self, ctx) -> None:
-        # print("sync command started")
-        fmt = await ctx.bot.tree.sync()
-        await ctx.send(f'Synced {len(fmt)}')
+
 
     @app_commands.command(name='laptimes', description='Compare laptimes of two drivers in a race (2018 onwards)')
     
@@ -36,11 +31,11 @@ class Laptimes(commands.Cog):
     
     # command
     async def laptimes(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, year: typing.Optional[int]):
+        # defer reply for later
+        await interaction.response.defer()
         # make sure inputs uppercase
         driver1 = driver1.upper()
         driver2 = driver2.upper()
-        # defer reply for later
-        await interaction.response.defer()
         # get current time
         now = pd.Timestamp.now()
         # setup embed
