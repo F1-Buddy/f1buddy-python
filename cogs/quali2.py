@@ -37,16 +37,16 @@ class Quali2(commands.Cog):
             round = (year_sched.shape[0])
             # print(round)
             # print(year_sched.loc[round, "Session5Date"].tz_convert('America/New_York'))
-            sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
+            sessionTime = year_sched.loc[round, "Session4Date"].tz_convert('America/New_York')
             while (now.tz_localize('America/New_York') < sessionTime):
                 round -= 1
-                sessionTime = year_sched.loc[round, "Session5Date"].tz_convert('America/New_York')
-            result_session = fastf1.get_session(year, round, 'Race')
+                sessionTime = year_sched.loc[round, "Session4Date"].tz_convert('America/New_York')
+            result_session = fastf1.get_session(year, round, 'Qualifying')
             result_session.load()
         # round given as number
         try:
             round_number = int(round)
-            if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).loc[round_number, "Session5Date"].tz_convert('America/New_York')):
+            if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).loc[round_number, "Session4Date"].tz_convert('America/New_York')):
                 message_embed.title = "Qualifying Session not found!"
                 message_embed.description = "Round " + (str)(round_number) + " not found!"
                 await interaction.followup.send(embed = message_embed)
