@@ -20,8 +20,8 @@ class DriverStandings(commands.Cog):
     @app_commands.describe(year = "Standings year")
     
     async def DriverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
-        driver_name, driver_position, driver_points = [], [], []
         await interaction.response.defer()
+        driver_name, driver_position, driver_points = [], [], []
         # get standings JSON
         url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year >= now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
         # print(url)
