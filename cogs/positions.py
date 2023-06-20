@@ -2,7 +2,6 @@ import discord
 import fastf1
 import os
 import typing
-from fastf1 import plotting
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
@@ -26,7 +25,9 @@ class Positions(commands.Cog):
     @app_commands.command(name='positions', description='See driver position changes over the race')
     @app_commands.describe(round='Round name or number (Australia or 3)')
     @app_commands.describe(year = "Year")
-    async def laptimes(self, interaction: discord.Interaction, round:str, year: typing.Optional[int]):
+    async def positions(self, interaction: discord.Interaction, round:str, year: typing.Optional[int]):
+        # defer reply for later
+        await interaction.response.defer()
         # pyplot setup
         f1plt.setup_mpl()
         f1plt.setup_mpl(misc_mpl_mods=False)
@@ -38,8 +39,6 @@ class Positions(commands.Cog):
         ax.set_facecolor('black')
         ax.set_ylim([21, 0])
         ax.set_yticks(range(1,21))
-        # defer reply for later
-        await interaction.response.defer()
         # get current time
         now = pd.Timestamp.now()
         # setup embed
