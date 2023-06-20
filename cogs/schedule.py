@@ -224,7 +224,7 @@ class Schedule(commands.Cog):
             message_embed.add_field(name="Time", value=times_string,inline=True)
             if (race_within_3days):
                 days = "Friday\nSaturday\nSunday"
-                message_embed.add_field(name="Weather:", value="",inline=False)
+                message_embed.add_field(name="Weather Forecast:", value="",inline=False)
                 message_embed.add_field(name="Day", value=days,inline=True)
                 message_embed.add_field(name="Temperature", value=weather_string,inline=True)
                 message_embed.add_field(name="Precipitation", value=precip_string,inline=True)
