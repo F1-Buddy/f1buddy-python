@@ -3,7 +3,7 @@
 # f1buddy-python
 
 A python version of the discordjs-f1-bot! 
-Rewritten in python to use fastf1 since ergast goes down too often
+Rewritten in python to use fastf1
 
 Invite it to your server!
 
@@ -23,17 +23,26 @@ Laptimes|  Results|  Positions
 
 ## Changelog
 
-added legend to laptimes and fixed round input as a number not working
+run commands in executor, should work simultaneously now
 
-added positions command
+moved sync out of laptimes
+
+added a help command
+
+added author to each embed
 
 
 ## To-do
+- [ ] add predictions command
+- [ ] add str arg to help command to provide command-specific help
 - [ ] (maybe) make round an optional input for laptime and positions
 - [ ] use fastf1 ergast implementation for wdc and wcc
     - [ ] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
 
 ## Issues
+
+2020 season data is odd (exacmple styrian gp, 2020 round 2)
+
 
 
 
