@@ -44,6 +44,7 @@ class Constructor(commands.Cog):
     async def Constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
         await interaction.response.defer()
         message_embed = discord.Embed(title=f"Constructor Information", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         message_embed.colour = colors.default
         url = checkYear(year,round)
         # print(url)
