@@ -34,6 +34,7 @@ class ConstructorStandings(commands.Cog):
         year = (response['MRData']['StandingsTable']['season']) 
         constructor_total = (int)(response['MRData']['total'])
         message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         message_embed.colour = colors.default
         
         for i in range(0,constructor_total):
