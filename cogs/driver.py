@@ -41,6 +41,7 @@ class Driver(commands.Cog):
 
         # setup embed
         message_embed = discord.Embed(title="temp_driver_title", description="")
+        message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         
         message_embed.colour = colors.default
         if 'anurag' in driver:

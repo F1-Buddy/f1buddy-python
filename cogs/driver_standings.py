@@ -20,8 +20,8 @@ class DriverStandings(commands.Cog):
     @app_commands.describe(year = "Standings year")
     
     async def DriverStandings(self, interaction: discord.Interaction, year: typing.Optional[int]):
-        driver_name, driver_position, driver_points = [], [], []
         await interaction.response.defer()
+        driver_name, driver_position, driver_points = [], [], []
         # get standings JSON
         url = "https://ergast.com/api/f1/current/driverStandings.json" if (year == None) or (year < 1957) or (year >= now.year) else f"https://ergast.com/api/f1/{year}/driverStandings.json"
         # print(url)
@@ -36,6 +36,7 @@ class DriverStandings(commands.Cog):
         year = (response['MRData']['StandingsTable']['season']) 
         # set embed color and title
         message_embed = discord.Embed(title=f"{year} Driver Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         message_embed.colour = colors.default
             
         for i in range(0,driver_total):

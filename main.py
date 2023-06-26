@@ -4,7 +4,6 @@ import config
 import os
 import asyncio
 from discord.ext import commands
-import pandas as pd
 
 
 fastf1.Cache.enable_cache('cache/')
@@ -13,6 +12,7 @@ fastf1.Cache.enable_cache('cache/')
 # token = open('token.txt').readline()
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 bot = commands.Bot(command_prefix='f1$', intents=intents)
 ########################################
 
@@ -20,6 +20,7 @@ bot = commands.Bot(command_prefix='f1$', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
+
 
 
 @bot.event
