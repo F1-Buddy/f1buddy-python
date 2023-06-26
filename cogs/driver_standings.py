@@ -35,8 +35,8 @@ class DriverStandings(commands.Cog):
             points = driver_standings.iloc[index]['points']
             driver_position.append(position)
             driver_points.append(points)
-            constructor_names = driver_standings.iloc[index]['constructorNames']
-            constructor_name = constructor_names[0]
+            constructor_name = driver_standings.iloc[index]['constructorNames']
+            constructor_name = constructor_name[0]
             try:
                 emoji_id = team_emoji_ids.get(constructor_name)
                 emoji = self.bot.get_emoji(emoji_id)
