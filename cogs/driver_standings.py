@@ -36,10 +36,15 @@ class DriverStandings(commands.Cog):
             driver_position.append(position)
             driver_points.append(points)
             constructor_names = driver_standings.iloc[index]['constructorNames']
-            constructor_names_string = '\n'.join(map(str, constructor_names))
+            constructor_name = constructor_names[0]
             try:
-                driver_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_names_string])) + " " + name)
-            except:
+                emoji_id = team_emoji_ids.get(constructor_name)
+                emoji = self.bot.get_emoji(emoji_id)
+                if emoji:
+                    driver_name.append(f"{emoji} {name}")
+                else:
+                    driver_name.append(name)
+            except KeyError:
                 driver_name.append(name)
         
         # sets embed color and title
