@@ -29,6 +29,7 @@ def get_driver_standings(self, year):
         driver_position.append(position)
         driver_points.append(points)
         constructor_name = driver_standings.iloc[index]['constructorNames']
+        # if driver has drove for multiple teams
         constructor_name = constructor_name[0]
         try:
             # discord runs out of character space after 23 drivers
@@ -67,16 +68,16 @@ def get_driver_standings(self, year):
     message_embed.colour = colors.default
 
     # replaces commas in list with newline
-    driver_positions_string = '\n'.join(map(str, driver_position))
-    driver_names_string = '\n'.join(driver_name)
-    if len(driver_names_string) >= 1024:
-        driver_names_string = driver_names_string[:1024 - len(driver_names_string) - 1] + '.'
-    driver_points_string = '\n'.join(map(str, driver_points))
+    driver_position = '\n'.join(map(str, driver_position))
+    driver_name = '\n'.join(driver_name)
+    if len(driver_name) >= 1024:
+        driver_name = driver_name[:1024 - len(driver_name) - 1] + '.'
+    driver_points = '\n'.join(map(str, driver_points))
     
     # discord embed columns
-    message_embed.add_field(name="Position", value= driver_positions_string,inline=True)
-    message_embed.add_field(name="Driver", value=driver_names_string,inline=True)
-    message_embed.add_field(name="Points", value=driver_points_string,inline=True)
+    message_embed.add_field(name="Position", value= driver_position,inline=True)
+    message_embed.add_field(name="Driver", value=driver_name,inline=True)
+    message_embed.add_field(name="Points", value=driver_points,inline=True)
     return message_embed
         
 class driver_standings(commands.Cog):
