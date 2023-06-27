@@ -36,6 +36,7 @@ added author to each embed
 - [ ] add predictions command
 - [ ] add str arg to help command to provide command-specific help
 - [ ] (maybe) make round an optional input for laptime and positions
+- [ ] fix constructor command not outputting anything for 2010/2011
 - [x] use fastf1 ergast implementation for wdc and wcc
     - [x] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
 
