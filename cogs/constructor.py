@@ -112,7 +112,7 @@ class constructor(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('Constructors cog loaded')  
-    @app_commands.command(name = 'constructor', description = 'Get constructor information')
+    @app_commands.command(name = 'constructors', description = 'Get constructor information')
     @app_commands.describe(year = "Constructor information")
     
     async def constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
