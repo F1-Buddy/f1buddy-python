@@ -38,6 +38,18 @@ def convert_timezone_fallback(location, converted_session_times):
         converted_session_times.update({key: date_object})
         # print(date_object)
 
+# function that takes a timedelta and returns a countdown string
+def countdown(totalseconds):
+    out_string = ""
+    days = int(totalseconds // 86400)
+    totalseconds %= 86400
+    hours = int(totalseconds // 3600)
+    totalseconds %= 3600
+    minutes = int(totalseconds // 60)
+    seconds = totalseconds % 60
+    seconds = int(seconds // 1)
+    out_string += f"{days} days, {hours} hours, {minutes} minutes, and {seconds} seconds until the race!"
+    return out_string
 
 class Schedule(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -72,8 +84,7 @@ class Schedule(commands.Cog):
         # now = pd.Timestamp(year=2023, month=4, day=30)
         ################################################################
 
-        # string to hold final message
-        out_string = "It is currently `" + now.strftime('%I:%M%p on %Y/%m/%d') + "`\n\n"
+        
 
         # range starts at 2 because I skip 0 and 1 since I ignore preseason testing sessions
         # find round number of next event
@@ -106,6 +117,8 @@ class Schedule(commands.Cog):
             # check if it is off season
             if (len(schedule) <= next_event):
                 raise IndexError
+            
+            
 
             # else
             # get name of event
@@ -148,6 +161,10 @@ class Schedule(commands.Cog):
                 # quali_date = pd.Timestamp(converted_session_times[":stopwatch: Qualifying"]).strftime('%Y-%m-%d')
                 # sprint_date = pd.Timestamp(converted_session_times[":race_car: Sprint"]).strftime('%Y-%m-%d')
                 # race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
+                
+            # string to hold description message
+            time_until = schedule.loc[next_event, "Session5Date"].tz_convert('America/New_York') - now.tz_localize('America/New_York')
+            out_string = countdown(time_until.total_seconds())
             
             try:
                 location = schedule.loc[next_event, "Location"]
@@ -242,6 +259,7 @@ class Schedule(commands.Cog):
         # all other errors
         except Exception as e:
             print(e)
+            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             out_string = "Unknown error occured! Uh-Oh! Bad! :thermometer_face:"
 
         #######################################################################

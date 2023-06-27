@@ -9,6 +9,7 @@ from discord.ext import commands
 from matplotlib import pyplot as plt
 from lib.colors import colors
 import pandas as pd
+import traceback
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -54,11 +55,24 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             # get driver data
             d1 = race.laps.pick_driver(driver1)
             d2 = race.laps.pick_driver(driver2)
+            d1_number = d1.iloc[0].loc['DriverNumber']
+            d2_number = d2.iloc[0].loc['DriverNumber']
+            # print(d2)
             fig, ax = plt.subplots()
             ax.set_facecolor('gainsboro')
+            # get driver color
+            if (year == now.year):
+                d1_color = fastf1.plotting.driver_color(driver1)
+                d2_color = fastf1.plotting.driver_color(driver2)
+            else:
+                d1_color = f"#{race.results.loc[d1_number,'TeamColor']}"
+                d2_color = f"#{race.results.loc[d2_number,'TeamColor']}"
+            # if comparing teammates, change one drive color to white to be able to differentiate
+            if d1_color == d2_color:
+                d2_color = 'white'
             # plot laptimes
-            ax.plot(d1['LapNumber'], d1['LapTime'], color=fastf1.plotting.driver_color(driver1), label = driver1)
-            ax.plot(d2['LapNumber'], d2['LapTime'], color=fastf1.plotting.driver_color(driver2), label = driver2)
+            ax.plot(d1['LapNumber'], d1['LapTime'], color=d1_color, label = driver1)
+            ax.plot(d2['LapNumber'], d2['LapTime'], color=d2_color, label = driver2)
             # pyplot setup
             ax.set_title(racename+ ' '+driver1+" vs "+driver2)
             ax.set_xlabel("Lap Number")
@@ -92,7 +106,8 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
     # 
     except Exception as e:
         print(e)
-        message_embed.set_footer(text = "Unknown Error occured")
+        traceback.print_exc()
+        message_embed.set_footer(text = e)
 
 
 
@@ -121,6 +136,10 @@ class Laptimes(commands.Cog):
         # make sure inputs uppercase
         driver1 = driver1.upper()
         driver2 = driver2.upper()
+        if driver1 == driver2:
+            message_embed.description = "Use 2 different drivers!"
+            await interaction.followup.send(embed=message_embed)
+            return
 
         loop = asyncio.get_running_loop()
         # run results query and build embed
@@ -131,7 +150,8 @@ class Laptimes(commands.Cog):
             message_embed.set_image(url='attachment://image.png')
             await interaction.followup.send(embed=message_embed,file=file)
         except:
-            message_embed.description = "Error Occured :("            
+            message_embed.description += "Error Occured :("        
+            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')    
             await interaction.followup.send(embed=message_embed)
         loop.close()
 

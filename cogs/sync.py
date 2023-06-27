@@ -19,6 +19,8 @@ class Sync(commands.Cog):
             # update status
             activity=discord.Activity(type=discord.ActivityType.listening, name=f"V10s | {len(self.bot.guilds)} servers")
             await self.bot.change_presence(activity=activity)
+            # change nickname
+            await self.bot.user.edit(username='f1buddy')
             # sync commands
             fmt = await ctx.bot.tree.sync()
             commands = len(fmt)

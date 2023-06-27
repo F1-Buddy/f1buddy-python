@@ -20,6 +20,8 @@ def quali_results(self,year,round):
     # check if args are valid
     if (year == None):
         year = now.year
+    elif (year > now.year):
+        year = now.year
     if (round == None):
         # get latest completed session by starting from the end of calendar and going back towards beginning of season
         year_sched = fastf1.get_event_schedule(year,include_testing=False)
@@ -33,39 +35,16 @@ def quali_results(self,year,round):
         result_session = fastf1.get_session(year, round, 'Qualifying')
         # most recent session found, load it
         result_session.load()
-    # round was given as number
     else:
-        try:
-            round_number = int(round)
-            # inputs were valid, but the Qualifying hasnt happened yet
-            if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).iloc[round_number].loc["Session4Date"].tz_convert('America/New_York')):
-                message_embed.title = "Qualifying not found!"
-                message_embed.description = "Round " + (str)(round_number) + " not found!"
-                return message_embed
-            # inputs were valid, get session
-            result_session = fastf1.get_session(year, round_number, 'Qualifying')
-            
-        # round was given as string
-        except Exception as e:
-            try:
-                # capitalize first letter of input to match dataframe value
-                round_number = round.lower().title()
-                # get schedule for the year
-                df = fastf1.get_event_schedule(year,include_testing=False)
-                # get start date of given Qualifying using panda dataframe fuckery
-                Qualifyingstart_date = df.loc[df['Country'] == round_number,['Session4Date']].iloc[0].loc['Session4Date']
-
-                # inputs were valid, but the Qualifying hasnt happened yet, return embed
-                if (now.tz_localize('America/New_York') < Qualifyingstart_date.tz_convert('America/New_York')):
-                    message_embed.title = "Qualifying not found!"
-                    message_embed.description = f"Round {round_number} not found!"
-                    return message_embed
-                # inputs were valid, Qualifying has happened, get session
-                result_session = fastf1.get_session(year, round_number, 'Qualifying')
-            except:
-                print(e)
-                message_embed.description = "Invalid Input"
-                return message_embed
+        result_session = fastf1.get_session(year, round, 'Qualifying')
+        # inputs were valid, but the Qualifying hasnt happened yet
+        if (now.tz_localize('America/New_York') - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
+            message_embed.title = "Qualifying not found!"
+            message_embed.description = "Round \"" + (str)(round) + "\" not found!"
+            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+            return message_embed
+        # inputs were valid, get session
+        
 
     # load session
     result_session.load()
@@ -82,6 +61,7 @@ def quali_results(self,year,round):
     time_string = ""
     # status_string = ""
     if (resultsTable.empty):
+        message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
         message_embed.description = "Session not found!"
         return message_embed
     for i in (resultsTable.DriverNumber.values):
