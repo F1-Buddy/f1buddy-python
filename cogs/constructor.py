@@ -70,7 +70,7 @@ def get_constructor_info(self, year, round):
                 description_string = f"No teams for this round."     
         else:
             year = int(response['MRData']['ConstructorTable']['season'])
-            if (round == 0):
+            if (round >= 0):
                 round = int(response['MRData']['ConstructorTable']['round'])
                 message_embed.title = f"{year} Round {round} Constructor Information" 
             else:
