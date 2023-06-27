@@ -33,7 +33,7 @@ def check_year(year,round):
             url =  f"https://ergast.com/api/f1/{year}/{round}/constructors.json"
             return url
 
-def get_constructor_info():
+def get_constructor_info(self, year, round):
     message_embed = discord.Embed(title=f"Constructor Information", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     message_embed.colour = colors.default
@@ -103,6 +103,8 @@ def get_constructor_info():
             message_embed.add_field(name = "Championships", value = '\n'.join(constructor_championships),inline = True)
             message_embed.description = description_string
             nation_dictionary()
+            return message_embed
+
 
 class constructor(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -117,7 +119,7 @@ class constructor(commands.Cog):
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
         # run query and build embed
-        constructor_embed = await loop.run_in_executor(None, get_constructor_info, self, year)
+        constructor_embed = await loop.run_in_executor(None, get_constructor_info, self, year, round)
         constructor_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         # send embed
         await interaction.followup.send(embed = constructor_embed)
