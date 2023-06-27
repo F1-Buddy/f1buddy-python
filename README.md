@@ -41,7 +41,7 @@ added author to each embed
 
 ## Issues
 
-2020 season data is odd (exacmple styrian gp, 2020 round 2)
+2020 season data is odd (example styrian gp, 2020 round 2)
 
 
 
