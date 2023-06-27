@@ -139,6 +139,7 @@ class Positions(commands.Cog):
             message_embed.set_image(url='attachment://image.png')
             await interaction.followup.send(embed=message_embed,file=file)
         except:
+            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             message_embed.description = "Error Occured :("            
             await interaction.followup.send(embed=message_embed)
         loop.close()
