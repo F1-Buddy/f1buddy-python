@@ -1,8 +1,6 @@
 import asyncio
 import datetime
 import discord
-import requests
-import json
 import typing
 import pandas as pd
 from fastf1.ergast import Ergast
