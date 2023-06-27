@@ -23,7 +23,9 @@ def get_driver_standings(self, year):
     for index in range(len(driver_standings)):
         position = driver_standings.iloc[index]['position']
         name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']}"
-        points = driver_standings.iloc[index]['points']
+        points = (driver_standings.iloc[index]['points'])
+        if points == int(points):
+            points = int(points)
         driver_position.append(position)
         driver_points.append(points)
         constructor_name = driver_standings.iloc[index]['constructorNames']
@@ -75,6 +77,7 @@ def get_driver_standings(self, year):
     message_embed.add_field(name="Position", value= driver_positions_string,inline=True)
     message_embed.add_field(name="Driver", value=driver_names_string,inline=True)
     message_embed.add_field(name="Points", value=driver_points_string,inline=True)
+    return message_embed
         
 class driver_standings(commands.Cog):
     def __init__(self, bot: commands.Bot):
