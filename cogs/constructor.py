@@ -38,7 +38,7 @@ class Constructor(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('Constructors cog loaded')  
-    @app_commands.command(name = 'team', description = 'Get constructor information')
+    @app_commands.command(name = 'team', description = 'Get information on constructors')
     @app_commands.describe(year = "Constructor information")
     
     async def Constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
@@ -73,7 +73,6 @@ class Constructor(commands.Cog):
                     url =  f"https://ergast.com/api/f1/{year}/{1}/constructors.json"
                     constructor = requests.get(url)
                     response = json.loads(constructor.content)
-                
             amount_of_teams = int(response['MRData']['total'])
             if (amount_of_teams == 0):
                     description_string = f"No teams for this round."     
@@ -86,13 +85,13 @@ class Constructor(commands.Cog):
                     message_embed.title = f"{year} Constructor Information" 
                     
                 for i in range(amount_of_teams):
+                    # print(i)
                     constructor_data = (response['MRData']['ConstructorTable']['Constructors'][i])
                         
                     try:
                         constructor_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
                     except:
                         constructor_name.append((constructor_data['name']))
-                        
                     if constructor_data['name'] in constructor_championship:
                         constructor_championships.append(constructor_championship[constructor_data['name']])
                     else:
@@ -105,12 +104,15 @@ class Constructor(commands.Cog):
                 
                 string = ""
                 for j in range(amount_of_teams):
-                    string += f"[{constructor_name[j]}]({constructor_wikipedia[j]})\n"
+                    try:
+                        string += f"{constructor_name[j][0:constructor_name[j].index('>')+1]}[{constructor_name[j][constructor_name[j].index('>')+1:]}]({constructor_wikipedia[j]})\n"
+                    except:
+                        string += f"[{constructor_name[j]}]({constructor_wikipedia[j]})\n"
                 
                 message_embed.add_field(name="Team", value=string, inline=True)
                 message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
                 message_embed.add_field(name = "Championships", value = '\n'.join(constructor_championships),inline = True)
-                nation_dictionary()
+                
 
                 
         # send final embed
