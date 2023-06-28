@@ -153,7 +153,7 @@ class Speed(commands.Cog):
 
 
 
-    @app_commands.command(name='speed', description='See track speed dominance between drivers on their personal fastest laps')
+    @app_commands.command(name='trackdominance', description='See track dominance between drivers on their personal fastest laps')
     
     # inputs
     @app_commands.describe(driver1='3 Letter Code for Driver 1')
