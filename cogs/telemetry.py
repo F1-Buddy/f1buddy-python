@@ -22,7 +22,7 @@ now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
 
 # setup embed
-message_embed = discord.Embed(title="Lap Telemetry", description="")
+message_embed = discord.Embed(title="Fastest Lap Telemetry", description="")
 message_embed.colour = colors.default
 message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
 message_embed.set_thumbnail(
@@ -67,14 +67,14 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         d2_fastest = d2_laps.pick_fastest()
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
-        
+        throttle_string = ""
+        brake_string = ""
 
         if (not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png')) and (
             not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d2_name+'vs'+d1_name+'.png')):
             try:
                 d1_tel = d1_fastest.get_telemetry()
                 d2_tel = d2_fastest.get_telemetry()
-                
                 # get driver color
                 if (year == now.year):
                     d1_color = f1plt.driver_color(d1_name)
@@ -110,26 +110,30 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 d1_brake_percent = 0
                 d2_brake_percent = 0
                 
-                for c in d1_tel.index:
-                    if (d1_tel.loc[c,'Throttle'] >= 99):
-                        d1_throttle_percent += 1
-                    if (d1_tel.loc[c,'Brake'] == 1):
-                        d1_brake_percent += 1
-                    if (d2_tel.loc[c,'Throttle'] >= 99):
-                        d2_throttle_percent += 1
-                    if (d2_tel.loc[c,'Brake'] == 1):
-                        d2_brake_percent += 1
+                try:
+                    for c in d1_tel.index:
+                        if (d1_tel.loc[c,'Throttle'] >= 99):
+                            d1_throttle_percent += 1
+                        if (d1_tel.loc[c,'Brake'] == 1):
+                            d1_brake_percent += 1
+                        if (d2_tel.loc[c,'Throttle'] >= 99):
+                            d2_throttle_percent += 1
+                        if (d2_tel.loc[c,'Brake'] == 1):
+                            d2_brake_percent += 1
+                except Exception as e:
+                    print(e)
                 d1_throttle_percent = d1_throttle_percent / total * 100
                 d2_throttle_percent = d2_throttle_percent / total * 100
                 d1_brake_percent = d1_brake_percent / total * 100
                 d2_brake_percent = d2_brake_percent / total * 100
-                throttle_string = ""
-                brake_string = ""
+                
+                
                 throttle_string += f"{d1_name} was on full throttle for {d1_throttle_percent:.2f}% of the lap\n"
                 throttle_string += f"{d2_name} was on full throttle for {d2_throttle_percent:.2f}% of the lap\n"
                 brake_string += f"{d1_name} was on full throttle for {d1_brake_percent:.2f}% of the lap\n"
                 brake_string += f"{d2_name} was on full throttle for {d2_brake_percent:.2f}% of the lap\n"
-                message_embed.description = throttle_string + brake_string
+                print(throttle_string)
+                print(brake_string)
                         
                 # plt.title(f"Lap Telemetry\n{year} {str(race.event.EventName)}\n{d1_name} vs {d2_name}",fontdict = {'fontsize' : 'small'})
                 plt.grid(visible=False, which='both')
@@ -142,6 +146,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
+                # message_embed.description += "\n" + throttle_string + brake_string
                 # reset plot just in case
                 plt.clf()
                 plt.cla()
@@ -151,6 +156,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 traceback.print_exc()
         # try to access the graph
         try:
+            print("already exists")
             file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
             message_embed.set_footer(text='')
@@ -158,6 +164,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
             return file
         
         except Exception as e:
+            print(e)
             # try to access the graph by switching driver1 and driver2 in filename
             try:
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
