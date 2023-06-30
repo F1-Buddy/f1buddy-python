@@ -25,13 +25,12 @@ def results_result(self, year, round):
     if (round == None):
         # get latest completed session by starting from the end of calendar and going back towards beginning of season
         year_sched = fastf1.get_event_schedule(year,include_testing=False)
-        round = (year_sched.shape[0]-1)
-        sessionTime = year_sched.iloc[round].loc["Session5Date"].tz_convert('America/New_York')
+        round = (year_sched.shape[0])
+        sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         # print(sessionTime)
         while (now.tz_localize('America/New_York') < sessionTime):
             round -= 1
-            sessionTime = year_sched.iloc[round].loc["Session5Date"].tz_convert('America/New_York')
-        round += 1
+            sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Race')
         # most recent session found, load it
         result_session.load()
