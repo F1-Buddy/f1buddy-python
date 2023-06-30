@@ -1,6 +1,7 @@
 token.txt
 config.py
 test.py
+test2.py
 # cache/
 /cache/*
 !/cache/.gitkeep
