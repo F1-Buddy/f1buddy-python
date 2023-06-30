@@ -153,7 +153,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}"
+                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = +{td_to_laptime(abs(d1_fl-d2_fl))}"
                 # message_embed.description += "\n" + throttle_string + brake_string
                 # reset plot just in case
                 plt.clf()
