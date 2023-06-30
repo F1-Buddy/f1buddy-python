@@ -29,7 +29,10 @@ message_embed.set_thumbnail(
 url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
 
-def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[int]):
+def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
+    message_embed.description = ""
+    message_embed.title = f"Track Dominance during {sessiontype.name.capitalize()}"
+    message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
     fig, ax = plt.subplots()
@@ -42,17 +45,11 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         except:
             year = now.year
         if (year > now.year | year < 2018):
-            try:
-                race = fastf1.get_session(now.year, round, 'R')
-            except:
-                race = fastf1.get_session(now.year, (int)(round), 'R')
+            race = fastf1.get_session(now.year, round, sessiontype.value)
         
         # use given year
         else:
-            try:
-                race = fastf1.get_session(year, round, 'R')
-            except:
-                race = fastf1.get_session(year, (int)(round), 'R')
+            race = fastf1.get_session(year, round, sessiontype.value)
         # check if graph already exists, if not create it
         race.load()
         message_embed.description = race.event.EventName
@@ -156,13 +153,18 @@ class Speed(commands.Cog):
     @app_commands.command(name='trackdominance', description='See track dominance between drivers on their personal fastest laps')
     
     # inputs
+    @app_commands.describe(sessiontype='Choose between Race or Qualifying')
+    @app_commands.choices(sessiontype=[
+        app_commands.Choice(name="Qualifying", value="Q"),
+        app_commands.Choice(name="Race", value="R"),
+        ])
     @app_commands.describe(driver1='3 Letter Code for Driver 1')
     @app_commands.describe(driver2='3 Letter Code for Driver 2')
     @app_commands.describe(round='Round name or number (Australia or 3)')
     @app_commands.describe(year = "Year")
     
     # command
-    async def speed(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, year: typing.Optional[int]):
+    async def speed(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, sessiontype: app_commands.Choice[str],year: typing.Optional[int]):
         # defer reply for later
         await interaction.response.defer()
             
@@ -176,7 +178,7 @@ class Speed(commands.Cog):
 
         loop = asyncio.get_running_loop()
         # run results query and build embed
-        file = await loop.run_in_executor(None, speed_results, driver1, driver2, round, year)
+        file = await loop.run_in_executor(None, speed_results, driver1, driver2, round, year, sessiontype)
         # send embed
         try:
             message_embed.set_image(url='attachment://image.png')
