@@ -167,7 +167,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
             print("already exists")
             file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-            message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}"
+            message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = +{td_to_laptime(abs(d1_fl-d2_fl))}"
             message_embed.set_footer(text='')
             print('found file')
             return file
@@ -178,7 +178,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
             try:
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}"
+                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = +{td_to_laptime(abs(d1_fl-d2_fl))}"
                 message_embed.set_footer(text='')
                 print("Swapped drivers around and found a file")
                 return file
