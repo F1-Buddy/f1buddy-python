@@ -39,6 +39,7 @@ added author to each embed
 - [ ] fix constructor command not outputting anything for 2010/2011
 - [x] use fastf1 ergast implementation for wdc and wcc
     - [x] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
+- [ ] fix schedule for new sprint weekend 
 
 ## Issues
 
