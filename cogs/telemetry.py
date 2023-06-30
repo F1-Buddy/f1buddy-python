@@ -28,8 +28,18 @@ message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.
 message_embed.set_thumbnail(
 url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
+def td_to_laptime(td):
+    td_microseconds = td.microseconds
+    td_seconds = td.seconds
+    td_minutes = td_seconds // 60
+    td_seconds = str(td_seconds % 60).zfill(2)
+    td_thousandths = str(td_microseconds)[:-3]
+    return f"{td_minutes}:{td_seconds}.{td_thousandths}"
 
-def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Optional[int]):
+def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
+    message_embed.description = ""
+    message_embed.title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
+    message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
     fig, ax = plt.subplots(3)
@@ -44,17 +54,11 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         except:
             year = now.year
         if (year > now.year | year < 2018):
-            try:
-                race = fastf1.get_session(now.year, round, 'R')
-            except:
-                race = fastf1.get_session(now.year, (int)(round), 'R')
+            race = fastf1.get_session(now.year, round, sessiontype.value)
         
         # use given year
         else:
-            try:
-                race = fastf1.get_session(year, round, 'R')
-            except:
-                race = fastf1.get_session(year, (int)(round), 'R')
+            race = fastf1.get_session(year, round, sessiontype.value)
         # check if graph already exists, if not create it
         race.load()
         message_embed.description = race.event.EventName
@@ -67,6 +71,9 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         d2_fastest = d2_laps.pick_fastest()
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
+        d1_fl = (race.laps.pick_driver(d1_number).pick_fastest()["LapTime"])
+        d2_fl = (race.laps.pick_driver(d2_number).pick_fastest()["LapTime"])
+
         throttle_string = ""
         brake_string = ""
 
@@ -145,7 +152,8 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 plt.rcParams['savefig.dpi'] = 300
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
-                message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
+                # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
+                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}"
                 # message_embed.description += "\n" + throttle_string + brake_string
                 # reset plot just in case
                 plt.clf()
@@ -158,7 +166,8 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         try:
             print("already exists")
             file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
-            message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
+            # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
+            message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}"
             message_embed.set_footer(text='')
             print('found file')
             return file
@@ -168,7 +177,8 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
             # try to access the graph by switching driver1 and driver2 in filename
             try:
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
-                message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
+                # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
+                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}"
                 message_embed.set_footer(text='')
                 print("Swapped drivers around and found a file")
                 return file
@@ -191,7 +201,11 @@ class Telemetry(commands.Cog):
         print('Telemetry cog loaded')
 
     @app_commands.command(name='telemetry', description='See telemetry between 2 drivers on their fastest laps in a race')
-    
+    @app_commands.describe(sessiontype='Choose between Race or Qualifying')
+    @app_commands.choices(sessiontype=[
+        app_commands.Choice(name="Qualifying", value="Q"),
+        app_commands.Choice(name="Race", value="R"),
+        ])
     # inputs
     @app_commands.describe(driver1='3 Letter Code for Driver 1')
     @app_commands.describe(driver2='3 Letter Code for Driver 2')
@@ -199,7 +213,7 @@ class Telemetry(commands.Cog):
     @app_commands.describe(year = "Year")
     
     # command
-    async def telemetry(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, year: typing.Optional[int]):
+    async def telemetry(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, sessiontype: app_commands.Choice[str], year: typing.Optional[int]):
         # defer reply for later
         await interaction.response.defer()
             
@@ -213,7 +227,7 @@ class Telemetry(commands.Cog):
 
         loop = asyncio.get_running_loop()
         # run results query and build embed
-        file = await loop.run_in_executor(None, telemetry_results, driver1, driver2, round, year)
+        file = await loop.run_in_executor(None, telemetry_results, driver1, driver2, round, year, sessiontype)
         # send embed
         try:
             message_embed.set_image(url='attachment://image.png')
