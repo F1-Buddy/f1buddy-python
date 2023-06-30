@@ -18,7 +18,7 @@ from lib.colors import colors
 fastf1.Cache.enable_cache('cache/')
 
 # fallback function to calculate timezone using lat/long if 
-# a suitable timezone is not found in timezones.py
+# a suitable timezone is not found in timezones.pyprint(schedule.loc[next_event, "Ev
 def convert_timezone_fallback(location, converted_session_times):
     # create coordinate finder object
     g = Nominatim(user_agent='f1pythonbottesting')
@@ -137,11 +137,11 @@ class Schedule(commands.Cog):
             # adjust emojis/session name according to weekend format
             if (schedule.loc[next_event, "EventFormat"] == 'conventional'):
                 converted_session_times = {
-                    ":one: FP1": schedule.loc[next_event, "Session1Date"],
-                    ":two: FP2": schedule.loc[next_event, "Session2Date"],
-                    ":three: FP3": schedule.loc[next_event, "Session3Date"],
-                    ":stopwatch: Qualifying": schedule.loc[next_event, "Session4Date"],
-                    ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
+                    f":one: {schedule.loc[next_event, 'Session1']}": schedule.loc[next_event, "Session1Date"],
+                    f":two: {schedule.loc[next_event, 'Session2']}": schedule.loc[next_event, "Session2Date"],
+                    f":three: {schedule.loc[next_event, 'Session3']}": schedule.loc[next_event, "Session3Date"],
+                    f":stopwatch: {schedule.loc[next_event, 'Session4']}": schedule.loc[next_event, "Session4Date"],
+                    f":checkered_flag: {schedule.loc[next_event, 'Session5']}": schedule.loc[next_event, "Session5Date"]
                 }
                 # fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
                 # fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
@@ -150,11 +150,11 @@ class Schedule(commands.Cog):
                 # race_date = pd.Timestamp(converted_session_times[":checkered_flag: Race"]).strftime('%Y-%m-%d')
             else:
                 converted_session_times = {
-                    ":one: FP1": schedule.loc[next_event, "Session1Date"],
-                    ":two: FP2": schedule.loc[next_event, "Session2Date"],
-                    ":stopwatch: Qualifying": schedule.loc[next_event, "Session3Date"],
-                    ":race_car: Sprint": schedule.loc[next_event, "Session4Date"],
-                    ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
+                    f":one: {schedule.loc[next_event, 'Session1']}": schedule.loc[next_event, "Session1Date"],
+                    f":stopwatch: {schedule.loc[next_event, 'Session2']}": schedule.loc[next_event, "Session2Date"],
+                    f":stopwatch: {schedule.loc[next_event, 'Session3']}": schedule.loc[next_event, "Session3Date"],
+                    f":race_car: {schedule.loc[next_event, 'Session4']}": schedule.loc[next_event, "Session4Date"],
+                    f":checkered_flag: {schedule.loc[next_event, 'Session5']}": schedule.loc[next_event, "Session5Date"]
                 }
                 # fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
                 # fp2_date = pd.Timestamp(converted_session_times[":two: FP2"]).strftime('%Y-%m-%d')
