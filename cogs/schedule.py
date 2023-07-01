@@ -151,9 +151,9 @@ class Schedule(commands.Cog):
             else:
                 converted_session_times = {
                     ":one: FP1": schedule.loc[next_event, "Session1Date"],
-                    ":two: FP2": schedule.loc[next_event, "Session2Date"],
-                    ":stopwatch: Qualifying": schedule.loc[next_event, "Session3Date"],
-                    ":race_car: Sprint": schedule.loc[next_event, "Session4Date"],
+                    ":stopwatch: Qualifying": schedule.loc[next_event, "Session2Date"],
+                    ":stopwatch: Sprint Qualifying": schedule.loc[next_event, "Session3Date"],
+                    ":race_car: Sprint Race": schedule.loc[next_event, "Session4Date"],
                     ":checkered_flag: Race": schedule.loc[next_event, "Session5Date"]
                 }
                 # fp1_date = pd.Timestamp(converted_session_times[":one: FP1"]).strftime('%Y-%m-%d')
