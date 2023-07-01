@@ -25,13 +25,24 @@ def quali_results(self,year,round):
     if (round == None):
         # get latest completed session by starting from the end of calendar and going back towards beginning of season
         year_sched = fastf1.get_event_schedule(year,include_testing=False)
-        round = (year_sched.shape[0]-1)
-        sessionTime = year_sched.iloc[round].loc["Session4Date"].tz_convert('America/New_York')
+        round = (year_sched.shape[0])
+        if (year_sched.loc[round, "EventFormat"] == 'conventional'):
+            # print(f"{year_sched.loc[round, 'EventName']} is conventional")
+            sessionTime = year_sched.loc[round,"Session4Date"].tz_convert('America/New_York')
+        else:
+            # print(f"{year_sched.loc[round, 'EventName']} is sprint")
+            sessionTime = year_sched.loc[round,"Session2Date"].tz_convert('America/New_York')
+        # print(f"{year_sched.loc[round, 'EventName']} is at {sessionTime}")
         # print(sessionTime)
         while (now.tz_localize('America/New_York') < sessionTime):
+            # print(f"{year_sched.loc[round, 'EventName']} is at {sessionTime}")
             round -= 1
-            sessionTime = year_sched.iloc[round].loc["Session4Date"].tz_convert('America/New_York')
-        round += 1
+            if (year_sched.loc[round, "EventFormat"] == 'conventional'):
+                # print(f"{year_sched.loc[round, 'EventName']} is conventional")
+                sessionTime = year_sched.loc[round,"Session4Date"].tz_convert('America/New_York')
+            else:
+                # print(f"{year_sched.loc[round, 'EventName']} is sprint")
+                sessionTime = year_sched.loc[round,"Session2Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Qualifying')
         # most recent session found, load it
         result_session.load()
