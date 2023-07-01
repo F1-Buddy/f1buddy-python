@@ -82,7 +82,12 @@ def get_constructor_info(self, year, round):
                 constructor_data = (response['MRData']['ConstructorTable']['Constructors'][i])
                     
                 try:
-                    constructor_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
+                    if amount_of_teams <= 11:
+                        constructor_name.append((str)(self.bot.get_emoji(team_emoji_ids[constructor_data['name']]))+' ' + constructor_data['name'])
+                    elif year == 2010 or year == 2011:
+                        constructor_name.append((constructor_data['name']))
+                    else:
+                        constructor_name.append((constructor_data['name']))
                 except:
                     constructor_name.append((constructor_data['name']))
                     
@@ -98,8 +103,14 @@ def get_constructor_info(self, year, round):
             
             string = ""
             for j in range(amount_of_teams):
-                string += f"[{constructor_name[j]}]({constructor_wikipedia[j]})\n"
+                try:
+                    team_name = f"{constructor_name[j][0:constructor_name[j].index('>')+1]}[{constructor_name[j][constructor_name[j].index('>')+1:]}]({constructor_wikipedia[j]})"
+                    string += team_name + "\n"
+                except:
+                    team_name = f"[{constructor_name[j]}]({constructor_wikipedia[j]})"
+                    string += team_name + "\n"
             
+            print(string)
             message_embed.add_field(name="Team", value=string, inline=True)
             message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
             message_embed.add_field(name = "Championships", value = '\n'.join(constructor_championships),inline = True)
@@ -120,11 +131,14 @@ class constructor(commands.Cog):
     async def constructor(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[int]):  
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
-        # run query and build embed
-        constructor_embed = await loop.run_in_executor(None, get_constructor_info, self, year, round)
-        constructor_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-        # send embed
-        await interaction.followup.send(embed = constructor_embed)
+        try:
+            # run query and build embed
+            constructor_embed = await loop.run_in_executor(None, get_constructor_info, self, year, round)
+            constructor_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+            # send embed
+            await interaction.followup.send(embed=constructor_embed)
+        except Exception as e:
+            await interaction.followup.send(f"An error occurred: {e}")
         loop.close()
 
 async def setup(bot):
