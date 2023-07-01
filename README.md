@@ -34,7 +34,7 @@ added author to each embed
 
 ## To-do
 - [ ] add predictions command
-- [ ] add str arg to help command to provide command-specific help
+- [x] add str arg to help command to provide command-specific help
 - [ ] (maybe) make round an optional input for laptime and positions
 - [x] fix constructor command not outputting anything for 2010/2011
 - [x] use fastf1 ergast implementation for wdc and wcc
