@@ -2,6 +2,7 @@ token.txt
 config.py
 test.py
 test2.py
+test3.py
 # cache/
 /cache/*
 !/cache/.gitkeep
@@ -18,6 +19,9 @@ test2.py
 
 /cogs/plots/positions/*
 !/cogs/plots/positions/.gitkeep
+
+/cogs/plots/qualigap/*
+!/cogs/plots/qualigap/.gitkeep 
 
 /cogs/plots/telemetry/*
 !/cogs/plots/telemetry/.gitkeep
