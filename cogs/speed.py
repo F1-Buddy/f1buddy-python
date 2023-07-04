@@ -133,7 +133,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 plt.gca().add_collection(lc)
                 plt.gca().axis('equal')
                 # more plot setup
-                plt.title(f"{d1_name} vs {d2_name}\n{event_year} {str(race.event.EventName)}\nTrack Dominance on Fastest Lap",fontdict = {'fontsize' : 'small'})
+                plt.title(f"{d1_name} vs {d2_name}\n{str(race.date.year)} {str(race.event.EventName)}\nTrack Dominance on Fastest Lap",fontdict = {'fontsize' : 'small'})
                 plt.grid(visible=False, which='both')
                 # set up legend
                 d1_patch = mpatches.Patch(color=d1_color, label=d1_name)
