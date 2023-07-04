@@ -15,9 +15,13 @@ class Help(commands.Cog):
 
     @app_commands.command(name='help', description='get help')
     async def help(self, interaction: discord.Interaction, command_name: typing.Optional[str]):
+        is_real_command = False
         async def message_embed(help_string, filename):
             await interaction.response.defer()
-            message_embed = discord.Embed(title="f1buddy Help", description=help_string)
+            if is_real_command:
+                message_embed = discord.Embed(title=f"f1buddy Help - {command_name}", description=help_string)
+            else: 
+                message_embed = discord.Embed(title="f1buddy Help", description=help_string)
             message_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
             message_embed.colour = colors.default
             message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
@@ -43,7 +47,8 @@ class Help(commands.Cog):
                 help_string += "Arguments:\n- year (optional): The year for which you want to retrieve the driver standings.\n\n"
                 help_string += "Examples:\n`/wdc` - Retrieves the current year's driver standings.\n\n"
                 help_string += "`/wdc 2007` - Retrieves the driver standings for the year 2007."
-                filename = "wdcwcc.png"
+                is_real_command = True
+                filename = "wdc.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["wcc", "/wcc"]:
                 help_string = "`/wcc` - Retrieves the current year's constructor standings.\n\n"
@@ -52,7 +57,8 @@ class Help(commands.Cog):
                 help_string += "Arguments:\n- year (optional): The year for which you want to retrieve the constructor standings.\n\n"
                 help_string += "Examples:\n`/wcc` - Retrieves the current year's constructor standings.\n"
                 help_string += "`/wcc 2007` - Retrieves the constructor standings for the year 2007."
-                filename = "wdcwcc.png"
+                is_real_command = True
+                filename = "wcc.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["constructors", "/constructors"]:
                 help_string = "`/constructors` - Retrieves the current year's constructor information.\n\n"
@@ -65,6 +71,7 @@ class Help(commands.Cog):
                 help_string += "Examples:\n`/constructors` - Retrieves the current year's constructor information.\n"
                 help_string += "`/constructors 2015` - Retrieves the constructor information for the year 2015.\n"
                 help_string += "`/constructors 2015 5` - Retrieves the constructor information for the year 2015 and round 5."
+                is_real_command = True
                 filename = "constructors.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["driver", "/driver"]:
@@ -73,6 +80,7 @@ class Help(commands.Cog):
                 help_string += "Arguments:\n- driver: The full name of the driver.\n\n"
                 help_string += "Examples:\n`/driver Lewis Hamilton` - Retrieves information about Lewis Hamilton.\n"
                 help_string += "`/driver Max Verstappen` - Retrieves information about Max Verstappen."
+                is_real_command = True
                 filename = "driver.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["laptimes", "/laptimes"]:
@@ -88,6 +96,7 @@ class Help(commands.Cog):
                 help_string += "Examples:\n"
                 help_string += "`/laptimes HAM VER Australia`\n"
                 help_string += "`/laptimes BOT RIC 3 2022`"
+                is_real_command = True
                 filename = "laptimes.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["positions", "/positions"]:
@@ -98,6 +107,7 @@ class Help(commands.Cog):
                 help_string += "Note: The round can be either the name of the race or its number.\n\n"
                 help_string += "Example:\n`/positions Australia` - Visualize position changes for the Australian Grand Prix.\n"
                 help_string += "`/positions 4 2022` - Visualize position changes for the fourth round of the 2022 season."
+                is_real_command = True
                 filename = "positions.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["quali", "/quali"]:
@@ -108,6 +118,7 @@ class Help(commands.Cog):
                 help_string += "- round (optional): The round name or number for which you want to retrieve the qualifying results.\n\n"
                 help_string += "Examples:\n`/quali` - Retrieves the results of the latest completed qualifying session.\n"
                 help_string += "`/quali 2023 Australia` - Retrieves the qualifying results for the 2023 Australian Grand Prix."
+                is_real_command = True
                 filename = "quali.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["qualigap", "/qualigap"]:
@@ -117,6 +128,7 @@ class Help(commands.Cog):
                 help_string += "- year (optional): The year for which you want to generate the graph.\n\n"
                 help_string += "Examples:\n`/qualigap Australia` - Generate the qualifying gap graph for the current year's Australian Grand Prix.\n"
                 help_string += "`/qualigap 3 2022` - Generate the qualifying gap graph for the year 2022's third round."
+                is_real_command = True
                 filename = "qualigap.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["results", "/results"]:
@@ -128,6 +140,7 @@ class Help(commands.Cog):
                 help_string += "`/results 2022` - Get the results of all races in the year 2022.\n"
                 help_string += "`/results Australia` - Get the results of the race named 'Australia'.\n"
                 help_string += "`/results 2021 3` - Get the results of the race with the round number 3 in the year 2021."
+                is_real_command = True
                 filename = "results.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["schedule", "/schedule"]:
@@ -135,6 +148,7 @@ class Help(commands.Cog):
                 help_string += "This command retrieves the schedule for the next Formula 1 event.\n\n"
                 help_string += "The schedule includes various sessions such as practice, qualifying, sprint, and race.\n\n"
                 help_string += "Example:\n`/schedule` - Retrieves the schedule for the next Formula 1 event."
+                is_real_command = True
                 filename = "schedule.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["trackdominance", "/trackdominance"]:
@@ -149,6 +163,7 @@ class Help(commands.Cog):
                 help_string += "Examples:\n"
                 help_string += "`/trackdominance Qualifying HAM VER Australia` - See track dominance between Hamilton and Verstappen in Qualifying for the Australian Grand Prix.\n"
                 help_string += "`/trackdominance Race BOT PER 5 2022` - See track dominance between Bottas and Perez in Race 5 of 2022.\n"
+                is_real_command = True
                 filename = "trackdominance.png"
                 await message_embed(help_string, filename)
             elif command_name.lower() in ["telemetry", "/telemetry"]:
@@ -157,6 +172,7 @@ class Help(commands.Cog):
                 help_string += "Arguments:\n- driver1: Name and version of the first driver.\n- driver2: Name and version of the second driver.\n- round: Race round.\n- sessiontype: Session type.\n- year (optional): Race year. If not provided, it will default to the current year.\n\n"
                 help_string += "Examples:\n`/telemetry ver ham 6 Race 2022` - Telemetry of VER and HAM in race of round 6 for 2022.\n"
                 help_string += "/telemetry ver ham 6 Race` - Telemetry of VER and HAM in race of round 6 for the current year."
+                is_real_command = True
                 filename = "telemetry.png"
                 await message_embed(help_string, filename)
             else:
