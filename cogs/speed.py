@@ -9,12 +9,14 @@ from discord.ext import commands
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+# from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
-
+import numpy as np
 
 # get current time
 now = pd.Timestamp.now()
@@ -39,23 +41,30 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
     ax.axis('equal')
     ax.axis('off')
     try:
-        # year given is invalid
+        # no year given
         if year == None:
             event_year = now.year
         else:
+            # given year invalid
             if (year > now.year | year < 2018):
                 event_year = now.year
+            # year is valid
             else:
                 event_year = year
+        # get proper round (string/int)
         try:
+            # given as int
             event_round = int(round)
         except ValueError:
+            # given as string
             event_round = round
 
+        # get session using given args
         race = fastf1.get_session(event_year, event_round, sessiontype.value)
-        # check if graph already exists, if not create it
+
         race.load()
         message_embed.description = race.event.EventName
+        # get driver data for their fastest lap during the session
         d1_laps = race.laps.pick_driver(driver1)
         d1_fastest = d1_laps.pick_fastest()
         d1_number = d1_laps.iloc[0].loc['DriverNumber']
@@ -66,38 +75,64 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
         
+        # check if graph already exists, if not create it
         if (not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')) and (
             not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d2_name+'vs'+d1_name+'.png')):
             try:
+                # get driver telemetry
                 d1_telemetry_data = d1_fastest.get_telemetry()
                 d2_telemetry_data = d2_fastest.get_telemetry()
-                # d1_lap_data = d1_laps.pick_fastest().get_pos_data()
-                # d1_car_data = d1_laps.pick_fastest().get_car_data()
-                # d2_lap_data = d2_laps.pick_fastest().get_pos_data()
-                # d2_car_data = d2_laps.pick_fastest().get_car_data()
-
-                for c in d1_telemetry_data.index:
+                
+                # get driver color
+                if (year == now.year):
+                    # fastf1.plotting.driver_color() only supports current season
+                    d1_color = f1plt.driver_color(d1_name)
+                    d2_color = f1plt.driver_color(d2_name)
+                else:
+                    # otherwise use team color
+                    d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
+                    d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
+                if d1_color == d2_color:
+                    # if comparing teammates, make second driver white (unless first driver is already white Ex: Haas)
+                    if (d1_color == '#ffffff'):
+                        d2_color = 'grey'
+                    else:
+                        d2_color = 'white'
+                
+                # get drivers' speed and X/Y coords
+                d1_speeds = d1_telemetry_data["Speed"]
+                d2_speeds = d2_telemetry_data["Speed"]
+                x = d1_telemetry_data["X"].tolist()
+                y = d1_telemetry_data["Y"].tolist()
+                
+                # create color array for each segment of line
+                color_array = []
+                # compare speed in each sector and add faster driver's color to color_array
+                for i in d1_speeds.index:
                     try:
-                        # get driver color
-                        if (year == now.year):
-                            d1_color = f1plt.driver_color(d1_name)
-                            d2_color = f1plt.driver_color(d2_name)
+                        if (d1_speeds[i] >= d2_speeds[i]):
+                            color_array.append(0)
                         else:
-                            d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
-                            d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
-                        if d1_color == d2_color:
-                            d2_color = 'white'
-                        if (d1_telemetry_data.loc[c,"Speed"] >= d2_telemetry_data.loc[c,"Speed"]):
-                            # print(f"in {c} {d1_name} is faster than {d2_name}")
-                            # print(str(d1_telemetry_data.loc[c,"Speed"]) + " > " + str(d2_telemetry_data.loc[c,"Speed"]))
-                            plt.scatter(d1_telemetry_data.loc[c,"X"],d1_telemetry_data.loc[c,"Y"],color=d1_color,s=2,label=d1_name)
-                        elif (d1_telemetry_data.loc[c,"Speed"] < d2_telemetry_data.loc[c,"Speed"]):
-                            # print(f"in {c} {d2_name} is faster than {d1_name}")
-                            # print(str(d1_telemetry_data.loc[c,"Speed"]) + " < " + str(d2_telemetry_data.loc[c,"Speed"]))
-                            plt.scatter(d2_telemetry_data.loc[c,"X"],d2_telemetry_data.loc[c,"Y"],color=d2_color,s=2,label=d2_name)
+                            color_array.append(1)
+                    # when there is no data for either driver for a sector, make the color black
                     except Exception as e:
+                        color_array.append(2)
                         print(e)
-                        
+
+                # some numpy fuckery to turn x and y lists to coords
+                points = np.array([x, y]).T.reshape(-1, 1, 2)
+                segments = np.concatenate([points[:-1], points[1:]], axis=1)
+                
+                # colormap
+                cmap = ListedColormap([d1_color,d2_color,'#000000'])
+                # setup LineCollection
+                lc = LineCollection(segments,cmap=cmap)
+                lc.set_array(color_array)
+                lc.set_linewidth(2)
+                # plot line
+                plt.gca().add_collection(lc)
+                plt.gca().axis('equal')
+                # more plot setup
                 plt.title(f"{d1_name} vs {d2_name}\n{year} {str(race.event.EventName)}\nTrack Dominance on Fastest Lap",fontdict = {'fontsize' : 'small'})
                 plt.grid(visible=False, which='both')
                 # set up legend
@@ -106,6 +141,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 plt.legend(handles=[d1_patch, d2_patch])
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
+                # plt.show()
                 plt.savefig("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')
                 file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
@@ -184,7 +220,7 @@ class Speed(commands.Cog):
         # send embed
         try:
             message_embed.set_image(url='attachment://image.png')
-            message_embed.set_footer(text="*Some lap data may be missing")
+            message_embed.set_footer(text="*Some lap data may be missing (black)")
             await interaction.followup.send(embed=message_embed,file=file)
         except:
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
