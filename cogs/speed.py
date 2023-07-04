@@ -40,16 +40,19 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
     ax.axis('off')
     try:
         # year given is invalid
-        try:
-            year = int(year)
-        except:
-            year = now.year
-        if (year > now.year | year < 2018):
-            race = fastf1.get_session(now.year, round, sessiontype.value)
-        
-        # use given year
+        if year == None:
+            event_year = now.year
         else:
-            race = fastf1.get_session(year, round, sessiontype.value)
+            if (year > now.year | year < 2018):
+                event_year = now.year
+            else:
+                event_year = year
+        try:
+            event_round = int(round)
+        except ValueError:
+            event_round = round
+
+        race = fastf1.get_session(event_year, event_round, sessiontype.value)
         # check if graph already exists, if not create it
         race.load()
         message_embed.description = race.event.EventName
