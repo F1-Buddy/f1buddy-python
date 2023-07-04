@@ -33,9 +33,14 @@ def td_to_laptime(td):
     return f"{td_minutes}:{td_seconds}.{td_thousandths}"
 
 # add labels to each bar
-def addlabels(x,y):
+def addlabels(x,y,driver_colors):
     for i in range(len(x)):
-        plt.text(i, y[0]-0.02, f"+{str(y[i])[0:5].ljust(5,'0')}", ha = 'center',rotation=90,)
+        string = f"+{str(y[i])[0:5].ljust(5,'0')}"
+        if (i == 0):
+            string = "   Pole"
+        elif (string == "+0.000" and i != 0):
+            string = "No Time"
+        plt.text(min(max(y),5)+0.09, i, string, va = 'center')
 
 f1plt._enable_fastf1_color_scheme()
 f1plt.setup_mpl(misc_mpl_mods=False)
@@ -44,29 +49,26 @@ fig, ax = plt.subplots()
 def quali_gap(round, year):
     # get current time
     now = pd.Timestamp.now()
-
+    event_year = None
+    event_round = None
     try:
         # year given is invalid
-        try:
-            year = int(year)
-        except:
-            year = now.year
-        if (year > now.year | year < 2018):
-            try:
-                race = fastf1.get_session(now.year, round, 'Q')
-            except:
-                race = fastf1.get_session(now.year, (int)(round), 'Q')
-            race.load()
-            racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-        
-        # use given year
+        if year == None:
+            event_year = now.year
         else:
-            try:
-                race = fastf1.get_session(year, round, 'Q')
-            except:
-                race = fastf1.get_session(year, (int)(round), 'Q')
-            race.load()
-            racename = '' + str(race.date.year)+' '+str(race.event.EventName)
+            if (year > now.year | year < 2018):
+                event_year = now.year
+            else:
+                event_year = year
+        try:
+            event_round = int(round)
+        except ValueError:
+            event_round = round
+
+        race = fastf1.get_session(event_year, event_round, 'Q')
+        race.load()
+        racename = '' + str(race.date.year)+' '+str(race.event.EventName)
+        
         resultsTable = race.results
         # check if graph already exists, if not create it
         message_embed.description = racename
@@ -99,26 +101,30 @@ def quali_gap(round, year):
                     bar_heights.append(0.0)
             
             # plot each delta as a bar
-            plt.bar(driver_names, bar_heights, color=driver_colors)
+            plt.barh(driver_names, bar_heights,.88, color=driver_colors)
             # label each bar
-            addlabels(driver_names, bar_heights)
+            addlabels(driver_names, bar_heights, driver_colors)
             # set graph limits, try to set ylimit to last driver's delta
-            plt.ylim(bottom=min(max(bar_heights),5), top=0)
+            plt.xlim(right=min(max(bar_heights),5), left=0)
+            plt.ylim([20,-1])
             # graph setup stuff
-            plt.xticks(rotation=90) 
+            # plt.xticks(rotation=90) 
             ax.minorticks_off()
-            # plt.grid(visible=False, which='both')
+            plt.grid(visible=False, which='both')
             plt.title(f"Qualifying Gap for {str(race.date.year)+' '+str(race.event.EventName)}",y=1.16,fontdict = {'fontsize' : '16'})
-            plt.ylabel("Delta (Seconds)")
-            plt.xlabel("Driver")
-            plt.subplots_adjust(left=0.16,bottom = 0.16,top = 0.78)
+            plt.xlabel("Delta (Seconds)")
+            plt.ylabel("Driver")
+            plt.subplots_adjust(right=0.88,left=0.16,bottom = 0.16,top = 0.78)
             plt.rcParams['savefig.dpi'] = 300
             # save plot
             plt.savefig("cogs/plots/qualigap/"+race.date.strftime('%Y-%m-%d_%I%M')+"_QualiGap"+'.png')
+            # plt.show()
             # clear plot
             plt.clf()
             plt.cla()
             plt.close()
+            # return
+            
         # try to access the graph
         try:
             file = discord.File("cogs/plots/qualigap/"+race.date.strftime('%Y-%m-%d_%I%M')+"_QualiGap"+'.png', filename="image.png")
@@ -165,3 +171,6 @@ class QualiGap(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(QualiGap(bot))
+
+
+# quali_gap('baku', 2023)
