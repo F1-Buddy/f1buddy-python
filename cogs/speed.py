@@ -63,9 +63,8 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
         
-
-        if (not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png')) and (
-            not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d2_name+'vs'+d1_name+'.png')):
+        if (not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')) and (
+            not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d2_name+'vs'+d1_name+'.png')):
             try:
                 d1_telemetry_data = d1_fastest.get_telemetry()
                 d2_telemetry_data = d2_fastest.get_telemetry()
@@ -104,8 +103,8 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 plt.legend(handles=[d1_patch, d2_patch])
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
-                plt.savefig("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png')
-                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+                plt.savefig("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')
+                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
                 # reset plot just in case
                 plt.clf()
@@ -116,7 +115,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 traceback.print_exc()
         # try to access the graph
         try:
-            file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+            file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
             message_embed.set_footer(text='')
             print('found file')
@@ -125,7 +124,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         except Exception as e:
             # try to access the graph by switching driver1 and driver2 in filename
             try:
-                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
+                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
                 message_embed.set_footer(text='')
                 print("Swapped drivers around and found a file")
