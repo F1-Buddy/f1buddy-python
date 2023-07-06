@@ -47,18 +47,18 @@ def get_fia_doc():
                 pix.save(output)
                 page_num += 1
         except ValueError:
-            print("broken")
+            pass
         doc.close()
         # delete the pdf
         os.remove(f"{filePath}/{fileName}")
     else:
         print("Already got this document")
 
-
-    print()
+    # get images, turn into discord.File, put in list
     files = []
     for image in os.listdir(filePath):
         files.append(discord.File(f"{filePath}/{image}", filename=f"{image}"))
+    # return images
     return files
         
 class fia_doc(commands.Cog):
