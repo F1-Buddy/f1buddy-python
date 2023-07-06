@@ -1,5 +1,9 @@
 token.txt
 config.py
+test.py
+test2.py
+test3.py
+.DS_Store
 # cache/
 /cache/*
 !/cache/.gitkeep
@@ -9,10 +13,25 @@ config.py
 /lib/__pycache__/
 
 # plots
-/cogs/plots/laptime/*
-/cogs/plots/positions/*
 !/cogs/plots/.gitkeep 
+
+/cogs/plots/laptime/*
 !/cogs/plots/laptime/.gitkeep 
+
+/cogs/plots/positions/*
 !/cogs/plots/positions/.gitkeep
 
-test.py
+/cogs/plots/qualigap/*
+!/cogs/plots/qualigap/.gitkeep 
+
+/cogs/plots/telemetry/*
+!/cogs/plots/telemetry/.gitkeep
+
+/cogs/plots/speed/*
+!/cogs/plots/speed/.gitkeep 
+
+/cogs/plots/strategy/*
+!/cogs/plots/strategy/.gitkeep 
+
+/cogs/fiaDocs/*
+!/cogs/fiaDocs/.gitkeep 

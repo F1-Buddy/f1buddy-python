@@ -1,4 +1,4 @@
-import fastf1
+# import fastf1
 import discord
 import config
 import os
@@ -6,7 +6,7 @@ import asyncio
 from discord.ext import commands
 
 
-fastf1.Cache.enable_cache('cache/')
+# fastf1.Cache.enable_cache('cache/')
 # basic bot setup
 ########################################
 # token = open('token.txt').readline()

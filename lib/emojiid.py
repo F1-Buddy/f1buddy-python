@@ -27,7 +27,10 @@ team_emoji_ids = {
     "Williams":1081767613283176579,
     "Haas F1 Team":1081767511424520313,
     "Manor Marussia":1081822299671498792,
-    "Marussia":1081822299671498792
+    "Marussia":1081822299671498792,
+    "Caterham":1122921348960878622,
+    "HRT":1122923506842214420,
+    "Virgin":1122924331895377930
 }
 
 def get_emoji(country_name):

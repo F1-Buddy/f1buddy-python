@@ -34,14 +34,16 @@ added author to each embed
 
 ## To-do
 - [ ] add predictions command
-- [ ] add str arg to help command to provide command-specific help
+- [x] add str arg to help command to provide command-specific help
 - [ ] (maybe) make round an optional input for laptime and positions
-- [ ] use fastf1 ergast implementation for wdc and wcc
-    - [ ] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
+- [x] fix constructor command not outputting anything for 2010/2011
+- [x] use fastf1 ergast implementation for wdc and wcc
+    - [x] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
+- [x] fix schedule for new sprint weekend 
 
 ## Issues
 
-2020 season data is odd (exacmple styrian gp, 2020 round 2)
+2020 season data is odd (example styrian gp, 2020 round 2)
 
 
 

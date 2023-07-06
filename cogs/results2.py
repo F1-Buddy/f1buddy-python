@@ -20,52 +20,34 @@ def results_result(self, year, round):
     # check if args are valid
     if (year == None):
         year = now.year
+    elif (year > now.year):
+        year = now.year
     if (round == None):
         # get latest completed session by starting from the end of calendar and going back towards beginning of season
         year_sched = fastf1.get_event_schedule(year,include_testing=False)
-        round = (year_sched.shape[0]-1)
-        sessionTime = year_sched.iloc[round].loc["Session5Date"].tz_convert('America/New_York')
-        print(sessionTime)
+        round = (year_sched.shape[0])
+        sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
+        # print(sessionTime)
         while (now.tz_localize('America/New_York') < sessionTime):
             round -= 1
-            sessionTime = year_sched.iloc[round].loc["Session5Date"].tz_convert('America/New_York')
-        round += 1
+            sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Race')
         # most recent session found, load it
         result_session.load()
     # round was given as number
     else:
+        event_round = None
         try:
-            round_number = int(round)
-            # inputs were valid, but the race hasnt happened yet
-            if (now.tz_localize('America/New_York') < fastf1.get_event_schedule(year,include_testing=False).iloc[round_number].loc["Session5Date"].tz_convert('America/New_York')):
-                message_embed.title = "Race not found!"
-                message_embed.description = "Round " + (str)(round_number) + " not found!"
-                return message_embed
-            # inputs were valid, get session
-            result_session = fastf1.get_session(year, round_number, 'Race')
-            
-        # round was given as string
-        except Exception as e:
-            try:
-                # capitalize first letter of input to match dataframe value
-                round_number = round.lower().title()
-                # get schedule for the year
-                df = fastf1.get_event_schedule(year,include_testing=False)
-                # get start date of given race using panda dataframe fuckery
-                racestart_date = df.loc[df['Country'] == round_number,['Session5Date']].iloc[0].loc['Session5Date']
-
-                # inputs were valid, but the race hasnt happened yet, return embed
-                if (now.tz_localize('America/New_York') < racestart_date.tz_convert('America/New_York')):
-                    message_embed.title = "Race not found!"
-                    message_embed.description = f"Round {round_number} not found!"
-                    return message_embed
-                # inputs were valid, race has happened, get session
-                result_session = fastf1.get_session(year, round_number, 'Race')
-            except:
-                print(e)
-                message_embed.description = "Invalid Input"
-                return message_embed
+            event_round = int(round)
+        except:
+            event_round = round
+        result_session = fastf1.get_session(year, event_round, 'Race')
+        if (now.tz_localize('America/New_York') - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
+            message_embed.title = "Race hasn't happened yet!!"
+            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+            message_embed.description = "Round \"" + (str)(event_round) + "\" not found!"
+            return message_embed
+        
 
     # load session
     result_session.load()
@@ -79,6 +61,7 @@ def results_result(self, year, round):
     # unsure if necessary
     if (resultsTable.empty):
         message_embed.description = "Race not found!"
+        message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
         return message_embed
     # get each drivers finishing position/points and put them in the strings
     for i in (resultsTable.DriverNumber.values):
