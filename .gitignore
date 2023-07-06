@@ -3,6 +3,7 @@ config.py
 test.py
 test2.py
 test3.py
+.DS_Store
 # cache/
 /cache/*
 !/cache/.gitkeep

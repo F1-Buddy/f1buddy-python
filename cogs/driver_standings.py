@@ -57,8 +57,9 @@ def get_driver_standings(self, year):
                     driver_name.append(f"{emoji} {last_name}")
                 else:
                     driver_name.append(name)
-        except KeyError:
+        except KeyError as ke:
             driver_name.append(name)
+            print(ke)
     
     # sets embed color and title
     message_embed = discord.Embed(title=f"{year} Driver Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
