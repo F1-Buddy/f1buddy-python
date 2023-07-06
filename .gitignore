@@ -30,3 +30,5 @@ test3.py
 /cogs/plots/speed/*
 !/cogs/plots/speed/.gitkeep 
 
+/cogs/fiaDocs/*
+!/cogs/fiaDocs/.gitkeep 
