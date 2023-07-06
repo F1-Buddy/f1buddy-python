@@ -9,7 +9,7 @@ from discord.ext import commands
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.ticker import (MultipleLocator)
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
@@ -46,6 +46,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
     ax[1].set_ylim([0, 105])
     ax[0].set_ylim([0, 360])
     ax[2].set_ylim([0,1.1])
+    
     plt.subplots_adjust(left = 0.06, right = 0.99, top = 0.9, hspace=0.8)
     try:
         # year given is invalid
