@@ -47,11 +47,16 @@ def quali_results(self,year,round):
         # most recent session found, load it
         result_session.load()
     else:
-        result_session = fastf1.get_session(year, round, 'Qualifying')
+        event_round = None
+        try:
+            event_round = int(round)
+        except:
+            event_round = round
+        result_session = fastf1.get_session(year, event_round, 'Qualifying')
         # inputs were valid, but the Qualifying hasnt happened yet
         if (now.tz_localize('America/New_York') - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
             message_embed.title = "Qualifying not found!"
-            message_embed.description = "Round \"" + (str)(round) + "\" not found!"
+            message_embed.description = "Round \"" + (str)(event_round) + "\" not found!"
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             return message_embed
         # inputs were valid, get session

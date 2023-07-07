@@ -9,12 +9,14 @@ from discord.ext import commands
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
-matplotlib.use('agg')
+# from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap
+# matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
-
+import numpy as np
 
 # get current time
 now = pd.Timestamp.now()
@@ -39,20 +41,30 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
     ax.axis('equal')
     ax.axis('off')
     try:
-        # year given is invalid
-        try:
-            year = int(year)
-        except:
-            year = now.year
-        if (year > now.year | year < 2018):
-            race = fastf1.get_session(now.year, round, sessiontype.value)
-        
-        # use given year
+        # no year given
+        if year == None:
+            event_year = now.year
         else:
-            race = fastf1.get_session(year, round, sessiontype.value)
-        # check if graph already exists, if not create it
+            # given year invalid
+            if (year > now.year | year < 2018):
+                event_year = now.year
+            # year is valid
+            else:
+                event_year = year
+        # get proper round (string/int)
+        try:
+            # given as int
+            event_round = int(round)
+        except ValueError:
+            # given as string
+            event_round = round
+
+        # get session using given args
+        race = fastf1.get_session(event_year, event_round, sessiontype.value)
+
         race.load()
         message_embed.description = race.event.EventName
+        # get driver data for their fastest lap during the session
         d1_laps = race.laps.pick_driver(driver1)
         d1_fastest = d1_laps.pick_fastest()
         d1_number = d1_laps.iloc[0].loc['DriverNumber']
@@ -63,40 +75,123 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
         
-
-        if (not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png')) and (
-            not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d2_name+'vs'+d1_name+'.png')):
+        # check if graph already exists, if not create it
+        if (not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')) and (
+            not os.path.exists("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d2_name+'vs'+d1_name+'.png')):
             try:
+                # get driver telemetry
                 d1_telemetry_data = d1_fastest.get_telemetry()
                 d2_telemetry_data = d2_fastest.get_telemetry()
-                # d1_lap_data = d1_laps.pick_fastest().get_pos_data()
-                # d1_car_data = d1_laps.pick_fastest().get_car_data()
-                # d2_lap_data = d2_laps.pick_fastest().get_pos_data()
-                # d2_car_data = d2_laps.pick_fastest().get_car_data()
+                
+                # get driver color
+                if (year == now.year):
+                    # fastf1.plotting.driver_color() only supports current season
+                    d1_color = f1plt.driver_color(d1_name)
+                    d2_color = f1plt.driver_color(d2_name)
+                else:
+                    # otherwise use team color
+                    d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
+                    d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
+                if d1_color == d2_color:
+                    # if comparing teammates, make second driver white (unless first driver is already white Ex: Haas)
+                    if (d1_color == '#ffffff'):
+                        d2_color = 'grey'
+                    else:
+                        d2_color = 'white'
+                
+                # We want 25 mini-sectors
+                num_minisectors = 25
 
-                for c in d1_telemetry_data.index:
+                # What is the total distance of a lap?
+                total_distance = max(d1_telemetry_data['Distance'])
+
+                # Generate equally sized mini-sectors 
+                minisector_length = total_distance / num_minisectors
+
+                minisectors = [0]
+
+                for i in range(0, (num_minisectors - 1)):
+                    minisectors.append(minisector_length * (i + 1))
+                    
+                # add columns for minisector number and minisector average speed
+                d1_telemetry_data['Minisector'] =  d1_telemetry_data['Distance'].apply(
+                    lambda z: (
+                        minisectors.index(
+                        min(minisectors, key=lambda x: abs(x-z)))+1
+                    )
+                )
+                avg_speeds1 = d1_telemetry_data.groupby("Minisector")["Speed"].mean()
+                d1_telemetry_data["Minisector_Speed"] = d1_telemetry_data["Minisector"].map(avg_speeds1)
+                
+                d2_telemetry_data['Minisector'] =  d2_telemetry_data['Distance'].apply(
+                    lambda z: (
+                        minisectors.index(
+                        min(minisectors, key=lambda x: abs(x-z)))+1
+                    )
+                )
+                avg_speeds2 = d2_telemetry_data.groupby("Minisector")["Speed"].mean()
+                d2_telemetry_data["Minisector_Speed"] = d2_telemetry_data["Minisector"].map(avg_speeds2)
+                
+                # add another column for driver color
+                d1_telemetry_data['Driver_Color'] = d1_color
+                d2_telemetry_data['Driver_Color'] = d2_color
+                
+                # get the greatest average speed per minisector
+                d1_avg_speeds = d1_telemetry_data.groupby("Minisector")["Minisector_Speed"].max()
+                d2_avg_speeds = d2_telemetry_data.groupby("Minisector")["Minisector_Speed"].max()
+                max_avg_speeds = []
+                for i in d1_avg_speeds.index:
+                    if (d1_avg_speeds[i] >= d2_avg_speeds[i]):
+                        max_avg_speeds.append(d1_avg_speeds[i])
+                    else:
+                        max_avg_speeds.append(d2_avg_speeds[i])
+                # Create a new dataframe combining the "X", "Y", "Minisector", and "Minisector_Speed" columns from both dataframes
+                combined_data = pd.concat([d1_telemetry_data[['X', 'Y', 'Minisector', 'Minisector_Speed','Driver_Color']], d2_telemetry_data[['X', 'Y', 'Minisector', 'Minisector_Speed','Driver_Color']]])
+                df_list = []
+                for i in range(25):
+                    df_list.append(combined_data.loc[combined_data['Minisector_Speed'] == max_avg_speeds[i]])
+                filtered_df = pd.concat(df_list)
+                # remove duplicate rows
+                filtered_df = filtered_df.loc[filtered_df.groupby(filtered_df.index)['Minisector_Speed'].idxmax()]
+                
+                # create color array for each segment of line
+                color_array = []
+                
+                # compare speed in each sector and add faster driver's color to color_array
+                x = filtered_df["X"].to_list()
+                y = filtered_df["Y"].to_list()
+                x = d1_telemetry_data["X"].to_list()
+                y = d1_telemetry_data["Y"].to_list()
+                for i in filtered_df.index:
                     try:
-                        # get driver color
-                        if (year == now.year):
-                            d1_color = f1plt.driver_color(d1_name)
-                            d2_color = f1plt.driver_color(d2_name)
-                        else:
-                            d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
-                            d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
-                        if d1_color == d2_color:
-                            d2_color = 'white'
-                        if (d1_telemetry_data.loc[c,"Speed"] >= d2_telemetry_data.loc[c,"Speed"]):
-                            # print(f"in {c} {d1_name} is faster than {d2_name}")
-                            # print(str(d1_telemetry_data.loc[c,"Speed"]) + " > " + str(d2_telemetry_data.loc[c,"Speed"]))
-                            plt.scatter(d1_telemetry_data.loc[c,"X"],d1_telemetry_data.loc[c,"Y"],color=d1_color,s=2,label=d1_name)
-                        elif (d1_telemetry_data.loc[c,"Speed"] < d2_telemetry_data.loc[c,"Speed"]):
-                            # print(f"in {c} {d2_name} is faster than {d1_name}")
-                            # print(str(d1_telemetry_data.loc[c,"Speed"]) + " < " + str(d2_telemetry_data.loc[c,"Speed"]))
-                            plt.scatter(d2_telemetry_data.loc[c,"X"],d2_telemetry_data.loc[c,"Y"],color=d2_color,s=2,label=d2_name)
+                        row_color = filtered_df.loc[i,"Driver_Color"]
+                        # use faster driver's color
+                        if (type(row_color)) == str:
+                            if (row_color == d1_color):
+                                color_array.append(1)
+                            elif (row_color == d2_color):
+                                color_array.append(2)
+                    # when there is no data for either driver for a sector, make the color black
                     except Exception as e:
-                        print(e)
-                        
-                plt.title(f"{d1_name} vs {d2_name}\n{year} {str(race.event.EventName)}\nTrack Dominance on Fastest Lap",fontdict = {'fontsize' : 'small'})
+                        # traceback.print_exc()
+                        color_array.append(None)
+                        print(i)
+
+                # some numpy fuckery to turn x and y lists to coords idk how this works
+                points = np.array([x, y]).T.reshape(-1, 1, 2)
+                segments = np.concatenate([points[:-1], points[1:]], axis=1)
+                
+                # colormap
+                cmap = ListedColormap([d1_color,d2_color])
+                # setup LineCollection
+                lc = LineCollection(segments,cmap=cmap)
+                lc.set_array(color_array)
+                lc.set_linewidth(2)
+                # plot line
+                plt.gca().add_collection(lc)
+                plt.gca().axis('equal')
+                # more plot setup
+                plt.title(f"{d1_name} vs {d2_name}\n{str(race.date.year)} {str(race.event.EventName)} {sessiontype.name.capitalize()}\nTrack Dominance on Fastest Lap",fontdict = {'fontsize' : 'small'})
                 plt.grid(visible=False, which='both')
                 # set up legend
                 d1_patch = mpatches.Patch(color=d1_color, label=d1_name)
@@ -104,8 +199,10 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 plt.legend(handles=[d1_patch, d2_patch])
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
-                plt.savefig("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png')
-                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+                # plt.show()
+                # plt.show()
+                plt.savefig("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')
+                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
                 # reset plot just in case
                 plt.clf()
@@ -116,7 +213,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 traceback.print_exc()
         # try to access the graph
         try:
-            file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+            file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
             message_embed.set_footer(text='')
             print('found file')
@@ -125,7 +222,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         except Exception as e:
             # try to access the graph by switching driver1 and driver2 in filename
             try:
-                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+"_speed_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
+                file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
                 message_embed.set_footer(text='')
                 print("Swapped drivers around and found a file")
@@ -182,7 +279,7 @@ class Speed(commands.Cog):
         # send embed
         try:
             message_embed.set_image(url='attachment://image.png')
-            message_embed.set_footer(text="*Some lap data may be missing")
+            message_embed.set_footer(text="")
             await interaction.followup.send(embed=message_embed,file=file)
         except:
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')

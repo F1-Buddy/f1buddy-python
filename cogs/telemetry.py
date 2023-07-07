@@ -9,7 +9,7 @@ from discord.ext import commands
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.ticker import (MultipleLocator)
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
@@ -46,19 +46,23 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
     ax[1].set_ylim([0, 105])
     ax[0].set_ylim([0, 360])
     ax[2].set_ylim([0,1.1])
+    
     plt.subplots_adjust(left = 0.06, right = 0.99, top = 0.9, hspace=0.8)
     try:
         # year given is invalid
-        try:
-            year = int(year)
-        except:
-            year = now.year
-        if (year > now.year | year < 2018):
-            race = fastf1.get_session(now.year, round, sessiontype.value)
-        
-        # use given year
+        if year == None:
+            event_year = now.year
         else:
-            race = fastf1.get_session(year, round, sessiontype.value)
+            if (year > now.year | year < 2018):
+                event_year = now.year
+            else:
+                event_year = year
+        try:
+            event_round = int(round)
+        except ValueError:
+            event_round = round
+
+        race = fastf1.get_session(event_year, event_round, sessiontype.value)
         # check if graph already exists, if not create it
         race.load()
         message_embed.description = race.event.EventName
@@ -76,9 +80,9 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
 
         throttle_string = ""
         brake_string = ""
-
-        if (not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png')) and (
-            not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d2_name+'vs'+d1_name+'.png')):
+        
+        if (not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')) and (
+            not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png')):
             try:
                 d1_tel = d1_fastest.get_telemetry()
                 d2_tel = d2_fastest.get_telemetry()
@@ -150,8 +154,8 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 plt.legend(handles=[d1_patch, d2_patch],bbox_to_anchor=(1.01, 5.2),loc='upper right')
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
-                plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
-                file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+                plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
+                file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
                 message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
                 # message_embed.description += "\n" + throttle_string + brake_string
@@ -165,7 +169,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         # try to access the graph
         try:
             print("already exists")
-            file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+            file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
             message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
             message_embed.set_footer(text='')
@@ -176,7 +180,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
             print(e)
             # try to access the graph by switching driver1 and driver2 in filename
             try:
-                file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
+                file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
                 message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
                 message_embed.set_footer(text='')

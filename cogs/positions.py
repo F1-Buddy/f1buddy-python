@@ -40,26 +40,20 @@ def positions_result(round, year):
 
     try:
         # year given is invalid
-        try:
-            year = int(year)
-        except:
-            year = now.year
-        if (year > now.year | year < 2018):
-            try:
-                race = fastf1.get_session(now.year, round, 'R')
-            except:
-                race = fastf1.get_session(now.year, (int)(round), 'R')
-            race.load()
-            racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-        
-        # use given year
+        if year == None:
+            event_year = now.year
         else:
-            try:
-                race = fastf1.get_session(year, round, 'R')
-            except:
-                race = fastf1.get_session(year, (int)(round), 'R')
-            race.load()
-            racename = '' + str(race.date.year)+' '+str(race.event.EventName)
+            if (year > now.year | year < 2018):
+                event_year = now.year
+            else:
+                event_year = year
+        try:
+            event_round = int(round)
+        except ValueError:
+            event_round = round
+        race = fastf1.get_session(event_year, event_round, 'R')
+        race.load()
+        racename = '' + str(race.date.year)+' '+str(race.event.EventName)
 
         # check if graph already exists, if not create it
         message_embed.description = racename

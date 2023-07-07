@@ -36,11 +36,16 @@ def results_result(self, year, round):
         result_session.load()
     # round was given as number
     else:
-        result_session = fastf1.get_session(year, round, 'Race')
+        event_round = None
+        try:
+            event_round = int(round)
+        except:
+            event_round = round
+        result_session = fastf1.get_session(year, event_round, 'Race')
         if (now.tz_localize('America/New_York') - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
             message_embed.title = "Race hasn't happened yet!!"
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            message_embed.description = "Round \"" + (str)(round) + "\" not found!"
+            message_embed.description = "Round \"" + (str)(event_round) + "\" not found!"
             return message_embed
         
 
