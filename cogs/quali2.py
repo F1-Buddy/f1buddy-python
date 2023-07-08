@@ -26,6 +26,7 @@ def quali_results(self,year,round):
         # get latest completed session by starting from the end of calendar and going back towards beginning of season
         year_sched = fastf1.get_event_schedule(year,include_testing=False)
         round = (year_sched.shape[0])
+        print(round)
         if (year_sched.loc[round, "EventFormat"] == 'conventional'):
             # print(f"{year_sched.loc[round, 'EventName']} is conventional")
             sessionTime = year_sched.loc[round,"Session4Date"].tz_convert('America/New_York')
@@ -43,6 +44,7 @@ def quali_results(self,year,round):
             else:
                 # print(f"{year_sched.loc[round, 'EventName']} is sprint")
                 sessionTime = year_sched.loc[round,"Session2Date"].tz_convert('America/New_York')
+        print(round)
         result_session = fastf1.get_session(year, round, 'Qualifying')
         # most recent session found, load it
         result_session.load()
@@ -80,6 +82,13 @@ def quali_results(self,year,round):
         message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
         message_embed.description = "Session not found!"
         return message_embed
+    
+    try:
+        total_positions = 0
+        num_races = 0
+    except: 
+        print("Error at 0.")
+    
     for i in (resultsTable.DriverNumber.values):
         try:
             # print(resultsTable.loc[i,'TeamName'])
@@ -88,6 +97,14 @@ def quali_results(self,year,round):
             driver_names += resultsTable.loc[i,'FullName'] + "\n"
         temp = (str)(resultsTable.loc[i,'Position'])
         position_string += temp[0:temp.index('.')] + "\n"
+        
+        # try:
+        #     total_positions += position_string
+        #     num_races += 1
+        #     print("total positions " + total_positions + "      num races:" + num_races)
+        # except:
+        #     print("Error setting averg")
+        
         # get best lap time from furthest session driver made it to (Q3? -> Q2? -> Q1)
         time = (str)(resultsTable.loc[i,'Q3'])
         q = 3
@@ -106,7 +123,11 @@ def quali_results(self,year,round):
         time = "Q" +(str)(q)+": " + time 
         time_string += time + "\n"
         
-        
+        # try:
+        #     average_position = total_positions / num_races
+        #     print(average_position)
+        # except:
+        #     print("error final stage")
         # status_string += (str)(resultsTable.loc[i,'Status']) + "\n"
 
     # print(driver_names)
