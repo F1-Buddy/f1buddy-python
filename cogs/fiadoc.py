@@ -42,7 +42,7 @@ def get_fia_doc():
         try:
             while (True):
                 page = doc.load_page(page_num)  # number of page
-                pix = page.get_pixmap()
+                pix = page.get_pixmap(matrix=(fitz.Matrix(300 / 72, 300 / 72)))
                 output = f"{filePath}/{page_num}.png"
                 pix.save(output)
                 page_num += 1
