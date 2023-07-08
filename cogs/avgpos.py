@@ -4,13 +4,10 @@ import fastf1
 from matplotlib.ticker import MultipleLocator
 import pandas as pd
 from matplotlib import font_manager, pyplot as plt
-import matplotlib
 import pandas as pd
-import fastf1.plotting as f1plt
 from discord import app_commands
 from discord.ext import commands
 from lib.colors import colors
-from lib.emojiid import team_emoji_ids
 from lib.drivernames import driver_names
 from lib.teamcolors import team_colors
 from datetime import datetime
@@ -167,4 +164,3 @@ class AveragePos(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(AveragePos(bot))
-
