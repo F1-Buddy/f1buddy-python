@@ -40,7 +40,7 @@ added author to each embed
 - [x] use fastf1 ergast implementation for wdc and wcc
     - [x] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
 - [x] fix schedule for new sprint weekend 
-
+- [ ] change background and font for all graphs
 ## Issues
 
 2020 season data is odd (example styrian gp, 2020 round 2)
