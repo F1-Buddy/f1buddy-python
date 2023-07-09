@@ -99,9 +99,7 @@ def avg_pos(sessiontype):
     # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
-        
     driver_positions, driver_teams = {}, [] # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
-    # total_positions, num_races = 0, 0
     
     for round_num in range(1, num_rounds + 1):
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
@@ -115,38 +113,15 @@ def avg_pos(sessiontype):
         except Exception as e:
             print(f"An error occurred in round {round_num}: {e}")
             continue
-        
-        driver_names = ""
-        position_string = "" 
 
         for i in resultsTable.DriverNumber.values:
             try:
                 team_name = resultsTable.loc[i, 'TeamName']
-                driver_names += resultsTable.loc[i, 'FullName'] + "\n"
             except:
-                driver_names += resultsTable.loc[i, 'FullName'] + "\n"
-            try:
-                temp = str(resultsTable.loc[i, 'Position'])
-                position_string += temp[0:temp.index('.')] + "\n"
-            except ValueError:
-                print(f"No time set for driver {resultsTable.loc[i, 'FullName']} in round {round_num}")
-                continue
-            except KeyError:
-                print(f"Driver {resultsTable.loc[i, 'FullName']} did not appear in round {round_num}")
-                continue
-            except Exception as e:
-                print(f"An error occurred for driver {resultsTable.loc[i, 'FullName']} in round {round_num}: {e}")
-                message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-                message_embed.description = "Error Occured :( \n {e}"            
-                continue
+                pass
             
             driver_positions.setdefault(resultsTable.loc[i, 'FullName'], []).append(int(resultsTable.loc[i, 'Position']))
             driver_teams.append(team_name)  # add team name to the separate list
-    # for driver, positions in driver_positions.items(): # test values with string
-    #     avg_position = round(sum(int(pos) for pos in positions) / len(positions), 2)
-    #     print(f"{driver} Average {sessiontype} Position {avg_position}")
-    #     total_positions += sum(positions)
-    #     num_races += len(positions)
     return driver_positions, driver_teams
 
 class AveragePos(commands.Cog):
