@@ -4,7 +4,7 @@ import discord
 import fastf1
 from matplotlib.ticker import MultipleLocator
 import pandas as pd
-from matplotlib import font_manager, pyplot as plt
+from matplotlib import pyplot as plt
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
@@ -19,11 +19,9 @@ fastf1.Cache.enable_cache('cache/')
 message_embed = discord.Embed(title=f"Average Positions", description="Average Positions") # boilerplate/initalization for global scope
 
 def plot_avg_positions(event):
-    # convert discord choice to string
-    sessiontype = str(event.name)
+    sessiontype = str(event.name) # convert discord choice to string
     
-    # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
-    # use this to check for race date in png's
+    # get latest completed session by starting from the end of calendar and going back towards the beginning of the season, use this to check for race date in png's
     year_sched = fastf1.get_event_schedule(current_year,include_testing=False)
     round_check = (year_sched.shape[0])
     if (year_sched.loc[round_check, "EventFormat"] == 'conventional'):
@@ -39,16 +37,14 @@ def plot_avg_positions(event):
     race = fastf1.get_session(current_year, round_check, f"{sessiontype}") 
     
     filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png"
-    if not os.path.exists(filename):
+    if not os.path.exists(filename): # checks if image has already been generated
         # calculate average positions
         driver_positions, driver_teams = avg_pos(sessiontype)
         driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
         avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
         
-        # sort drivers based on average positions
-        driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1]))
-
-        fig, ax = plt.subplots(figsize=(7.5, 5)) # create the bar plot and size
+        driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
+        fig, ax = plt.subplots(figsize=(8, 5)) # create the bar plot and size
         ax.barh(range(len(driver_codes)), avg_positions, color=[team_colors.get(team, 'gray') for team in driver_teams]) # plotting the horizontal bar chart
 
         # setting x-axis label, title
@@ -65,10 +61,10 @@ def plot_avg_positions(event):
         ax.xaxis.set_tick_params(labelsize=12)
         ax.yaxis.set_tick_params(labelsize=12)
         ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font)
-        ax.set_yticks(range(len(driver_codes)))
         ax.set_yticklabels(driver_codes, fontproperties=bold_font)
-        ax.tick_params(axis='x', length=0)
-        ax.tick_params(axis='y', length=0)
+        ax.set_yticks(range(len(driver_codes)))
+        ax.tick_params(axis='both', length=0)
+        # ax.tick_params(axis='y', length=0)
 
         # remove all lines, bar the x-axis grid lines
         ax.yaxis.grid(False)
@@ -100,7 +96,7 @@ def avg_pos(sessiontype):
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
     driver_positions, driver_teams = {}, [] # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
-    
+
     for round_num in range(1, num_rounds + 1):
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
         if now.tz_localize('America/New_York') < sessionTime:
@@ -119,9 +115,9 @@ def avg_pos(sessiontype):
                 team_name = resultsTable.loc[i, 'TeamName']
             except:
                 pass
-            
             driver_positions.setdefault(resultsTable.loc[i, 'FullName'], []).append(int(resultsTable.loc[i, 'Position']))
             driver_teams.append(team_name)  # add team name to the separate list
+            
     return driver_positions, driver_teams
 
 class AveragePos(commands.Cog):
