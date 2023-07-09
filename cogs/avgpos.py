@@ -1,4 +1,5 @@
 import asyncio
+import os
 import discord
 import fastf1
 from matplotlib.ticker import MultipleLocator
@@ -20,62 +21,80 @@ def plot_avg_positions(event):
     # convert discord choice to string
     sessiontype = str(event.name)
     
-    # set fonts
-    regular_font_path = "fonts/Formula1-Regular.ttf"
-    bold_font_path = "fonts/Formula1-Bold.ttf"
-    regular_font = font_manager.FontProperties(fname=regular_font_path)
-    bold_font = font_manager.FontProperties(fname=bold_font_path)
+    # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
+    # use this to check for race date in png's
+    year_sched = fastf1.get_event_schedule(current_year,include_testing=False)
+    round_check = (year_sched.shape[0])
+    if (year_sched.loc[round_check, "EventFormat"] == 'conventional'):
+        sessionTime = year_sched.loc[round_check,"Session4Date"].tz_convert('America/New_York')
+    else:
+        sessionTime = year_sched.loc[round_check,"Session2Date"].tz_convert('America/New_York')
+    while (now.tz_localize('America/New_York') < sessionTime):
+        round_check -= 1
+        if (year_sched.loc[round_check, "EventFormat"] == 'conventional'):
+            sessionTime = year_sched.loc[round_check,"Session4Date"].tz_convert('America/New_York')
+        else:
+            sessionTime = year_sched.loc[round_check,"Session2Date"].tz_convert('America/New_York') 
+    race = fastf1.get_session(current_year, round_check, f"{sessiontype}") 
     
-    # calculate average positions
-    driver_positions, driver_teams = avg_pos(sessiontype)
-    driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
-    avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
+    filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png"
+    if not os.path.exists(filename):
+        # set fonts
+        regular_font_path = "fonts/Formula1-Regular.ttf"
+        bold_font_path = "fonts/Formula1-Bold.ttf"
+        regular_font = font_manager.FontProperties(fname=regular_font_path)
+        bold_font = font_manager.FontProperties(fname=bold_font_path)
+        
+        # calculate average positions
+        driver_positions, driver_teams = avg_pos(sessiontype)
+        driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
+        avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
+        
+        # sort drivers based on average positions
+        driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1]))
 
-    # sort drivers based on average positions
-    driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1]))
+        fig, ax = plt.subplots(figsize=(7.5, 5)) # create the bar plot and size
+        ax.barh(range(len(driver_codes)), avg_positions, color=[team_colors.get(team, 'gray') for team in driver_teams]) # plotting the horizontal bar chart
 
-    fig, ax = plt.subplots(figsize=(7.5, 5)) # create the bar plot and size
-    ax.barh(range(len(driver_codes)), avg_positions, color=[team_colors.get(team, 'gray') for team in driver_teams]) # plotting the horizontal bar chart
+        # setting x-axis label, title
+        ax.set_xlabel("Position", fontproperties=regular_font, labelpad=10)
+        ax.set_title(f"Average {sessiontype} Position {current_year}", fontproperties=bold_font)
 
-    # setting x-axis label, title
-    ax.set_xlabel("Position", fontproperties=regular_font, labelpad=10)
-    ax.set_title(f"Average {sessiontype} Position {current_year}", fontproperties=bold_font)
+        # space between limits for the y-axis and x-axis
+        ax.set_ylim(-0.8, 19.8)
+        ax.set_xlim(0, 20.1)
+        ax.invert_yaxis() # invert y axis, top to bottom
+        ax.xaxis.set_major_locator(MultipleLocator(1)) # amount x-axis increments by 1
 
-    # space between limits for the y-axis and x-axis
-    ax.set_ylim(-0.8, 19.8)
-    ax.set_xlim(0, 20.1)
-    ax.invert_yaxis() # invert y axis, top to bottom
-    ax.xaxis.set_major_locator(MultipleLocator(1)) # amount x-axis increments by 1
+        # remove ticks, keep labels
+        ax.xaxis.set_tick_params(labelsize=12)
+        ax.yaxis.set_tick_params(labelsize=12)
+        ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font)
+        ax.set_yticks(range(len(driver_codes)))
+        ax.set_yticklabels(driver_codes, fontproperties=bold_font)
+        ax.tick_params(axis='x', length=0)
+        ax.tick_params(axis='y', length=0)
 
-    # remove ticks, keep labels
-    ax.xaxis.set_tick_params(labelsize=12)
-    ax.yaxis.set_tick_params(labelsize=12)
-    ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font)
-    ax.set_yticks(range(len(driver_codes)))
-    ax.set_yticklabels(driver_codes, fontproperties=bold_font)
-    ax.tick_params(axis='x', length=0)
-    ax.tick_params(axis='y', length=0)
+        # remove all lines, bar the x-axis grid lines
+        ax.yaxis.grid(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.minorticks_off()
+        
+        # set blackground
+        ax.set_facecolor('black')    
+        fig.set_facecolor('black')
 
-    # remove all lines, bar the x-axis grid lines
-    ax.yaxis.grid(False)
-    ax.spines['top'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.minorticks_off()
-    
-    # set blackground
-    ax.set_facecolor('black')    
-    fig.set_facecolor('black')
-
-    # adds position number near bars
-    for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
-        ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font)
-
-    plt.savefig("cogs/plots/avgpos/avg_pos.png") # save plot
-    
+        # adds position number near bars
+        for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
+            ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font)
+            
+        plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png") # save plot
+        
     try:
-        file = discord.File("cogs/plots/avgpos/avg_pos.png", filename="image.png")
+        file = discord.File(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png", filename="image.png")
         return file
     except Exception as e:
         print(e)
@@ -85,14 +104,12 @@ def avg_pos(sessiontype):
     # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
-    
-    
+        
     driver_positions, driver_teams = {}, [] # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
-    total_positions, num_races = 0, 0
+    # total_positions, num_races = 0, 0
     
     for round_num in range(1, num_rounds + 1):
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
-
         if now.tz_localize('America/New_York') < sessionTime:
             break
         
@@ -149,7 +166,7 @@ class AveragePos(commands.Cog):
     @app_commands.describe(event='Choose between Qualifying or Race')
     @app_commands.choices(event=[app_commands.Choice(name="Qualifying", value="Qualifying"), app_commands.Choice(name="Race", value="Race"),])
     async def positions(self, interaction: discord.Interaction, event: app_commands.Choice[str]):
-        message_embed = discord.Embed(title=f"Average {event.name} Position {current_year}", description=f"Average {event.name.lower()} positions throughout {current_year}")
+        message_embed = discord.Embed(title=f"Average {event.name} Position {current_year}", description="")
         message_embed.colour = colors.default
         message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         message_embed.set_thumbnail(
