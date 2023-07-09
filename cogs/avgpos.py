@@ -12,6 +12,7 @@ from lib.colors import colors
 from lib.drivernames import driver_names
 from lib.teamcolors import team_colors
 from datetime import datetime
+from lib.f1font import regular_font, bold_font
 current_year = datetime.now().year
 now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
@@ -39,12 +40,6 @@ def plot_avg_positions(event):
     
     filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png"
     if not os.path.exists(filename):
-        # set fonts
-        regular_font_path = "fonts/Formula1-Regular.ttf"
-        bold_font_path = "fonts/Formula1-Bold.ttf"
-        regular_font = font_manager.FontProperties(fname=regular_font_path)
-        bold_font = font_manager.FontProperties(fname=bold_font_path)
-        
         # calculate average positions
         driver_positions, driver_teams = avg_pos(sessiontype)
         driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
