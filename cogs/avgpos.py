@@ -49,7 +49,7 @@ def plot_avg_positions(event):
 
         # setting x-axis label, title
         ax.set_xlabel("Position", fontproperties=regular_font, labelpad=10)
-        ax.set_title(f"Average {sessiontype} Position {current_year}", fontproperties=bold_font)
+        ax.set_title(f"Average {sessiontype} Finish Position {current_year}", fontproperties=bold_font)
 
         # space between limits for the y-axis and x-axis
         ax.set_ylim(-0.8, 19.8)
@@ -120,6 +120,25 @@ def avg_pos(sessiontype):
             
     return driver_positions, driver_teams
 
+def head_to_head_results():
+    driver_positions = avg_pos()
+    head_to_head = {}
+
+    for driver1 in driver_positions:
+        for driver2 in driver_positions:
+            if driver1 != driver2:
+                driver1_positions = driver_positions[driver1]
+                driver2_positions = driver_positions[driver2]
+
+                # Calculate the number of times each driver finished ahead of the other
+                driver1_wins = sum(pos1 < pos2 for pos1, pos2 in zip(driver1_positions, driver2_positions))
+                driver2_wins = sum(pos1 > pos2 for pos1, pos2 in zip(driver1_positions, driver2_positions))
+
+                head_to_head_key = f"{driver1} vs {driver2}"
+                head_to_head[head_to_head_key] = f"{driver1_wins}-{driver2_wins}"
+
+    return head_to_head
+
 class AveragePos(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -128,11 +147,11 @@ class AveragePos(commands.Cog):
     async def on_ready(self):
         print('Avg Positions cog loaded')
         
-    @app_commands.command(name='avgpos', description='See average position for driver for race/qualifying throughout the year. Will take some time to load.')
+    @app_commands.command(name='avgpos', description='See average finish position for driver for race/qualifying throughout the year. May take some time to load.')
     @app_commands.describe(event='Choose between Qualifying or Race')
     @app_commands.choices(event=[app_commands.Choice(name="Qualifying", value="Qualifying"), app_commands.Choice(name="Race", value="Race"),])
     async def positions(self, interaction: discord.Interaction, event: app_commands.Choice[str]):
-        message_embed = discord.Embed(title=f"Average {event.name} Position {current_year}", description="")
+        message_embed = discord.Embed(title=f"Average {event.name} Finish Position {current_year}", description="")
         message_embed.colour = colors.default
         message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         message_embed.set_thumbnail(
@@ -143,9 +162,9 @@ class AveragePos(commands.Cog):
         try:
             message_embed.set_image(url='attachment://image.png')
             await interaction.followup.send(embed=message_embed,file=file)
-        except:
+        except Exception as e:
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            message_embed.description = "Error Occured :("            
+            message_embed.description = f"Error Occured :( {e}"            
             await interaction.followup.send(embed=message_embed)
         loop.close()
 
