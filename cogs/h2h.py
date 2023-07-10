@@ -6,7 +6,7 @@ import fastf1
 import unidecode
 import pandas as pd
 import country_converter as coco
-from cogs.avgpos import avg_pos
+# from cogs.avgpos import avg_pos
 from lib import colors
 from lib.drivernames import driver_names
 from discord import app_commands
@@ -18,6 +18,36 @@ from lib.emojiid import nation_dictionary
 fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 current_year = datetime.now().year
+
+
+def avg_pos(sessiontype):
+    # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
+    year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
+    num_rounds = year_sched.shape[0]
+    driver_positions, driver_teams = {}, [] # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
+
+    for round_num in range(1, num_rounds + 1):
+        sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
+        if now.tz_localize('America/New_York') < sessionTime:
+            break
+        
+        try:
+            result_session = fastf1.get_session(current_year, round_num, sessiontype)
+            result_session.load()
+            resultsTable = result_session.results
+        except Exception as e:
+            print(f"An error occurred in round {round_num}: {e}")
+            continue
+
+        for i in resultsTable.DriverNumber.values:
+            try:
+                team_name = resultsTable.loc[i, 'TeamName']
+            except:
+                pass
+            driver_positions.setdefault(resultsTable.loc[i, 'FullName'], []).append(int(resultsTable.loc[i, 'Position']))
+            driver_teams.append(team_name)  # add team name to the separate list
+            
+    return driver_positions, driver_teams
 
 def head_to_head(driver1_code, driver2_code, sessiontype):
     ergast = Ergast()
