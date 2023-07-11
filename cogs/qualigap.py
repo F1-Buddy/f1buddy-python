@@ -1,4 +1,3 @@
-import json
 import discord
 import asyncio
 import fastf1
@@ -11,9 +10,8 @@ import matplotlib
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
+from lib.f1font import regular_font, bold_font
 import fastf1.plotting as f1plt
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
-
 fastf1.Cache.enable_cache('cache/')
 
 # setup embed
@@ -29,22 +27,24 @@ def td_to_laptime(td):
     td_seconds = td.seconds
     td_minutes = td_seconds // 60
     td_seconds = str(td_seconds % 60).zfill(2)
-    td_thousandths = str(td_microseconds)[:-3].ljust(3, '0')
+    td_thousandths = str(td_microseconds)[:-3].zfill(3)
     return f"{td_minutes}:{td_seconds}.{td_thousandths}"
 
 # add labels to each bar
-def addlabels(x,y,driver_colors):
+def addlabels(x,y,driver_colors, regular_font):
     for i in range(len(x)):
         string = f"+{str(y[i])[0:5].ljust(5,'0')}"
         if (i == 0):
             string = "   Pole"
         elif (string == "+0.000" and i != 0):
             string = "No Time"
-        plt.text(min(max(y),5)+0.09, i, string, va = 'center')
+        plt.text(min(max(y),5)+0.09, i, string, va = 'center', fontproperties=regular_font)
 
 f1plt._enable_fastf1_color_scheme()
 f1plt.setup_mpl(misc_mpl_mods=False)
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(8.25, 5.5))
+fig.set_facecolor('black')
+ax.set_facecolor('black')
 
 def quali_gap(round, year):
     # get current time
@@ -103,18 +103,25 @@ def quali_gap(round, year):
             # plot each delta as a bar
             plt.barh(driver_names, bar_heights,.88, color=driver_colors)
             # label each bar
-            addlabels(driver_names, bar_heights, driver_colors)
+            addlabels(driver_names, bar_heights, driver_colors, regular_font)
             # set graph limits, try to set ylimit to last driver's delta
             plt.xlim(right=min(max(bar_heights),5), left=0)
             plt.ylim([20,-1])
             # graph setup stuff
             # plt.xticks(rotation=90) 
             ax.minorticks_off()
+            # ax.spines['top'].set_visible(False) removes box around chart
+            # ax.spines['bottom'].set_visible(False)
+            # ax.spines['left'].set_visible(False)
+            # ax.spines['right'].set_visible(False)
             plt.grid(visible=False, which='both')
-            plt.title(f"Qualifying Gap for {str(race.date.year)+' '+str(race.event.EventName)}",y=1.16,fontdict = {'fontsize' : '16'})
-            plt.xlabel("Delta (Seconds)")
-            plt.ylabel("Driver")
+            plt.title(f"Qualifying Gap for {str(race.date.year)+' '+str(race.event.EventName)}",fontproperties=bold_font, pad=20)
+            plt.xlabel("Delta (Seconds)",fontproperties=regular_font)
             plt.subplots_adjust(right=0.88,left=0.16,bottom = 0.16,top = 0.78)
+            for label in ax.get_xticklabels():
+                label.set_fontproperties(regular_font)
+            for label in ax.get_yticklabels():
+                label.set_fontproperties(bold_font)
             plt.rcParams['savefig.dpi'] = 300
             # save plot
             plt.savefig("cogs/plots/qualigap/"+race.date.strftime('%Y-%m-%d_%I%M')+"_QualiGap"+'.png')
