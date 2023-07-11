@@ -34,7 +34,7 @@ def td_to_laptime(td):
     td_seconds = td.seconds
     td_minutes = td_seconds // 60
     td_seconds = str(td_seconds % 60).zfill(2)
-    td_thousandths = str(td_microseconds)[:-3].ljust(3, '0')
+    td_thousandths = str(td_microseconds)[:-3].zfill(3)
     return f"{td_minutes}:{td_seconds}.{td_thousandths}"
 
 def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):

@@ -110,7 +110,7 @@ def get_constructor_info(self, year, round):
                     team_name = f"[{constructor_name[j]}]({constructor_wikipedia[j]})"
                     string += team_name + "\n"
             
-            print(string)
+            # print(string)
             message_embed.add_field(name="Team", value=string, inline=True)
             message_embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
             message_embed.add_field(name = "Championships", value = '\n'.join(constructor_championships),inline = True)
