@@ -7,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
 import matplotlib
 # from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
@@ -37,7 +38,9 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7.5,6))
+    fig.set_facecolor('black')
+    ax.set_facecolor('black')
     ax.axis('equal')
     ax.axis('off')
     try:
@@ -191,12 +194,12 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 plt.gca().add_collection(lc)
                 plt.gca().axis('equal')
                 # more plot setup
-                plt.title(f"{d1_name} vs {d2_name}\n{str(race.date.year)} {str(race.event.EventName)} {sessiontype.name.capitalize()}\nTrack Dominance on Fastest Lap",fontdict = {'fontsize' : 'small'})
+                plt.title(f"{d1_name} vs {d2_name}\n{str(race.date.year)} {str(race.event.EventName)} {sessiontype.name.capitalize()}\nTrack Dominance on Fastest Lap",fontproperties=bold_font)
                 plt.grid(visible=False, which='both')
                 # set up legend
                 d1_patch = mpatches.Patch(color=d1_color, label=d1_name)
                 d2_patch = mpatches.Patch(color=d2_color, label=d2_name)
-                plt.legend(handles=[d1_patch, d2_patch])
+                plt.legend(handles=[d1_patch, d2_patch], prop=bold_font)
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
                 # plt.show()

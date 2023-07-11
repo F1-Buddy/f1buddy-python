@@ -7,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
 from lib.colors import colors
@@ -28,10 +29,11 @@ def positions_result(round, year):
     f1plt.setup_mpl()
     f1plt.setup_mpl(misc_mpl_mods=False)
     fig, ax = plt.subplots(figsize=(8.0, 4.9))
-    plt.ylabel("Position")
-    plt.xlabel("Lap")
+    plt.ylabel("Position",fontproperties=regular_font, labelpad=10)
+    plt.xlabel("Lap",fontproperties=regular_font, labelpad=10)
     plt.tight_layout()
     plt.subplots_adjust(right=0.85,top = 0.89)
+    fig.set_facecolor('black')
     ax.set_facecolor('black')
     ax.set_ylim([21, 0])
     ax.set_yticks(range(1,21))
@@ -83,13 +85,16 @@ def positions_result(round, year):
                     print("no info for this driver")
 
             # pyplot setup
-            ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2)
+            ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2, prop=bold_font)
             ax.minorticks_off()
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
-            plt.title('Position Changes during '+racename)
+            
+            plt.title('Position Changes during '+racename, fontproperties=bold_font)
             plt.grid(visible=False, which='both')
             plt.rcParams['savefig.dpi'] = 300
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontproperties(regular_font)
             # save plot
             plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
             # clear plot
