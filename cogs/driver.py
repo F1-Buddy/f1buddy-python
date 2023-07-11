@@ -1,17 +1,14 @@
 import asyncio
-import datetime
 import re
 import discord
 import pandas as pd
 import wikipedia
 import requests
 import json
-import country_converter as coco
 from unidecode import unidecode
 from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.ext import commands
-from lib.drivernames import driver_names
 from lib.colors import colors
 
 WIKI_REQUEST = 'http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='

@@ -7,8 +7,6 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
-import matplotlib
-# matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt

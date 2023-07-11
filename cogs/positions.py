@@ -1,4 +1,3 @@
-import json
 import discord
 import asyncio
 import fastf1
@@ -13,7 +12,7 @@ matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.ticker import (MultipleLocator)
 
 fastf1.Cache.enable_cache('cache/')
 

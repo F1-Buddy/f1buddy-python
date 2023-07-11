@@ -1,4 +1,3 @@
-import json
 import discord
 import asyncio
 import fastf1
@@ -13,8 +12,6 @@ from lib.colors import colors
 import pandas as pd
 from lib.f1font import regular_font, bold_font
 import fastf1.plotting as f1plt
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
-
 fastf1.Cache.enable_cache('cache/')
 
 # setup embed

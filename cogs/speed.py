@@ -9,11 +9,8 @@ from discord.ext import commands
 from matplotlib import pyplot as plt
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
-import matplotlib
-# from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap
-# matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
