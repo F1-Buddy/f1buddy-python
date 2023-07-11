@@ -44,12 +44,12 @@ def plot_avg_positions(event):
         avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
         
         driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
-        fig, ax = plt.subplots(figsize=(8, 5)) # create the bar plot and size
+        fig, ax = plt.subplots(figsize=(16.8, 10.5)) # create the bar plot and size
         ax.barh(range(len(driver_codes)), avg_positions, color=[team_colors.get(team, 'gray') for team in driver_teams]) # plotting the horizontal bar chart
 
         # setting x-axis label, title
-        ax.set_xlabel("Position", fontproperties=regular_font, labelpad=10)
-        ax.set_title(f"Average {sessiontype} Finish Position {current_year}", fontproperties=bold_font)
+        ax.set_xlabel("Position", fontproperties=regular_font, fontsize=20, labelpad=20)
+        ax.set_title(f"Average {sessiontype} Finish Position {current_year}", fontproperties=bold_font, fontsize=20, pad=20)
 
         # space between limits for the y-axis and x-axis
         ax.set_ylim(-0.8, 19.8)
@@ -60,10 +60,10 @@ def plot_avg_positions(event):
         # remove ticks, keep labels
         ax.xaxis.set_tick_params(labelsize=12)
         ax.yaxis.set_tick_params(labelsize=12)
-        ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font)
-        ax.set_yticklabels(driver_codes, fontproperties=bold_font)
+        ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font, fontsize=20)
+        ax.set_yticklabels(driver_codes, fontproperties=bold_font, fontsize=20)
         ax.set_yticks(range(len(driver_codes)))
-        ax.tick_params(axis='both', length=0)
+        ax.tick_params(axis='both', length=0, pad=8)
         # ax.tick_params(axis='y', length=0)
 
         # remove all lines, bar the x-axis grid lines
@@ -80,7 +80,7 @@ def plot_avg_positions(event):
 
         # adds position number near bars
         for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
-            ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font)
+            ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font, fontsize=20)
             
         plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png") # save plot
         
