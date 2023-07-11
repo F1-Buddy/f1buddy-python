@@ -42,6 +42,8 @@ added author to each embed
 - [x] fix schedule for new sprint weekend 
 - [ ] change background and font for all graphs
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend
+- [ ] align /laptimes to 0
+- [ ] add new commands to /help
 ## Issues
 
 2020 season data is odd (example styrian gp, 2020 round 2)
