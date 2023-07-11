@@ -20,6 +20,7 @@ now = pd.Timestamp.now()
 current_year = datetime.now().year
 
 def head_to_head(driver1_code, driver2_code, sessiontype):
+    sessiontype = str(sessiontype.name)
     ergast = Ergast()
     nationality_dict = nation_dictionary()
     driver_info = ergast.get_driver_info(season=current_year)
