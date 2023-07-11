@@ -21,12 +21,15 @@ class Sync(commands.Cog):
             await self.bot.change_presence(activity=activity)
             # change nickname
             await self.bot.user.edit(username='f1buddy')
+            print("Changed name and status")
             # sync commands
             fmt = await ctx.bot.tree.sync()
             commands = len(fmt)
+            print("Synced commands")
             user = self.bot.get_user(ctx.message.author.id)
             # send message
             await ctx.send(f'{user} synced {commands} commands')
+            print("Replied")
         # other user tries to sync
         else:
             user = self.bot.get_user(ctx.message.author.id)
