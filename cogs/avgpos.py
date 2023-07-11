@@ -147,7 +147,7 @@ class AveragePos(commands.Cog):
     async def on_ready(self):
         print('Avg Positions cog loaded')
         
-    @app_commands.command(name='avgpos', description='See average finish position for driver for race/qualifying throughout the year. May take some time to load.')
+    @app_commands.command(name='avgpos', description='See average finish position for driver for race/qualifying throughout the year')
     @app_commands.describe(event='Choose between Qualifying or Race')
     @app_commands.choices(event=[app_commands.Choice(name="Qualifying", value="Qualifying"), app_commands.Choice(name="Race", value="Race"),])
     async def positions(self, interaction: discord.Interaction, event: app_commands.Choice[str]):
