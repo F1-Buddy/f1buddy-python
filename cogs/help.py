@@ -159,6 +159,28 @@ def get_help_string(command_name):
             help_string += "/telemetry ver ham 6 Race` - Telemetry of VER and HAM in race of round 6 for the current year."
             is_real_command = True
             filename = "telemetry.png"
+        elif command_name.lower() in ["avgpos", "/avgpos"]:
+            help_string = "`/avgpos` - Generate and display a bar plot of average finish positions.\n\n"
+            help_string += "This command generates a bar plot showing the average finish positions of drivers in a specific session type.\n\n"
+            help_string += "Arguments:\n- event: The type of session for which you want to calculate the average finish positions.\n\n"
+            help_string += "Examples:\n`/avgpos Race` - Generate the average finish position bar plot for the race sessions.\n"
+            help_string += "`/avgpos Qualifying` - Generate the average finish position bar plot for the qualifying sessions.\n"
+            is_real_command = True
+            filename = "avgpos.png"
+        elif command_name.lower() in ["fiadoc", "/fiadoc"]:
+            help_string = "`/fiadoc` - Get the latest FIA Document.\n\n"
+            help_string += "This command retrieves and displays the latest FIA Document related to the FIA Formula One World Championship.\n\n"
+            help_string += "Examples:\n`/fiadoc` - Retrieve and display the latest FIA Document.\n"
+            is_real_command = True
+            filename = "fiadoc.png"
+        elif command_name.lower() in ["strategy", "/strategy"]:
+            help_string = "`/strategy` - See tire strategies for a specific race.\n\n"
+            help_string += "This command retrieves and displays the tire strategies used by drivers during a specific race.\n\n"
+            help_string += "Arguments:\n- round: The name or number of the race.\n- year (optional): The year of the race. If not provided, it will default to the current year.\n\n"
+            help_string += "Examples:\n`/strategy Australia` - Retrieve and display the tire strategies for the Australian race in the current year.\n"
+            help_string += "`/strategy 3 2022` - Retrieve and display the tire strategies for the race with the round number 3 in the year 2022.\n"
+            is_real_command = True
+            filename = "strategy.png"
         else:
             help_string = f"Command '{command_name}' not recognized. Please type the command name as it is verbatim in the bot's commands."
             is_real_command = False
