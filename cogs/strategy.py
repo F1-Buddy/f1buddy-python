@@ -7,11 +7,10 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
-import matplotlib
-# matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
+from lib.f1font import regular_font, bold_font
 from matplotlib.ticker import (MultipleLocator)
 
 # get current time
@@ -29,14 +28,19 @@ url='https://cdn.discordapp.com/attachments/884602392249770087/10594645322395812
 def tire_strategy(round, year):
     # pyplot setup
     f1plt.setup_mpl()
-    fig, ax = plt.subplots(figsize=(6, 10))
-    plt.ylabel("Driver")
-    plt.xlabel("Lap")
+    fig, ax = plt.subplots(figsize=(10, 10))
+    fig.set_facecolor('black')
+    ax.set_facecolor('black')
+    plt.xlabel("Lap", fontproperties=regular_font, fontsize=15, labelpad=15)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
+    ax.tick_params(axis='y', length=0)
     plt.tight_layout()
-    # plt.subplots_adjust(right=0.85,top = 0.89)
+    ax.yaxis.grid(False)
+    ax.xaxis.grid(False)
+    ax.minorticks_off() 
+    plt.subplots_adjust(left=0.1,top = 0.89)
     # ax.set_facecolor('black')
     ax.invert_yaxis()
     ax.set_ylim([19.6, -0.6])
@@ -94,7 +98,14 @@ def tire_strategy(round, year):
 
                     previous_stint_end += row["StintLength"]
             plt.rcParams['savefig.dpi'] = 300
-            plt.title(f"{racename}\nTire Strategy")
+            plt.title(f"{racename}\nTire Strategy", fontproperties=bold_font, fontsize=20)
+            for label in ax.get_xticklabels():
+                label.set_fontproperties(regular_font)
+                label.set_fontsize(15)
+            for label in ax.get_yticklabels():
+                label.set_fontproperties(bold_font)
+                label.set_fontsize(15)
+            ax.tick_params(axis='y', pad=8)
             message_embed.title = f"{racename} Tire Strategy"
             plt.subplots_adjust(top = 0.91)
             # save plot

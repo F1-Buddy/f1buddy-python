@@ -7,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
 import matplotlib
 from matplotlib.ticker import (MultipleLocator)
@@ -42,11 +43,15 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
-    fig, ax = plt.subplots(3)
+    fig, ax = plt.subplots(3, figsize=(9,6))
+    fig.set_facecolor('black')
     ax[1].set_ylim([0, 105])
     ax[0].set_ylim([0, 360])
     ax[2].set_ylim([0,1.1])
-    
+    ax[0].set_facecolor('black')    
+    ax[1].set_facecolor('black')    
+    ax[2].set_facecolor('black')    
+
     plt.subplots_adjust(left = 0.06, right = 0.99, top = 0.9, hspace=0.8)
     try:
         # year given is invalid
@@ -103,19 +108,23 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
 
                 ax[0].plot(d1_tel["Speed"],color=d1_color)
                 ax[0].plot(d2_tel["Speed"],color=d2_color)
-                ax[0].set_title("Speed")
+                ax[0].set_title("Speed", fontproperties=bold_font, fontsize=15)
                 ax[1].plot(d1_tel["Throttle"],color=d1_color)
                 ax[1].plot(d2_tel["Throttle"],color=d2_color)
-                ax[1].set_title("Throttle")
+                ax[1].set_title("Throttle", fontproperties=bold_font, fontsize=15)
                 ax[2].plot(d1_tel["Brake"],color=d1_color)
                 ax[2].plot(d2_tel["Brake"],color=d2_color)
-                ax[2].set_title("Brake")
+                ax[2].set_title("Brake", fontproperties=bold_font, fontsize=15)
 
                 total=len(d1_tel)
-                ax[0].set_xlim([0,total])
-                ax[1].set_xlim([0,total])
-                ax[2].set_xlim([0,total])
-                
+                for i in range(3):
+                    ax[i].set_xlim([0, total])
+                    for label in ax[i].get_xticklabels():
+                        label.set_fontproperties(regular_font)
+                    for label in ax[i].get_yticklabels():
+                        label.set_fontproperties(bold_font)
+
+                    
                 d1_throttle_percent = 0
                 d2_throttle_percent = 0
                 d1_brake_percent = 0
@@ -151,7 +160,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 # set up legend
                 d1_patch = mpatches.Patch(color=d1_color, label=d1_name)
                 d2_patch = mpatches.Patch(color=d2_color, label=d2_name)
-                plt.legend(handles=[d1_patch, d2_patch],bbox_to_anchor=(1.01, 5.2),loc='upper right')
+                plt.legend(handles=[d1_patch, d2_patch],bbox_to_anchor=(1.01, 5.2),loc='upper right', prop=regular_font)
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')

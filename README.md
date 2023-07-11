@@ -34,14 +34,11 @@ added author to each embed
 
 ## To-do
 - [ ] add predictions command
-- [x] add str arg to help command to provide command-specific help
 - [ ] (maybe) make round an optional input for laptime and positions
-- [x] fix constructor command not outputting anything for 2010/2011
-- [x] use fastf1 ergast implementation for wdc and wcc
-    - [x] https://theoehrly.github.io/Fast-F1-Pre-Release-Documentation/ergast.html#fastf1.ergast.Ergast.get_driver_standings
-- [x] fix schedule for new sprint weekend 
-- [ ] change background and font for all graphs
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend
+- [ ] align /laptimes to 0
+- [ ] add h2h to /help
+- [ ] cleanup /h2h
 ## Issues
 
 2020 season data is odd (example styrian gp, 2020 round 2)

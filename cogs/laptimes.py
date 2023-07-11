@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
 from lib.colors import colors
+from lib.f1font import regular_font, bold_font
 import pandas as pd
 import traceback
 
@@ -58,8 +59,9 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             d1_number = d1.iloc[0].loc['DriverNumber']
             d2_number = d2.iloc[0].loc['DriverNumber']
             # print(d2)
-            fig, ax = plt.subplots()
-            ax.set_facecolor('gainsboro')
+            fig, ax = plt.subplots(figsize=(9, 6))
+            fig.set_facecolor('black')
+            ax.set_facecolor('black')
             # get driver color
             if (year == now.year):
                 d1_color = fastf1.plotting.driver_color(driver1)
@@ -74,10 +76,12 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             ax.plot(d1['LapNumber'], d1['LapTime'], color=d1_color, label = driver1)
             ax.plot(d2['LapNumber'], d2['LapTime'], color=d2_color, label = driver2)
             # pyplot setup
-            ax.set_title(racename+ ' '+driver1+" vs "+driver2)
-            ax.set_xlabel("Lap Number")
-            ax.set_ylabel("Lap Time")
-            ax.legend(loc="upper right")
+            ax.set_title(racename+ ' '+driver1+" vs "+driver2, fontproperties=bold_font)
+            ax.set_xlabel("Lap Number", fontproperties=regular_font, labelpad=10)
+            ax.set_ylabel("Lap Time", fontproperties=regular_font, labelpad=10)
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontproperties(regular_font)
+            ax.legend(loc="upper right", prop=regular_font)
             plt.rcParams['savefig.dpi'] = 300
             # save plot
             plt.savefig("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
