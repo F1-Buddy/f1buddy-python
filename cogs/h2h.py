@@ -49,7 +49,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
     driver_positions, driver_teams = avg_pos(sessiontype)
     code_to_name = {code: name for name, code in driver_names.items()}  # Mapping of three-letter codes to full names
     wins, losses = 0, 0
-    driver_name, driver_name1, driver_name2, team_emojis = [], [], [], []
+    driver_name, driver_name1, driver_name2, team_emojis, score = [], [], [], [], []
 
     try:       
         if driver1_code != 'NULL' and driver2_code != 'NULL':
@@ -69,8 +69,9 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                             emoji1 = team_emoji_ids.get(team_dictionary[driver1_code])
                             emoji2 = team_emoji_ids.get(team_dictionary[driver2_code])
                             if emoji1 and emoji2:
-                                driver_name1.append(f"{(str)(self.bot.get_emoji(emoji1))} {driver1} `{wins}`")
-                                driver_name2.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                                driver_name1.append(f"{(str)(self.bot.get_emoji(emoji1))} {driver1}")
+                                score.append(f"`{wins}` - `{losses}`")
+                                driver_name2.append(f"{(str)(self.bot.get_emoji(emoji2))} {driver2}")
                             elif driver1 in driver_dictionary and driver2 in driver_dictionary:
                                 nationality1 = driver_dictionary[driver1]
                                 nationality2 = driver_dictionary[driver2]
@@ -80,8 +81,9 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 emoji2 = ":flag_" + \
                                     (coco.convert(
                                     names=nationality_dict[nationality2][0], to='ISO2')).lower()+":"
-                                driver_name1.append(f"{(str)(self.bot.get_emoji(emoji1))} {driver1} `{wins}`")
-                                driver_name2.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                                driver_name1.append(f"{(str)(self.bot.get_emoji(emoji1))} {driver1}")
+                                score.append(f"`{wins}` `{losses}`")
+                                driver_name2.append(f"{(str)(self.bot.get_emoji(emoji2))} {driver2}")
                         else:
                             print(f"{driver1} vs {driver2}: {wins}-{losses}")
                             driver_name.append(f"{driver1} vs {driver2}: {wins}-{losses}")
@@ -95,10 +97,17 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                 
             driver_name1 = '\n'.join(driver_name1)
             driver_name2 = '\n'.join(driver_name2)
+            score = '\n'.join(score)
             message_embed.add_field(name=driver1_code, value=driver_name1,inline=True)
+            message_embed.add_field(name='Score', value=score,inline=True)
             message_embed.add_field(name=driver2_code, value=driver_name2,inline=True)
             
-        elif driver1_code != 'NULL' and driver2_code == 'NULL':
+        elif (driver1_code != 'NULL' and driver2_code == 'NULL') or (driver1_code == 'NULL' and driver2_code != 'NULL'):
+            if driver1_code == 'NULL':
+                temp = driver1_code
+                driver1_code = driver2_code
+                driver2_code = temp
+                print(f"{driver1_code} xx {driver2_code}")
             driver1 = code_to_name.get(driver1_code)
             driver1_positions = driver_positions.get(driver1)
             
@@ -125,7 +134,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 print("tsaedqw")
                                 if emoji1 and emoji2:
                                     driver_name1.append(f" {driver1} `{wins}`")
-                                    driver_name2.append(f"`{wins}` - `{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                                    driver_name2.append(f"{(str)(self.bot.get_emoji(emoji2))} {driver2} `{wins}` - `{losses}`")
                                     is_team = True
                                 elif driver1 in driver_dictionary and driver2 in driver_dictionary:
                                     nationality1 = driver_dictionary[driver1]
@@ -218,6 +227,9 @@ class Head2Head(commands.Cog):
                     h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', 'null', event)
                 else:
                     h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, 'null', event)
+            elif driver1_code is None:
+                if driver2_code is not None:
+                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', driver2_code, event)
             else:   
                 h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, driver2_code, event)
         except Exception as e:
