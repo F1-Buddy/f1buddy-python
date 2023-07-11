@@ -6,8 +6,8 @@ import fastf1
 import unidecode
 import pandas as pd
 import country_converter as coco
-# from cogs.avgpos import avg_pos
-from lib import colors
+from cogs.avgpos import avg_pos
+from lib.colors import colors
 from lib.drivernames import driver_names
 from discord import app_commands
 from discord.ext import commands
@@ -18,59 +18,43 @@ from lib.emojiid import nation_dictionary
 fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 current_year = datetime.now().year
+title=''
+is_team, is_nation = False, False
 
-
-def avg_pos(sessiontype):
-    # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
-    year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
-    num_rounds = year_sched.shape[0]
-    driver_positions, driver_teams = {}, [] # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
-
-    for round_num in range(1, num_rounds + 1):
-        sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
-        if now.tz_localize('America/New_York') < sessionTime:
-            break
-        
-        try:
-            result_session = fastf1.get_session(current_year, round_num, sessiontype)
-            result_session.load()
-            resultsTable = result_session.results
-        except Exception as e:
-            print(f"An error occurred in round {round_num}: {e}")
-            continue
-
-        for i in resultsTable.DriverNumber.values:
-            try:
-                team_name = resultsTable.loc[i, 'TeamName']
-            except:
-                pass
-            driver_positions.setdefault(resultsTable.loc[i, 'FullName'], []).append(int(resultsTable.loc[i, 'Position']))
-            driver_teams.append(team_name)  # add team name to the separate list
-            
-    return driver_positions, driver_teams
-
-def head_to_head(driver1_code, driver2_code, sessiontype):
+def head_to_head(self, driver1_code, driver2_code, sessiontype):
+    driver1_code = driver1_code.upper()
+    driver2_code = driver2_code.upper()
     sessiontype = str(sessiontype.name)
+    message_embed = discord.Embed(title=f"Head to Head {sessiontype} Stats", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')   
+    message_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+    message_embed.colour = colors.default 
+    
     ergast = Ergast()
     nationality_dict = nation_dictionary()
     driver_info = ergast.get_driver_info(season=current_year)
-    driver_dictionary = {}
+    driver_dictionary, team_dictionary = {}, {}
     for _, row in driver_info.iterrows():
         given_name = unidecode.unidecode(row['givenName'])
         family_name = unidecode.unidecode(row['familyName'])
         full_name = given_name + ' ' + family_name
         nationality = row['driverNationality']
         driver_dictionary[full_name] = nationality
+    session = fastf1.get_session(current_year, 1, sessiontype)
+    session.load()
+    session = session.results
+    for _, row in session.iterrows():
+        code = row['Abbreviation']
+        team_name = row['TeamName']
+        team_dictionary[code] = team_name
     driver_positions, driver_teams = avg_pos(sessiontype)
     code_to_name = {code: name for name, code in driver_names.items()}  # Mapping of three-letter codes to full names
     wins, losses = 0, 0
-    driver_name = []
+    driver_name, driver_name1, driver_name2, team_emojis = [], [], [], []
 
     try:       
-        if driver1_code and driver2_code:
+        if driver1_code != 'NULL' and driver2_code != 'NULL':
             driver1 = code_to_name.get(driver1_code)
             driver2 = code_to_name.get(driver2_code)
-            
             if driver1 and driver2:
                 driver1_positions = driver_positions.get(driver1)
                 driver2_positions = driver_positions.get(driver2)
@@ -81,17 +65,23 @@ def head_to_head(driver1_code, driver2_code, sessiontype):
                         elif driver1_positions[i] > driver2_positions[i]:
                             losses += 1
                     try:
-                        if driver1 in driver_dictionary and driver2 in driver_dictionary:
-                            nationality1 = driver_dictionary[driver1]
-                            nationality2 = driver_dictionary[driver2]
-                            emoji1 = ":flag_" + \
-                                (coco.convert(
-                                names=nationality_dict[nationality1][0], to='ISO2')).lower()+":"
-                            emoji2 = ":flag_" + \
-                                (coco.convert(
-                                names=nationality_dict[nationality2][0], to='ISO2')).lower()+":"
-                            driver_name.append(f"{emoji1} {driver1} vs {emoji2} {driver2}: {wins}-{losses}")
-                            print(driver_name)
+                        if driver1_code in team_dictionary and driver2_code in team_dictionary:
+                            emoji1 = team_emoji_ids.get(team_dictionary[driver1_code])
+                            emoji2 = team_emoji_ids.get(team_dictionary[driver2_code])
+                            if emoji1 and emoji2:
+                                driver_name1.append(f"{(str)(self.bot.get_emoji(emoji1))} {driver1} `{wins}`")
+                                driver_name2.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                            elif driver1 in driver_dictionary and driver2 in driver_dictionary:
+                                nationality1 = driver_dictionary[driver1]
+                                nationality2 = driver_dictionary[driver2]
+                                emoji1 = ":flag_" + \
+                                    (coco.convert(
+                                    names=nationality_dict[nationality1][0], to='ISO2')).lower()+":"
+                                emoji2 = ":flag_" + \
+                                    (coco.convert(
+                                    names=nationality_dict[nationality2][0], to='ISO2')).lower()+":"
+                                driver_name1.append(f"{(str)(self.bot.get_emoji(emoji1))} {driver1} `{wins}`")
+                                driver_name2.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
                         else:
                             print(f"{driver1} vs {driver2}: {wins}-{losses}")
                             driver_name.append(f"{driver1} vs {driver2}: {wins}-{losses}")
@@ -100,71 +90,112 @@ def head_to_head(driver1_code, driver2_code, sessiontype):
                 else:
                     print(f"Insufficient data for the head-to-head comparison between {driver1} and {driver2}.")
             else:
+                print("hhh")
                 print("Invalid driver code.")
-        
-        elif driver1_code:
+                
+            driver_name1 = '\n'.join(driver_name1)
+            driver_name2 = '\n'.join(driver_name2)
+            message_embed.add_field(name=driver1_code, value=driver_name1,inline=True)
+            message_embed.add_field(name=driver2_code, value=driver_name2,inline=True)
+            
+        elif driver1_code != 'NULL' and driver2_code == 'NULL':
             driver1 = code_to_name.get(driver1_code)
             driver1_positions = driver_positions.get(driver1)
             
             if driver1_positions:
-                for driver, positions in driver_positions.items():
-                    if driver != driver1:
+                for driver2, positions in driver_positions.items():
+                    if driver2 != driver1:
+                        wins, losses = 0, 0
+                        driver2_code = driver_names.get(driver2)
+                        print(driver2_code)
                         for i in range(len(driver1_positions)):
                             if driver1_positions[i] < positions[i]:
                                 wins += 1
                             elif driver1_positions[i] > positions[i]:
                                 losses += 1
                         try:
-                            if driver1 in driver_dictionary and driver in driver_dictionary:
-                                nationality1 = driver_dictionary[driver1]
-                                nationality2 = driver_dictionary[driver]
-                                emoji1 = ":flag_" + \
-                                    (coco.convert(
-                                    names=nationality_dict[nationality1][0], to='ISO2')).lower()+":"
-                                emoji2 = ":flag_" + \
-                                    (coco.convert(
-                                    names=nationality_dict[nationality2][0], to='ISO2')).lower()+":"
-                                driver_name.append(f"{emoji1} {driver1} vs {emoji2} {driver}: {wins}-{losses}")
-                                print(driver_name)
+                            if driver1_code in team_dictionary:
+                                print("a"+driver1_code)
+                            if driver2_code in team_dictionary:
+                                print("b"+driver2_code)
+                            if driver1_code in team_dictionary and driver2_code in team_dictionary:
+                                print(team_dictionary[driver1_code])
+                                emoji1 = team_emoji_ids.get(team_dictionary[driver1_code])
+                                emoji2 = team_emoji_ids.get(team_dictionary[driver2_code])
+                                print("tsaedqw")
+                                if emoji1 and emoji2:
+                                    driver_name1.append(f" {driver1} `{wins}`")
+                                    driver_name2.append(f"`{wins}` - `{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                                    is_team = True
+                                elif driver1 in driver_dictionary and driver2 in driver_dictionary:
+                                    nationality1 = driver_dictionary[driver1]
+                                    nationality2 = driver_dictionary[driver2]
+                                    emoji1 = ":flag_" + \
+                                        (coco.convert(names=nationality_dict[nationality1][0], to='ISO2')).lower()+":"
+                                    emoji2 = ":flag_" + \
+                                        (coco.convert(names=nationality_dict[nationality2][0], to='ISO2')).lower()+":"
+                                    print("tttt")
+                                    driver_name1.append(f"{emoji1} {driver1}    `{wins}`")
+                                    driver_name2.append(f"  `{losses}` {emoji2} {driver2}")
+                                    print(driver_name)
+                                    is_nation = True
                             else:
-                                print(f"{driver1} vs {driver}: {wins}-{losses}")
-                                driver_name.append(f"{driver1} vs {driver}: {wins}-{losses}")
+                                print(f"{driver1} vs {driver2}: {wins}-{losses}")
+                                driver_name.append(f"{driver1} vs {driver2}: {wins}-{losses}")
                         except Exception as e:
                             print(f"Error: {e}")
                             wins, losses = 0, 0
             else:
                 print("Invalid driver code.")
-        elif driver1_code == '' and driver2_code =='':
-                unique_pairs = set()
-                for i, (driver1, team1) in enumerate(zip(driver_positions, driver_teams)):
-                    for j, (driver2, team2) in enumerate(zip(driver_positions, driver_teams)):
-                        if i != j and (driver2, driver1) not in unique_pairs and team1 == team2:
-                            unique_pairs.add((driver1, driver2))
-                            wins, losses = 0, 0
-                            driver1_positions = driver_positions[driver1]
-                            driver2_positions = driver_positions[driver2]
-                            
-                            for k in range(len(driver1_positions)):
-                                if driver1_positions[k] < driver2_positions[k]:
-                                    wins += 1
-                                elif driver1_positions[k] > driver2_positions[k]:
-                                    losses += 1
-                            
-                            emoji_id1 = team_emoji_ids.get(team1)
-                            emoji_id2 = team_emoji_ids.get(team2)
-                            if emoji_id1 and emoji_id2:
-                                driver_name.append(f"{emoji_id1} {driver1} vs {emoji_id2} {driver2} ({team1}): {wins}-{losses}")
-                            else:
-                                driver_name.append(f"{driver1} vs {driver2} ({team1}): {wins}-{losses}")
-                            print(driver_name)
+            driver_name1 = '\n'.join(driver_name1)
+            driver_name2 = '\n'.join(driver_name2)
+            if is_team:   
+                emoji1 = team_emoji_ids.get(team_dictionary[driver1_code])
+                message_embed.add_field(name=f"{(str)(self.bot.get_emoji(emoji1))} {driver1} vs.", value=driver_name2,inline=True)
+                message_embed.set_footer(text =f'Format of score: {driver1} vs. Driver',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
+            elif is_nation:
+                nationality1 = driver_dictionary[driver1]
+                emoji1 = ":flag_" + \
+                (coco.convert(names=nationality_dict[nationality1][0], to='ISO2')).lower()+":"
+                message_embed.add_field(name=f"{(str)(self.bot.get_emoji(emoji1))} {driver1}", value=driver_name1,inline=True)
+            else:
+                message_embed.add_field(name="Driver 1", value=driver_name2,inline=True)
+    
+        elif driver1_code == 'NULL' and driver2_code == 'NULL':
+            unique_pairs = set()
+            for i, (driver1, team1) in enumerate(zip(driver_positions, driver_teams)):
+                for j, (driver2, team2) in enumerate(zip(driver_positions, driver_teams)):
+                    if i != j and (driver2, driver1) not in unique_pairs and team1 == team2:
+                        unique_pairs.add((driver1, driver2))
+                        wins, losses = 0, 0
+                        driver1_positions = driver_positions[driver1]
+                        driver2_positions = driver_positions[driver2]
+                        
+                        for k in range(len(driver1_positions)):
+                            if driver1_positions[k] < driver2_positions[k]:
+                                wins += 1
+                            elif driver1_positions[k] > driver2_positions[k]:
+                                losses += 1
+                        
+                        emoji1 = team_emoji_ids.get(team1)
+                        emoji2 = team_emoji_ids.get(team2)
+                        if emoji1 and emoji2:
+                            team_emojis.append(f"       `{wins}`  {(str)(self.bot.get_emoji(emoji1))}   `{losses}`  ")
+                            driver_name1.append(f"`{driver1}`")
+                            driver_name2.append(f"`{driver2}`")
+                        else:
+                            driver_name.append(f"{driver1} vs {driver2} ({team1}): {wins}-{losses}")
+                                        
+            driver_name1 = '\n'.join(driver_name1)
+            driver_name2 = '\n'.join(driver_name2)
+            team_emojis = '\n'.join(team_emojis)
+                
+            message_embed.add_field(name="Driver", value=driver_name1,inline=True)
+            message_embed.add_field(name="Team", value=team_emojis,inline=True)
+            message_embed.add_field(name="Driver", value=driver_name2,inline=True)
+
     except Exception as e:
         print(f"Error: {e}")
-        
-    message_embed = discord.Embed(title=f"H2H", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-    message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-    message_embed.colour = colors.default
-    message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')    
-    message_embed.add_field(name="H2H", value=driver_name,inline=True)
     return message_embed
 
 class Head2Head(commands.Cog):
@@ -181,7 +212,19 @@ class Head2Head(commands.Cog):
     async def head2head(self, interaction: discord.Interaction, driver1_code: typing.Optional[str], driver2_code: typing.Optional[str], event: app_commands.Choice[str]):
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
-        h2h_embed = await loop.run_in_executor(None, head_to_head, driver1_code, driver2_code, event)
+        try:
+            if driver2_code is None:
+                if driver1_code is None:
+                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', 'null', event)
+                else:
+                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, 'null', event)
+            else:   
+                h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, driver2_code, event)
+        except Exception as e:
+            h2h_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+            h2h_embed.description = f"Error Occured :( {e}"  
+            print({e})
+            
         try:
             await interaction.followup.send(embed=h2h_embed)
         except Exception as e:
