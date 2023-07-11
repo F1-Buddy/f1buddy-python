@@ -18,14 +18,13 @@ from lib.emojiid import nation_dictionary
 fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 current_year = datetime.now().year
-title=''
 is_team, is_nation = False, False
 
 def head_to_head(self, driver1_code, driver2_code, sessiontype):
     driver1_code = driver1_code.upper()
     driver2_code = driver2_code.upper()
     sessiontype = str(sessiontype.name)
-    message_embed = discord.Embed(title=f"Head to Head {sessiontype} Stats", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')   
+    message_embed = discord.Embed(title=f"Head to Head {sessiontype} Stats {current_year}", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')   
     message_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     message_embed.colour = colors.default 
     
@@ -98,6 +97,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
             driver_name1 = '\n'.join(driver_name1)
             driver_name2 = '\n'.join(driver_name2)
             score = '\n'.join(score)
+            message_embed.title = f"{driver1_code} vs {driver2_code} Head to Head {sessiontype} {current_year}" 
             message_embed.add_field(name=driver1_code, value=driver_name1,inline=True)
             message_embed.add_field(name='Score', value=score,inline=True)
             message_embed.add_field(name=driver2_code, value=driver_name2,inline=True)
@@ -134,7 +134,10 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 print("tsaedqw")
                                 if emoji1 and emoji2:
                                     driver_name1.append(f" {driver1} `{wins}`")
-                                    driver_name2.append(f"{(str)(self.bot.get_emoji(emoji2))} {driver2} `{wins}` - `{losses}`")
+                                    if losses > 9  or wins > 9:    
+                                        driver_name2.append(f"`{wins}` - `{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                                    else:
+                                        driver_name2.append(f"`{wins}` - `{losses}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji2))} {driver2}")
                                     is_team = True
                                 elif driver1 in driver_dictionary and driver2 in driver_dictionary:
                                     nationality1 = driver_dictionary[driver1]
@@ -145,7 +148,10 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                         (coco.convert(names=nationality_dict[nationality2][0], to='ISO2')).lower()+":"
                                     print("tttt")
                                     driver_name1.append(f"{emoji1} {driver1}    `{wins}`")
-                                    driver_name2.append(f"  `{losses}` {emoji2} {driver2}")
+                                    if losses > 9 or wins > 9:    
+                                        driver_name2.append(f"`{wins}` - `{losses}` {(str)(self.bot.get_emoji(emoji2))} {driver2}")
+                                    else:
+                                        driver_name2.append(f"`{wins}` - `{losses}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji2))} {driver2}")
                                     print(driver_name)
                                     is_nation = True
                             else:
@@ -158,10 +164,11 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                 print("Invalid driver code.")
             driver_name1 = '\n'.join(driver_name1)
             driver_name2 = '\n'.join(driver_name2)
+            message_embed.title = f"{driver1_code} Head to Head {sessiontype} Battles {current_year}"
             if is_team:   
                 emoji1 = team_emoji_ids.get(team_dictionary[driver1_code])
                 message_embed.add_field(name=f"{(str)(self.bot.get_emoji(emoji1))} {driver1} vs.", value=driver_name2,inline=True)
-                message_embed.set_footer(text =f'Format of score: {driver1} vs. Driver',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
+                message_embed.set_footer(text =f'Format of score: {driver1} - Driver',icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
             elif is_nation:
                 nationality1 = driver_dictionary[driver1]
                 emoji1 = ":flag_" + \
@@ -189,7 +196,11 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                         emoji1 = team_emoji_ids.get(team1)
                         emoji2 = team_emoji_ids.get(team2)
                         if emoji1 and emoji2:
-                            team_emojis.append(f"       `{wins}`  {(str)(self.bot.get_emoji(emoji1))}   `{losses}`  ")
+                            if losses > 9 or wins > 9:      
+                                team_emojis.append(f"`{wins}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                            else:
+                                team_emojis.append(f"`{wins}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                            # team_emojis.append(f"       `{wins}`  {(str)(self.bot.get_emoji(emoji1))}   `{losses}`  ")
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
                         else:
@@ -198,7 +209,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
             driver_name1 = '\n'.join(driver_name1)
             driver_name2 = '\n'.join(driver_name2)
             team_emojis = '\n'.join(team_emojis)
-                
+            message_embed.title = f"Teammate Head to Head {sessiontype} Battles {current_year}" 
             message_embed.add_field(name="Driver", value=driver_name1,inline=True)
             message_embed.add_field(name="Team", value=team_emojis,inline=True)
             message_embed.add_field(name="Driver", value=driver_name2,inline=True)
