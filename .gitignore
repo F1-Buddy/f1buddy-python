@@ -36,5 +36,8 @@ test3.py
 /cogs/plots/avgpos/*
 !/cogs/plots/avgpos/.gitkeep 
 
+/cogs/plots/consistency/*
+!/cogs/plots/consistency/.gitkeep 
+
 /cogs/fiaDocs/*
 !/cogs/fiaDocs/.gitkeep 
