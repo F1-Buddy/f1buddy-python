@@ -18,6 +18,9 @@ test3.py
 /cogs/plots/laptime/*
 !/cogs/plots/laptime/.gitkeep 
 
+/cogs/plots/consistency/*
+!/cogs/plots/consistency/.gitkeep 
+
 /cogs/plots/positions/*
 !/cogs/plots/positions/.gitkeep
 
