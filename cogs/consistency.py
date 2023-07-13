@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+import os
 import typing
 import fastf1
 from matplotlib import pyplot as plt, ticker
@@ -9,7 +11,7 @@ from lib.colors import colors
 import discord
 from discord import app_commands
 from discord.ext import commands
-import traceback
+# import traceback
 lap_colors = []
 now = pd.Timestamp.now()
 
@@ -65,50 +67,72 @@ def laptime_consistency(driver, year, round):
     result_session.load()
     # this load may be repetetive, unsure
     
-
     specified_driver = driver
-
     driver_laps = result_session.laps.pick_driver(driver)
-
     mean_lap_time = driver_laps['LapTime'].mean().total_seconds()
-
-
-    fig, ax = plt.subplots()
-
-    # print(driver_laps.index)
-    for i in driver_laps.index:
-        try:
-            point_color = ""
-            curr_laptime = driver_laps.loc[i,'LapTime'].total_seconds()
-            if curr_laptime <= mean_lap_time:
-                point_color = "green"
-            else:
-                point_color = "red"
-            plt.scatter(driver_laps.loc[i,'LapNumber'], driver_laps.loc[i,'LapTime'].total_seconds(), c = point_color)
-        except Exception as e:
-            print(f"Error {e}")
-
-        
-    plt.axhline(mean_lap_time, color='red', linestyle='--', label='Mean Lap Time', c="#969696")
-
-    y_ticks = ax.get_yticks()
-    converted_labels = []
-    for tick in y_ticks:
-        minutes = int(tick // 60)
-        seconds = int(tick % 60)
-        converted_labels.append("{:02d}:{:02d}".format(minutes, seconds))
     
-    ax.set_yticklabels(converted_labels)
-    ax.set_title(f"{specified_driver} Laptime Consistency during \n{raceName}", fontproperties=bold_font)
-    ax.set_xlabel("Lap Number", fontproperties=regular_font, labelpad=10)
-    ax.set_ylabel("Lap Time", fontproperties=regular_font, labelpad=10)
-    for label in ax.get_xticklabels() + ax.get_yticklabels():
-        label.set_fontproperties(regular_font)
-    plt.rcParams['savefig.dpi'] = 300
-    plt.savefig(f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png") # save plot
+    try:
+        std_driver_laps = driver_laps[(driver_laps['LapNumber'] != 1)]
+        std_driver_laps = std_driver_laps[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
+        std_lap_time = std_driver_laps['LapTime'].std()
+        std_lap_time = (datetime.datetime.min + std_lap_time).time().strftime('%M:%S.%f')[:-3]
+        print(std_driver_laps)
+    except Exception as e:
+        print(e)
+        
+    filename = f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png"
+    if not os.path.exists(filename):
+        fig, ax = plt.subplots(figsize=(9,6))
+        # set blackground
+        ax.set_facecolor('black')    
+        fig.set_facecolor('black')
+    
+        # print(driver_laps.index)
+        lowest_laptime = float('99999999') 
+        lowest_lap_index = -1
+
+        for i in driver_laps.index:
+            try:
+                curr_laptime = driver_laps.loc[i, 'LapTime'].total_seconds()
+                
+                if curr_laptime < lowest_laptime:
+                    lowest_laptime = curr_laptime
+                    lowest_lap_index = i
+            
+                if curr_laptime <= mean_lap_time:
+                    point_color = "#00ff00"
+                else:
+                    point_color = "#F91536"
+                plt.scatter(driver_laps.loc[i, 'LapNumber'], curr_laptime, c=point_color)
+            except Exception as e:
+                print(f"Error {e}")
+
+        if lowest_lap_index != -1:
+            plt.scatter(driver_laps.loc[lowest_lap_index, 'LapNumber'], lowest_laptime, c="#B138DD")
+        plt.axhline(mean_lap_time, color='red', linestyle='--', label='Mean Lap Time', c="#969696")
+
+        y_ticks = ax.get_yticks()
+        converted_labels = []
+        for tick in y_ticks:
+            minutes = int(tick // 60)
+            seconds = int(tick % 60)
+            converted_labels.append("{:02d}:{:02d}".format(minutes, seconds))
+        
+        ax.set_yticklabels(converted_labels)
+        ax.set_title(f"{specified_driver} Laptime Consistency during \n{raceName}", fontproperties=bold_font)
+        ax.set_xlabel("Lap Number", fontproperties=regular_font, labelpad=10)
+        ax.set_ylabel("Lap Time", fontproperties=regular_font, labelpad=10)
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontproperties(regular_font)
+        plt.rcParams['savefig.dpi'] = 300
+        plt.savefig(f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png") # save plot
     
     consistency_embed.title = f"{driver} Laptime Consistency"
-    consistency_embed.description = f"{raceName}"
+    try:
+        consistency_embed.description = f"{raceName}\n\u03c3 = {std_lap_time}"
+        consistency_embed.set_footer(text="Standard deviation (\u03c3) calculated excluding outliers",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
+    except:
+        consistency_embed.description = f"{raceName}"
     consistency_embed.colour = colors.default
     consistency_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     consistency_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
