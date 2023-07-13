@@ -90,50 +90,6 @@ def laptime_consistency(driver, year, round):
 
         
     plt.axhline(mean_lap_time, color='red', linestyle='--', label='Mean Lap Time', c="#969696")
-=======
-lap_colors = []
-
-def convert_to_code(driver):
-    if driver in driver_names.values():
-        return driver
-    driver_code = driver_names.get(driver)
-    if driver_code is None:
-        raise ValueError(f"Unknown driver: {driver}")
-    return driver_code
-
-def laptime_consistency(driver):
-    driver_code = convert_to_code(driver)
-    print(driver_code)
-    session = fastf1.get_session(2023, 1, 'R')
-    session.load(telemetry=True, laps=True)
-    
-
-    specified_driver = 'ALO'
-    driver_laps = session.laps.pick_driver(specified_driver)
-    print(driver_laps['LapTime'])
-    print(driver_laps['LapTime'].dt.total_seconds())
-    print(driver_laps['LapNumber'])
-    final_lap_number = driver_laps['LapNumber'].max()
-    mean_lap_time = driver_laps['LapTime'].mean().total_seconds()
-    std_lap_time = driver_laps['LapTime'].std()
-
-    # for lap_time in driver_laps['LapTime'].dt.total_seconds():
-    #     if lap_time > mean_lap_time:
-    #         lap_colors.append('blue')  
-    #     else:
-    #         lap_colors.append('green')  
-
-    fig, ax = plt.subplots()
-    # fig.set_facecolor('black')
-    # ax.set_facecolor('black')
-    try:
-        plt.scatter(driver_laps['LapNumber'], driver_laps['LapTime'].dt.total_seconds())
-    except Exception as e:
-        print(f"Error {e}")
-        # ax.plot(driver_laps['LapNumber'], driver_laps['LapTime'].dt.total_seconds(), color='blue', label=specified_driver)
-        
-    ax.axhline(mean_lap_time, color='red', linestyle='--', label='Mean Lap Time')
-    # ax.plot(driver_laps['LapNumber'], driver_laps['LapTime'].dt.total_seconds(), color='blue', label=specified_driver)
 
     y_ticks = ax.get_yticks()
     converted_labels = []
@@ -149,12 +105,10 @@ def laptime_consistency(driver):
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_fontproperties(regular_font)
     plt.rcParams['savefig.dpi'] = 300
-    
     plt.savefig(f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png") # save plot
     
     consistency_embed.title = f"{driver} Laptime Consistency"
     consistency_embed.description = f"{raceName}"
-
     consistency_embed.colour = colors.default
     consistency_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     consistency_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
