@@ -38,7 +38,7 @@ added author to each embed
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend
 - [ ] align /laptimes to 0
 - [ ] add h2h to /help
-- [ ] cleanup /h2h
+- [ ] h2h validate duplicate
 ## Issues
 
 2020 season data is odd (example styrian gp, 2020 round 2)
