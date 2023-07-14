@@ -47,7 +47,7 @@ def laptime_consistency(driver, year, round):
             sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Race')
         # most recent session found, load it
-        result_session.load()
+        # result_session.load()
     # round was given as number
     else:
         event_round = None
@@ -69,14 +69,16 @@ def laptime_consistency(driver, year, round):
     
     specified_driver = driver
     driver_laps = result_session.laps.pick_driver(driver)
-    mean_lap_time = driver_laps['LapTime'].mean().total_seconds()
+    mean_lap_time = driver_laps[(driver_laps['LapNumber'] != 1)]
+    mean_lap_time = mean_lap_time[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
+    mean_lap_time = mean_lap_time['LapTime'].mean().total_seconds
     
     try:
         std_driver_laps = driver_laps[(driver_laps['LapNumber'] != 1)]
         std_driver_laps = std_driver_laps[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
         std_lap_time = std_driver_laps['LapTime'].std()
         std_lap_time = (datetime.datetime.min + std_lap_time).time().strftime('%M:%S.%f')[:-3]
-        print(std_driver_laps)
+        # print(std_driver_laps)
     except Exception as e:
         print(e)
         
@@ -88,16 +90,16 @@ def laptime_consistency(driver, year, round):
         fig.set_facecolor('black')
     
         # print(driver_laps.index)
-        lowest_laptime = float('99999999') 
-        lowest_lap_index = -1
+        # lowest_laptime = float('99999999') 
+        # lowest_lap_index = -1
 
         for i in driver_laps.index:
             try:
                 curr_laptime = driver_laps.loc[i, 'LapTime'].total_seconds()
                 
-                if curr_laptime < lowest_laptime:
-                    lowest_laptime = curr_laptime
-                    lowest_lap_index = i
+                # if curr_laptime < lowest_laptime:
+                #     lowest_laptime = curr_laptime
+                #     lowest_lap_index = i
             
                 if curr_laptime <= mean_lap_time:
                     point_color = "#00ff00"
@@ -107,8 +109,12 @@ def laptime_consistency(driver, year, round):
             except Exception as e:
                 print(f"Error {e}")
 
-        if lowest_lap_index != -1:
-            plt.scatter(driver_laps.loc[lowest_lap_index, 'LapNumber'], lowest_laptime, c="#B138DD")
+        min_lap_time = min(driver_laps['LapTime'])
+        min_lap_df = driver_laps[driver_laps['LapTime'] == min_lap_time]
+        min_lap_number = min_lap_df.loc[min_lap_df.index[0],'LapNumber']
+
+        # if lowest_lap_index != -1:
+        plt.scatter(min_lap_number, min_lap_time.total_seconds(), c="#B138DD")
         plt.axhline(mean_lap_time, color='red', linestyle='--', label='Mean Lap Time', c="#969696")
 
         y_ticks = ax.get_yticks()
@@ -130,7 +136,7 @@ def laptime_consistency(driver, year, round):
     consistency_embed.title = f"{driver} Laptime Consistency"
     try:
         consistency_embed.description = f"{raceName}\n\u03c3 = {std_lap_time}"
-        consistency_embed.set_footer(text="Standard deviation (\u03c3) calculated excluding outliers",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
+        consistency_embed.set_footer(text="Standard deviation (\u03c3) & mean calculated excluding outliers",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
     except:
         consistency_embed.description = f"{raceName}"
     consistency_embed.colour = colors.default
