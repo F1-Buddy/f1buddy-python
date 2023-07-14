@@ -33,6 +33,14 @@ team_emoji_ids = {
     "Virgin":1122924331895377930
 }
 
+tire_emoji_ids = {
+    "SOFT":1129191871260921919,
+    "MEDIUM":1129191869855846410,
+    "HARD":1129191868970844300,
+    "INTERMEDIATE":1129192509835313154,
+    "WET":1129192511689216142
+}
+
 def get_emoji(country_name):
     emoji = ":flag_" + \
                 (coco.convert(
