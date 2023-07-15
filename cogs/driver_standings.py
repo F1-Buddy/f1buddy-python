@@ -30,15 +30,15 @@ def get_driver_standings(self, year):
         # if driver has drove for multiple teams
         constructor_name = constructor_name[0]
         try:
-            # discord runs out of character space after 23 drivers
-            if (len(driver_standings) <= 23):
+            # discord runs out of character space after 21 drivers
+            if (len(driver_standings) <= 21):
                 emoji_id = team_emoji_ids.get(constructor_name)
                 emoji = self.bot.get_emoji(emoji_id)
                 if emoji:
                     driver_name.append(f"{emoji} {name}")
                 else:
                     driver_name.append(name)
-            elif (len(driver_standings) >= 23 and len(driver_standings) <= 26):
+            elif (len(driver_standings) >= 23 and len(driver_standings) <= 24):
                 # shorten first name to first initial to save space
                 first_name = driver_standings.iloc[index]['givenName'][0] 
                 last_name = driver_standings.iloc[index]['familyName']
@@ -48,7 +48,7 @@ def get_driver_standings(self, year):
                     driver_name.append(f"{emoji} {first_name}. {last_name}")
                 else:
                     driver_name.append(name)
-            elif (len(driver_standings) > 26):
+            elif (len(driver_standings) > 24 and len(driver_standings) < 27):
                 # removed first name when over 26 drivers
                 last_name = driver_standings.iloc[index]['familyName']
                 emoji_id = team_emoji_ids.get(constructor_name)
@@ -57,6 +57,8 @@ def get_driver_standings(self, year):
                     driver_name.append(f"{emoji} {last_name}")
                 else:
                     driver_name.append(name)
+            elif (len(driver_standings) > 26):
+                driver_name.append(name)
         except KeyError as ke:
             driver_name.append(name)
             print(ke)
