@@ -35,10 +35,14 @@ added author to each embed
 ## To-do
 - [ ] add predictions command
 - [ ] (maybe) make round an optional input for laptime and positions
-- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend
-- [ ] align /laptimes to 0
-- [ ] add h2h to /help
-- [ ] cleanup /h2h
+- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
+- [ ] align /laptimes to 0 on graph
+- [ ] add h2h, consistency, fastest_lap to /help
+- [ ] h2h - validate duplicate input (e.g. VER vs VER)
+- [ ] fastest_lap - 2020 season will not load, 2022 season rounds after 4 (imola) will not load
+- [ ] general: move font and help images into lib 
+- [ ] fix session.load for slower commands
+- [ ] calling consistency more than once with the same args throws an error
 ## Issues
 
 2020 season data is odd (example styrian gp, 2020 round 2)

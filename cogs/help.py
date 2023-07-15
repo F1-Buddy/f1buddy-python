@@ -9,9 +9,7 @@ message_embed = discord.Embed(title=f"Help", description="Help") # boilerplate/i
 is_real_command = False
 
 def create_message_embed(command_name):
-    print('d')
     help_string, is_real_command, filename = get_help_string(command_name.lower())
-    print('e')
     if is_real_command:
         message_embed = discord.Embed(title=f"f1buddy Help - {command_name}", description=help_string)
     else: 
@@ -19,7 +17,6 @@ def create_message_embed(command_name):
     message_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     message_embed.colour = colors.default
     message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-    print('f')
     if filename.startswith("https://"):
         message_embed.set_image(url=filename)
     else:
