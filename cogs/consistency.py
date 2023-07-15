@@ -72,6 +72,7 @@ def laptime_consistency(driver, year, round):
     mean_lap_time = driver_laps[(driver_laps['LapNumber'] != 1)]
     mean_lap_time = mean_lap_time[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
     mean_lap_time = mean_lap_time['LapTime'].mean().total_seconds
+
     
     try:
         std_driver_laps = driver_laps[(driver_laps['LapNumber'] != 1)]
@@ -137,6 +138,7 @@ def laptime_consistency(driver, year, round):
     try:
         consistency_embed.description = f"{raceName}\n\u03c3 = {std_lap_time}"
         consistency_embed.set_footer(text="Standard deviation (\u03c3) & mean calculated excluding outliers",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
+
     except:
         consistency_embed.description = f"{raceName}"
     consistency_embed.colour = colors.default
