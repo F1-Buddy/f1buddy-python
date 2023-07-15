@@ -46,7 +46,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
     
     # for mapping name to team for emoji 
     session = fastf1.get_session(current_year, 1, sessiontype)
-    session.load()
+    session.load(laps=True,telemetry=False,weather=False,messages=False)
     session = session.results
     for _, row in session.iterrows():
         code = row['Abbreviation']
@@ -229,32 +229,40 @@ class Head2Head(commands.Cog):
         
     @app_commands.command(name='h2h', description='See head to head stats of specific drivers or teammate pairings. May take some time to load.')
     @app_commands.describe(event='Choose between Qualifying or Race')
-    @app_commands.choices(event=[app_commands.Choice(name="Qualifying", value="Qualifying"), app_commands.Choice(name="Race", value="Race"),])
+    @app_commands.choices(event=[app_commands.Choice(name="Race", value="Race"), 
+                                 app_commands.Choice(name="Qualifying", value="Qualifying"),])
     async def head2head(self, interaction: discord.Interaction, driver1_code: typing.Optional[str], driver2_code: typing.Optional[str], event: app_commands.Choice[str]):
         await interaction.response.defer()
-        loop = asyncio.get_running_loop()
-        try:
-            if driver2_code is None:
-                if driver1_code is None:
-                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', 'null', event)
+        if driver1_code != None and driver2_code != None and driver1_code.upper() == driver2_code.upper():
+            # setup embed
+            message_embed = discord.Embed(title=f"Head to Head", description="Use 2 different drivers!").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')  
+            message_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+            message_embed.colour = colors.default 
+            await interaction.followup.send(embed=message_embed)
+        else:
+            loop = asyncio.get_running_loop()
+            try:
+                if driver2_code is None:
+                    if driver1_code is None:
+                        h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', 'null', event)
+                    else:
+                        h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, 'null', event)
+                elif driver1_code is None:
+                    if driver2_code is not None:
+                        h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', driver2_code, event)
                 else:
-                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, 'null', event)
-            elif driver1_code is None:
-                if driver2_code is not None:
-                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, 'null', driver2_code, event)
-            else:   
-                h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, driver2_code, event)
-        except Exception as e:
-            h2h_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            h2h_embed.description = f"Error Occured :( {e}"  
-            print({e})
-        try:
-            await interaction.followup.send(embed=h2h_embed)
-        except Exception as e:
-            h2h_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            h2h_embed.description = f"Error Occured :( {e}"            
-            await interaction.followup.send(embed=h2h_embed)
-        loop.close()
+                    h2h_embed = await loop.run_in_executor(None, head_to_head, self, driver1_code, driver2_code, event)
+            except Exception as e:
+                h2h_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+                h2h_embed.description = f"Error Occured :( {e}"  
+                print({e})
+            try:
+                await interaction.followup.send(embed=h2h_embed)
+            except Exception as e:
+                h2h_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+                h2h_embed.description = f"Error Occured :( {e}"            
+                await interaction.followup.send(embed=h2h_embed)
+            loop.close()
 
 async def setup(bot):
     await bot.add_cog(Head2Head(bot))
