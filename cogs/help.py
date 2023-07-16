@@ -11,7 +11,6 @@ is_real_command = False
 def create_message_embed(command_name):
     try:
         help_string, is_real_command, filename = get_help_string(command_name)
-        print(filename)
         if is_real_command:
             message_embed = discord.Embed(title=f"f1buddy Help - {command_name}", description=help_string)
         else: 
@@ -22,13 +21,14 @@ def create_message_embed(command_name):
         file = discord.File(f"cogs/plots/help/{filename}", filename=filename)
         message_embed.set_image(url=f'attachment://{filename}')
     except Exception as e:
+        message_embed.description = f"Error Occured :( {e}"  
         print(e) 
     return message_embed, file        
 
 def get_help_string(command_name):
     try:
         match command_name:
-            case "null":
+            case "null" | "help" | "/help":
                 help_string = ""
                 help_string += "If you are having any issues or want to provide feedback, please open a new issue on [GitHub](https://github.com/F1-Buddy/f1buddy-python/issues)\n\n"
                 help_string += "Data from 2020 season can be a bit messy/buggy\n\n"
@@ -154,9 +154,9 @@ def get_help_string(command_name):
             case "telemetry" | "/telemetry":
                 help_string = "`/telemetry` - Display telemetry data for selected drivers.\n\n"
                 help_string += "This command displays the speed, throttle, and brake graphs for the two chosen drivers on a plot/graph with information about their time deltas.\n\n"
-                help_string += "Arguments:\n- driver1: Name and version of the first driver.\n- driver2: Name and version of the second driver.\n- round: Race round.\n- sessiontype: Session type.\n- year (optional): Race year. If not provided, it will default to the current year.\n\n"
-                help_string += "Examples:\n`/telemetry ver ham 6 Race 2022` - Telemetry of VER and HAM in race of round 6 for 2022.\n"
-                help_string += "/telemetry ver ham 6 Race` - Telemetry of VER and HAM in race of round 6 for the current year."
+                help_string += "Arguments:\n- driver1: Three-letter code of the first driver.\n- driver2: Three-letter code of the second driver.\n- round: Race round.\n- sessiontype: Session type.\n- year (optional): Race year. If not provided, it will default to the current year.\n\n"
+                help_string += "Examples:\n`/telemetry VER HAM 6 Race 2022` - Telemetry of VER and HAM in race of round 6 for 2022.\n"
+                help_string += "/telemetry VER HAM 6 Race` - Telemetry of VER and HAM in race of round 6 for the current year."
                 is_real_command = True
                 filename = "telemetry.png"
             case "avgpos" | "/avgpos":
@@ -181,6 +181,36 @@ def get_help_string(command_name):
                 help_string += "`/strategy 3 2022` - Retrieve and display the tire strategies for the race with the round number 3 in the year 2022.\n"
                 is_real_command = True
                 filename = "strategy.png"
+            case "consistency" | "/consistency":
+                help_string = "`/consistency` - Plot driver laptime consistency\n\n"
+                help_string += "This command plots and displays the laptime consistency of a driver during a specific race.\n\n"
+                help_string += "Arguments:\n"
+                help_string += "- `driver`: The three-letter code of the driver.\n"
+                help_string += "- `round` (optional): The round name or number of the race. If not provided, it will default to the latest completed race.\n"
+                help_string += "- `year` (optional): The year of the race. If not provided, it will default to the current year.\n\n"
+                help_string += "Examples:\n"
+                help_string += "`/consistency HAM` - Plot and display the laptime consistency of Lewis Hamilton for the latest completed race.\n"
+                help_string += "`/consistency VER 3 2022` - Plot and display the laptime consistency of Max Verstappen for the race with round number 3 in the year 2022.\n"
+            case "h2h" | "/h2h":
+                help_string = "`/h2h` - See head to head stats of specific drivers or teammate pairings. May take some time to load.\n\n"
+                help_string += "This command displays the head-to-head stats between two drivers or teammate pairings in qualifying or race sessions.\n\n"
+                help_string += "Arguments:\n"
+                help_string += "- `driver1_code` (optional): The three-letter code of the first driver.\n"
+                help_string += "- `driver2_code` (optional): The three-letter code of the second driver.\n"
+                help_string += "- `event`: Choose between `Qualifying` or `Race`.\n\n"
+                help_string += "Note: The `driver1_code` and `driver2_code` arguments are optional. If only one driver code is provided, it will compare the driver against all other drivers.\n\n"
+                help_string += "Examples:\n"
+                help_string += "`/h2h HAM VER Race` - Display head-to-head stats between Hamilton and Verstappen in race sessions.\n"
+                help_string += "`/h2h ALO Qualifying` - Display head-to-head stats of Fernando Alonso against all other drivers in qualifying sessions.\n"
+                help_string += "`/h2h Race - Display head-to-head stats of all drivers in race sessions.\n"
+            case "fl" | "/fl":
+                help_string = "`/fl` - Get fastest lap\n\n"
+                help_string += "This command retrieves and displays the fastest lap information for a specific race or all races in a year.\n\n"
+                help_string += "Arguments:\n- `round` (optional): The round name or number of the race. If not provided, it will retrieve the fastest lap information for all races in the given year.\n"
+                help_string += "- `year` (optional): The year of the race. If not provided, it will default to 2023.\n\n"
+                help_string += "Examples:\n`/fl Australia` - Retrieve and display the fastest lap information for the Australian race in the default year (2023).\n"
+                help_string += "`/fl 3 2022` - Retrieve and display the fastest lap information for the race with the round number 3 in the year 2022.\n"
+                help_string += "`/fl` - Retrieve and display the fastest lap information for all races in the default year (2023).\n"
             case _:
                 help_string = f"Command '{command_name}' not recognized. Please type the command name as it is verbatim in the bot's commands."
                 is_real_command = False
