@@ -43,6 +43,7 @@ added author to each embed
 - [x] general: move font and help images into lib 
 - [ ] fix session.load for slower commands
 - [ ] calling consistency more than once with the same args throws an error
+- [ ] may need to call /fl a couple of times after first call to get output
 ## Issues
 
 2020 season data is odd (example styrian gp, 2020 round 2)
