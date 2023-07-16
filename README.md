@@ -40,7 +40,7 @@ added author to each embed
 - [x] add h2h, consistency, fastest_lap to /help
 - [x] h2h - validate duplicate input (e.g. VER vs VER)
 - [x] fastest_lap - 2020 season will not load, 2022 season rounds after 4 (imola) will not load
-- [ ] general: move font and help images into lib 
+- [x] general: move font and help images into lib 
 - [ ] fix session.load for slower commands
 - [ ] calling consistency more than once with the same args throws an error
 ## Issues
