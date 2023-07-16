@@ -18,7 +18,7 @@ current_year = datetime.date.today().year
 
 def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix):
     session = fastf1.get_session(year, round_num, 'Race')
-    session.load(laps=True,telemetry=False,weather=False,messages=False,livedata=False)
+    session.load(laps=True,telemetry=False,weather=False,messages=False)
     fastest_lap = session.laps.pick_fastest()
     
     driver = fastest_lap.loc['Driver']

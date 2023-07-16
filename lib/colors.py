@@ -28,5 +28,5 @@ class colors:
     
     # CHANGE THIS LINE TO CHANGE COLORS OF ALL COMMANDS IN UR BRANCH
 
-    default = gold
+    default = aqua
 
