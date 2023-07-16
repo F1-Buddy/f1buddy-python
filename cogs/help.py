@@ -18,7 +18,7 @@ def create_message_embed(command_name):
         message_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         message_embed.colour = colors.default
         message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        file = discord.File(f"cogs/plots/help/{filename}", filename=filename)
+        file = discord.File(f"images/{filename}", filename=filename)
         message_embed.set_image(url=f'attachment://{filename}')
     except Exception as e:
         message_embed.description = f"Error Occured :( {e}"  
