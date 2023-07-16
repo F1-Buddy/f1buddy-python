@@ -191,6 +191,8 @@ def get_help_string(command_name):
                 help_string += "Examples:\n"
                 help_string += "`/consistency HAM` - Plot and display the laptime consistency of Lewis Hamilton for the latest completed race.\n"
                 help_string += "`/consistency VER 3 2022` - Plot and display the laptime consistency of Max Verstappen for the race with round number 3 in the year 2022.\n"
+                is_real_command = True
+                filename = "consistency.png"
             case "h2h" | "/h2h":
                 help_string = "`/h2h` - See head to head stats of specific drivers or teammate pairings. May take some time to load.\n\n"
                 help_string += "This command displays the head-to-head stats between two drivers or teammate pairings in qualifying or race sessions.\n\n"
@@ -203,6 +205,8 @@ def get_help_string(command_name):
                 help_string += "`/h2h HAM VER Race` - Display head-to-head stats between Hamilton and Verstappen in race sessions.\n"
                 help_string += "`/h2h ALO Qualifying` - Display head-to-head stats of Fernando Alonso against all other drivers in qualifying sessions.\n"
                 help_string += "`/h2h Race - Display head-to-head stats of all drivers in race sessions.\n"
+                is_real_command = True
+                filename = "h2h.png"
             case "fl" | "/fl":
                 help_string = "`/fl` - Get fastest lap\n\n"
                 help_string += "This command retrieves and displays the fastest lap information for a specific race or all races in a year.\n\n"
@@ -211,6 +215,8 @@ def get_help_string(command_name):
                 help_string += "Examples:\n`/fl Australia` - Retrieve and display the fastest lap information for the Australian race in the default year (2023).\n"
                 help_string += "`/fl 3 2022` - Retrieve and display the fastest lap information for the race with the round number 3 in the year 2022.\n"
                 help_string += "`/fl` - Retrieve and display the fastest lap information for all races in the default year (2023).\n"
+                is_real_command = True
+                filename = "fl.png"
             case _:
                 help_string = f"Command '{command_name}' not recognized. Please type the command name as it is verbatim in the bot's commands."
                 is_real_command = False
