@@ -1,5 +1,6 @@
 import asyncio
 import re
+import traceback
 import discord
 import pandas as pd
 import wikipedia
@@ -12,6 +13,17 @@ from discord.ext import commands
 from lib.colors import colors
 
 WIKI_REQUEST = 'http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='
+
+def parse_driver_name(name):
+        return name.strip().replace("~", "").replace("*", "").replace("^", "")
+
+def parse_championships(championships):
+    champ_val = championships.split('<')[0].strip()[0]
+    return int(champ_val) if champ_val.isdigit() else 0
+
+def parse_brackets(text):
+    return re.sub(r'\[.*?\]', '', text)
+
 def get_wiki_image(search_term):
     try:
         result = wikipedia.search(search_term, results = 1)
@@ -41,40 +53,34 @@ def get_driver(driver):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "lxml")
     table = soup.find('table', {'class': 'wikitable sortable'})
-    
-    def parse_driver_name(name):
-        return name.strip().replace("~", "").replace("*", "").replace("^", "")
-
-    def parse_championships(championships):
-        champ_val = championships.split('<')[0].strip()[0]
-        return int(champ_val) if champ_val.isdigit() else 0
-    
-    def parse_brackets(text):
-        return re.sub(r'\[.*?\]', '', text)
+    # print(table)
     
     driver_data = []
     
-    for row in table.find_all('tr')[1:]:
-        columns = row.find_all('td')
-        flags = row.find('img', {'class': 'thumbborder'})
-        if flags:
-            nationality = flags['src']
-        if columns:
-            driver_dict = {
-                'name': parse_driver_name(columns[0].text.strip()),
-                'nationality': nationality,
-                'seasons_completed': columns[2].text.strip(),
-                'championships': parse_championships(columns[3].text.strip()),
-                'entries': parse_brackets(columns[4].text.strip()),
-                'starts': parse_brackets(columns[5].text.strip()),
-                'poles': parse_brackets(columns[6].text.strip()),
-                'wins': parse_brackets(columns[7].text.strip()),
-                'podiums': parse_brackets(columns[8].text.strip()),
-                'fastest_laps': parse_brackets(columns[9].text.strip()),
-                'points': parse_brackets(columns[10].text.strip())
-            }
-            driver_data.append(driver_dict)
-            
+    try:
+        for row in table.find_all('tr')[1:]:
+            columns = row.find_all('td')
+            flags = row.find('img', {'class': 'mw-file-element'})
+            if flags:
+                nationality = flags['src']
+            if columns:
+                driver_dict = {
+                    'name': parse_driver_name(columns[0].text.strip()),
+                    'nationality': nationality,
+                    'seasons_completed': columns[2].text.strip(),
+                    'championships': parse_championships(columns[3].text.strip()),
+                    'entries': parse_brackets(columns[4].text.strip()),
+                    'starts': parse_brackets(columns[5].text.strip()),
+                    'poles': parse_brackets(columns[6].text.strip()),
+                    'wins': parse_brackets(columns[7].text.strip()),
+                    'podiums': parse_brackets(columns[8].text.strip()),
+                    'fastest_laps': parse_brackets(columns[9].text.strip()),
+                    'points': parse_brackets(columns[10].text.strip())
+                }
+                driver_data.append(driver_dict)
+    except Exception as e:
+        message_embed.set_footer(f"Error getting data! {e}")
+        
     normalized_input = unidecode(driver).casefold()
     # img_url = unidecode(driver).title()
     wiki_image = get_wiki_image(driver)
