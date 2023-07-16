@@ -37,9 +37,9 @@ added author to each embed
 - [ ] (maybe) make round an optional input for laptime and positions
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
 - [ ] align /laptimes to 0 on graph
-- [ ] add h2h, consistency, fastest_lap to /help
-- [ ] h2h - validate duplicate input (e.g. VER vs VER)
-- [ ] fastest_lap - 2020 season will not load, 2022 season rounds after 4 (imola) will not load
+- [x] add h2h, consistency, fastest_lap to /help
+- [x] h2h - validate duplicate input (e.g. VER vs VER)
+- [x] fastest_lap - 2020 season will not load, 2022 season rounds after 4 (imola) will not load
 - [ ] general: move font and help images into lib 
 - [ ] fix session.load for slower commands
 - [ ] calling consistency more than once with the same args throws an error
