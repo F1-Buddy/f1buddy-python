@@ -62,7 +62,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
         # get session using given args
         race = fastf1.get_session(event_year, event_round, sessiontype.value)
 
-        race.load()
+        race.load(laps=True,telemetry=True,weather=False,messages=False)
         message_embed.description = race.event.EventName
         # get driver data for their fastest lap during the session
         d1_laps = race.laps.pick_driver(driver1)

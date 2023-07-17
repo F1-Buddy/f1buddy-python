@@ -53,7 +53,7 @@ def positions_result(round, year):
         except ValueError:
             event_round = round
         race = fastf1.get_session(event_year, event_round, 'R')
-        race.load()
+        race.load(laps=True,telemetry=False,weather=False,messages=False)
         racename = '' + str(race.date.year)+' '+str(race.event.EventName)
 
         # check if graph already exists, if not create it

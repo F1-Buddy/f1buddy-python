@@ -38,7 +38,7 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
                 race = fastf1.get_session(now.year, round, 'R')
             except:
                 race = fastf1.get_session(now.year, (int)(round), 'R')
-            race.load()
+            race.load(laps=True,telemetry=False,weather=False,messages=False)
             racename = '' + str(race.date.year)+' '+str(race.event.EventName)
         
         # use given year
@@ -47,7 +47,7 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
                 race = fastf1.get_session(year, round, 'R')
             except:
                 race = fastf1.get_session(year, (int)(round), 'R')
-            race.load()
+            race.load(laps=True,telemetry=False,weather=False,messages=False)
             racename = '' + str(race.date.year)+' '+str(race.event.EventName)
         # check if graph already exists, if not create it
         if (not os.path.exists("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')) and (

@@ -104,7 +104,7 @@ def avg_pos(sessiontype):
         
         try:
             result_session = fastf1.get_session(current_year, round_num, sessiontype)
-            result_session.load()
+            result_session.load(laps=True,telemetry=False,weather=False,messages=False)
             resultsTable = result_session.results
         except Exception as e:
             print(f"An error occurred in round {round_num}: {e}")
