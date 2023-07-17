@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import os
+import traceback
 import typing
 import fastf1
 from matplotlib import pyplot as plt, ticker
@@ -65,14 +66,18 @@ def laptime_consistency(driver, year, round):
     raceName = f"{year} {result_session.event.EventName}"
     # load session
     result_session.load()
+    print(result_session.results)
     # this load may be repetetive, unsure
     
-    specified_driver = driver
-    driver_laps = result_session.laps.pick_driver(driver)
-    mean_lap_time = driver_laps[(driver_laps['LapNumber'] != 1)]
-    mean_lap_time = mean_lap_time[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
-    mean_lap_time = mean_lap_time['LapTime'].mean().total_seconds
-
+    try:
+        specified_driver = driver
+        driver_laps = result_session.laps.pick_driver(driver)
+        mean_lap_time = driver_laps[(driver_laps['LapNumber'] != 1)]
+        mean_lap_time = mean_lap_time[(driver_laps['LapTime'].dt.total_seconds() <= (mean_lap_time['LapTime'].mean().total_seconds() + 15))]
+        mean_lap_time = mean_lap_time['LapTime'].mean().total_seconds()
+    except Exception as e:
+        traceback.print_exc()
+    print(mean_lap_time)
     
     try:
         std_driver_laps = driver_laps[(driver_laps['LapNumber'] != 1)]
