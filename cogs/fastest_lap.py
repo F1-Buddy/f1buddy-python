@@ -12,6 +12,7 @@ from discord.ext import commands
 from fastf1.ergast import Ergast
 from lib.emojiid import tire_emoji_ids, tire_emoji_ids_2018, team_emoji_ids
 from lib.colors import colors
+fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 nationality_dict = nation_dictionary()
 current_year = datetime.date.today().year
