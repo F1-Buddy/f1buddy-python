@@ -1,9 +1,10 @@
 import asyncio
 import datetime
 import os
+import traceback
 import typing
 import fastf1
-from matplotlib import pyplot as plt, ticker
+from matplotlib import patches, pyplot as plt, ticker
 import pandas as pd
 # from lib.drivernames import driver_names
 from lib.f1font import regular_font, bold_font
@@ -14,6 +15,7 @@ from discord.ext import commands
 # import traceback
 lap_colors = []
 now = pd.Timestamp.now()
+fastf1.Cache.enable_cache('cache/')
 
 # fuck this function we do it later
 # def convert_to_code(driver):
@@ -65,18 +67,30 @@ def laptime_consistency(driver, year, round):
     raceName = f"{year} {result_session.event.EventName}"
     # load session
     result_session.load()
-    # this load may be repetetive, unsure
-    
-    specified_driver = driver
-    driver_laps = result_session.laps.pick_driver(driver)
-    mean_lap_time = driver_laps[(driver_laps['LapNumber'] != 1)]
-    mean_lap_time = mean_lap_time[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
-    mean_lap_time = mean_lap_time['LapTime'].mean().total_seconds
-
+    # print(result_session.results) 
     
     try:
+        specified_driver = driver
+        driver_laps = result_session.laps.pick_driver(driver)
+        mean_lap_time = driver_laps[(driver_laps['LapNumber'] != 1)]
+        mean_lap_time = mean_lap_time[(driver_laps['LapTime'].dt.total_seconds() <= (mean_lap_time['LapTime'].mean().total_seconds() + 13))]
+        mean_lap_time = mean_lap_time['LapTime'].mean().total_seconds()
+    except Exception as e:
+        traceback.print_exc()
+    # print(mean_lap_time)
+    try:
+        outlier_laps = result_session.laps.pick_driver(driver)
+        # condition1 = outlier_laps['PitInTime'].notnull()
+        condition2 = outlier_laps['PitOutTime'].notnull()
+        condition3 = outlier_laps['LapTime'].dt.total_seconds() >= (mean_lap_time + 10)
+        # outlier_laps = outlier_laps[(outlier_laps['LapTime'].dt.total_seconds() >= (outlier_laps['LapTime'].mean().total_seconds() + 13))]
+        outlier_laps = outlier_laps[ condition2 | condition3]
+        # print(outlier_laps)
+    except:
+        traceback.print_exc()
+    try:
         std_driver_laps = driver_laps[(driver_laps['LapNumber'] != 1)]
-        std_driver_laps = std_driver_laps[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 15)]
+        std_driver_laps = std_driver_laps[(driver_laps['LapTime'].dt.total_seconds() <= mean_lap_time + 13)]
         std_lap_time = std_driver_laps['LapTime'].std()
         std_lap_time = (datetime.datetime.min + std_lap_time).time().strftime('%M:%S.%f')[:-3]
         # print(std_driver_laps)
@@ -86,6 +100,7 @@ def laptime_consistency(driver, year, round):
     filename = f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png"
     if not os.path.exists(filename):
         fig, ax = plt.subplots(figsize=(9,6))
+        # plt.subplots_adjust(left=0.1)
         # set blackground
         ax.set_facecolor('black')    
         fig.set_facecolor('black')
@@ -105,7 +120,7 @@ def laptime_consistency(driver, year, round):
                 if curr_laptime <= mean_lap_time:
                     point_color = "#00ff00"
                 else:
-                    point_color = "#F91536"
+                    point_color = "#ffaf00"
                 plt.scatter(driver_laps.loc[i, 'LapNumber'], curr_laptime, c=point_color)
             except Exception as e:
                 print(f"Error {e}")
@@ -116,8 +131,14 @@ def laptime_consistency(driver, year, round):
 
         # if lowest_lap_index != -1:
         plt.scatter(min_lap_number, min_lap_time.total_seconds(), c="#B138DD")
-        plt.axhline(mean_lap_time, color='red', linestyle='--', label='Mean Lap Time', c="#969696")
-
+        plt.axhline(mean_lap_time, linestyle='--', label='Mean Lap Time', c="#969696")
+        for i in outlier_laps.index:
+            try:
+                curr_laptime = outlier_laps.loc[i, 'LapTime'].total_seconds()
+                plt.scatter(outlier_laps.loc[i, 'LapNumber'], curr_laptime, c="#F91536")
+            except Exception as e:
+                traceback.print_exc()
+        
         y_ticks = ax.get_yticks()
         converted_labels = []
         for tick in y_ticks:
@@ -132,7 +153,14 @@ def laptime_consistency(driver, year, round):
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontproperties(regular_font)
         plt.rcParams['savefig.dpi'] = 300
-        plt.savefig(f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png") # save plot
+        slow_patch = patches.Patch(color="#ffaf00", label="Slower than AVG")
+        quick_patch = patches.Patch(color="#00ff00", label="Quicker than AVG")
+        mean_patch = patches.Patch(color="#969696", label="Average Lap Time")
+        outlier_patch = patches.Patch(color="#F91536", label="Outlier")
+        quickest_patch = patches.Patch(color="#B138DD", label="Fastest Lap")
+        plt.legend(handles=[mean_patch, quickest_patch, quick_patch, slow_patch, outlier_patch], prop=bold_font,bbox_to_anchor=(1.3,1))
+        # plt.legend()
+        plt.savefig(f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png",bbox_inches='tight') # save plot
     
     consistency_embed.title = f"{driver} Laptime Consistency"
     try:
