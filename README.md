@@ -11,38 +11,51 @@ Invite it to your server!
     <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="157" height="112">
 </a>
 
-
-
+# Command Previews
+<details><summary><b>General Commands</b></summary>
+    
 Schedule             |  Standings|  Driver|  
 :-------------------------:|:-------------------------:|:-------------------------:
 ![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  
 
-Laptimes|  Results|  Positions
+Race Results             |  Quali Results |  FIA Document|  
 :-------------------------:|:-------------------------:|:-------------------------:
-![](/images/laptimes.png)|  ![](/images/results.png)|  ![](/images/positions.png)
+![](/images/results.png)|    ![](/images/quali.png)|  ![](/images/fiadoc.png)|  
+
+And more!!
+</details>
+
+<details><summary><b>Data/Telemetry Commands</b></summary>
+    
+Telemetry             |  Track Dominance |  Position Changes|  
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/telemetry.png)  |  ![](/images/trackdominance.png)|  ![](/images/positions.png)|  
+
+Qualifying Gap             |  Laptime Consistency |  Laptimes |  
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/qualigap.png)|    ![](/images/consistency.png)|  ![](/images/laptimes.png)|  
+
+And more!!
+</details>
+
 
 ## Changelog
 
-run commands in executor, should work simultaneously now
-
-moved sync out of laptimes
-
-added a help command
-
-added author to each embed
+- updated help command and readme images
+- added multiple new commands since last main merge, consistency, fl, h2h, fiadoc, avgpos, strategy
+- fixed all graph aesthetics
 
 
 ## To-do
 - [ ] add predictions command
 - [ ] (maybe) make round an optional input for laptime and positions
-- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend
-- [ ] align /laptimes to 0
-- [ ] add h2h to /help
-- [ ] cleanup /h2h
-## Issues
+- [ ] align /laptimes to 0 on graph
+- [ ] fix session.load for slower commands (did not change yet for: qualigap, telemetry)
 
-2020 season data is odd (example styrian gp, 2020 round 2)
-
-
-
+## Bugs
+- [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
+- [ ] telemetry will bug out and display nothing for a graph if called upon multiple times in quick succession
+- [ ] calling consistency more than once with the same args throws an error
+- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
+- [ ] may need to call /fl a couple of times after first call to get output
 

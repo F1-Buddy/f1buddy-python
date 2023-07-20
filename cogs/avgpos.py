@@ -104,7 +104,7 @@ def avg_pos(sessiontype):
         
         try:
             result_session = fastf1.get_session(current_year, round_num, sessiontype)
-            result_session.load()
+            result_session.load(laps=True,telemetry=False,weather=False,messages=False)
             resultsTable = result_session.results
         except Exception as e:
             print(f"An error occurred in round {round_num}: {e}")
@@ -118,7 +118,7 @@ def avg_pos(sessiontype):
             driver_positions.setdefault(resultsTable.loc[i, 'FullName'], []).append(int(resultsTable.loc[i, 'Position']))
             driver_teams.append(team_name)  # add team name to the separate list
             
-    return driver_positions, driver_teams
+    return driver_positions, driver_teams # driver_positions returns positions of drivers through races, driver_teams is the corresponding team names for each driver
 
 def head_to_head_results():
     driver_positions = avg_pos()
