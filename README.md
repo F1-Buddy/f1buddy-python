@@ -11,15 +11,33 @@ Invite it to your server!
     <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="157" height="112">
 </a>
 
-
-
+# Command Previews
+<details><summary><b>General Commands</b></summary>
+    
 Schedule             |  Standings|  Driver|  
 :-------------------------:|:-------------------------:|:-------------------------:
 ![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  
 
-Laptimes|  Results|  Positions
+Race Results             |  Quali Results |  FIA Document|  
 :-------------------------:|:-------------------------:|:-------------------------:
-![](/images/laptimes.png)|  ![](/images/results.png)|  ![](/images/positions.png)
+![](/images/results.png)|    ![](/images/quali.png)|  ![](/images/fiadoc.png)|  
+
+And more!!
+</details>
+
+<details><summary><b>Data/Telemetry Commands</b></summary>
+    
+Telemetry             |  Track Dominance |  Position Changes|  
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/telemetry.png)  |  ![](/images/trackdominance.png)|  ![](/images/positions.png)|  
+
+Qualifying Gap             |  Laptime Consistency |  Laptimes |  
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/images/qualigap.png)|    ![](/images/consistency.png)|  ![](/images/laptimes.png)|  
+
+And more!!
+</details>
+
 
 ## Changelog
 
