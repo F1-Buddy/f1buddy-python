@@ -5,6 +5,7 @@ import fastf1
 import os
 import typing
 from discord import app_commands
+from typing import Dict, List
 from discord.ext import commands
 from matplotlib import pyplot as plt
 from lib.colors import colors
@@ -17,6 +18,29 @@ from matplotlib.ticker import (MultipleLocator)
 now = pd.Timestamp.now()
 
 fastf1.Cache.enable_cache('cache/')
+
+compound_colors: Dict[str, str] = {
+    "SOFT": "#da291c",
+    "MEDIUM": "#ffd12e",
+    "HARD": "#f0f0ec",
+    "INTERMEDIATE": "#43b02a",
+    "WET": "#0067ad",
+    "UNKNOWN": "#00ffff",
+    "TEST-UNKNOWN": "#434649"
+ }
+compound_colors_2018: Dict[str, str] = {
+    "SOFT": "#ffd12e", # yellow
+    "MEDIUM": "#f0f0ec", # white
+    "HARD": "#0096FF", # bright blue
+    "INTERMEDIATE": "#43b02a",
+    "WET": "#0067ad",
+    "HYPERSOFT":"#FFC0CB", # pink
+    "ULTRASOFT":"#BF40BF", # bright purple
+    "SUPERSOFT":"#DA291C", # red
+    "SUPERHARD":"#FFA500",
+    "UNKNOWN": "#00ffff",
+    "TEST-UNKNOWN": "#434649"
+ }
 
 # setup embed
 message_embed = discord.Embed(title="Tire Strategy", description="")
@@ -63,10 +87,12 @@ def tire_strategy(round, year):
             event_round = round
         
         race = fastf1.get_session(event_year, event_round, 'R')
-        race.load()
+        race.load(laps=True,telemetry=False,weather=False,messages=False)
         laps = race.laps
         racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-
+        print(racename)
+        if event_year <= 2018:
+            compound_colors = compound_colors_2018
         # check if graph already exists, if not create it
         message_embed.description = f"Tire strategies during the {racename}"
         file_exist = not os.path.exists("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png')
@@ -91,7 +117,7 @@ def tire_strategy(round, year):
                         y=driver,
                         width=row["StintLength"],
                         left=previous_stint_end,
-                        color=fastf1.plotting.COMPOUND_COLORS[row["Compound"]],
+                        color=compound_colors[row["Compound"]],
                         edgecolor="black",
                         fill=True
                     )
@@ -106,7 +132,6 @@ def tire_strategy(round, year):
                 label.set_fontproperties(bold_font)
                 label.set_fontsize(15)
             ax.tick_params(axis='y', pad=8)
-            message_embed.title = f"{racename} Tire Strategy"
             plt.subplots_adjust(top = 0.91)
             # save plot
             plt.savefig("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png')
@@ -115,6 +140,9 @@ def tire_strategy(round, year):
             plt.clf()
             plt.cla()
             plt.close()
+        message_embed.title = f"{racename} Tire Strategy"
+        if year==2018:
+            message_embed.set_footer(text="2018 tire colors used",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
         # try to access the graph
         try:
             file = discord.File("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png', filename="image.png")
@@ -139,7 +167,7 @@ class Strategy(commands.Cog):
 
     @app_commands.command(name='strategy', description='See tire strategies for the race')
     @app_commands.describe(round='Round name or number (Australia or 3)')
-    @app_commands.describe(year = "Year")
+    @app_commands.describe(year = "Year (supports 2018 and after)")
     async def positions(self, interaction: discord.Interaction, round:str, year: typing.Optional[int]):
         # defer reply for later
         await interaction.response.defer()
