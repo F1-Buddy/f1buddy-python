@@ -41,28 +41,21 @@ And more!!
 
 ## Changelog
 
-run commands in executor, should work simultaneously now
-
-moved sync out of laptimes
-
-added a help command
-
-added author to each embed
+- updated help command and readme images
+- added multiple new commands since last main merge, consistency, fl, h2h, fiadoc, avgpos, strategy
+- fixed all graph aesthetics
 
 
 ## To-do
 - [ ] add predictions command
 - [ ] (maybe) make round an optional input for laptime and positions
-- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
 - [ ] align /laptimes to 0 on graph
 - [ ] fix session.load for slower commands (did not change yet for: qualigap, telemetry)
-- [ ] calling consistency more than once with the same args throws an error
-- [ ] may need to call /fl a couple of times after first call to get output
+
+## Bugs
+- [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
 - [ ] telemetry will bug out and display nothing for a graph if called upon multiple times in quick succession
-## Issues
-
-2020 season data is odd (example styrian gp, 2020 round 2)
-
-
-
+- [ ] calling consistency more than once with the same args throws an error
+- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
+- [ ] may need to call /fl a couple of times after first call to get output
 
