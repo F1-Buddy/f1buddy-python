@@ -1,5 +1,3 @@
-
-
 class colors:
     teal = 0x1abc9c
     dark_teal = 0x11806a
@@ -27,5 +25,5 @@ class colors:
     hot_pink = 0xff69b4
     
     # CHANGE THIS LINE TO CHANGE COLORS OF ALL COMMANDS IN UR BRANCH
-    default = dark_red
+    default = blurple
 
