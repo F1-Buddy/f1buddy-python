@@ -33,6 +33,7 @@ def get_help_string(command_name):
                 help_string += "If you are having any issues or want to provide feedback, please open a new issue on [GitHub](https://github.com/F1-Buddy/f1buddy-python/issues)\n\n"
                 help_string += "Data from 2020 season can be a bit messy/buggy\n\n"
                 help_string += "To see all commands and usage, type '/' and click on f1buddy as shown in the attached image\n"
+                help_string += "If you need additional assistance, join the [f1buddy support server](https://discord.gg/VahajEWm)\n"
                 filename = "help.png"
                 is_real_command = False
             case "wdc" | "/wdc":
