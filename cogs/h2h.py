@@ -182,6 +182,11 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                         team1="AlphaTauri"
                     elif driver2=="Daniel Ricciardo":
                         team2="AlphaTauri"
+                        
+                    if driver1 == "Daniel Ricciardo" and driver2 == "Nyck De Vries":
+                        continue
+                    elif driver1 == "Nyck De Vries" and driver2 == "Daniel Ricciardo":
+                        continue
                     # check if the drivers are different, not already paired, and belong to the same team
                     if i != j and (driver2, driver1) not in unique_pairs and team1 == team2:
                         unique_pairs.add((driver1, driver2))
