@@ -51,11 +51,13 @@ And more!!
 - [ ] (maybe) make round an optional input for laptime and positions
 - [ ] align /laptimes to 0 on graph
 - [ ] fix session.load for slower commands (did not change yet for: qualigap, telemetry)
+- [ ] fix hardcoded team colors for RIC at /h2h and /avgpos
+- [ ] implement user-input years for /h2h and /avgpos
+- [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
 - [ ] telemetry will bug out and display nothing for a graph if called upon multiple times in quick succession
 - [ ] calling consistency more than once with the same args throws an error
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
-- [ ] may need to call /fl a couple of times after first call to get output
-
+- [ ] may need to call /fl, /avgpos a couple of times after first call to get output
