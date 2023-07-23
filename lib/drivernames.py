@@ -22,4 +22,5 @@ driver_names = {
     "Esteban Ocon": "OCO",
     "Charles Leclerc": "LEC",
     "Oscar Piastri": "PIA",
+    "Daniel Ricciardo":"RIC"
 }
