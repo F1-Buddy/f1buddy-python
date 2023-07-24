@@ -1,5 +1,3 @@
-
-
 class colors:
     teal = 0x1abc9c
     dark_teal = 0x11806a

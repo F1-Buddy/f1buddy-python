@@ -1,3 +1,4 @@
+import traceback
 import asyncio
 import datetime
 import typing
@@ -174,7 +175,18 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
 
             # iterate over the driver positions and teams
             for i, (driver1, team1) in enumerate(zip(driver_positions, driver_teams)):
+                print("a")
                 for j, (driver2, team2) in enumerate(zip(driver_positions, driver_teams)):
+                    print("b")
+                    if driver1=="Daniel Ricciardo":
+                        team1="AlphaTauri"
+                    elif driver2=="Daniel Ricciardo":
+                        team2="AlphaTauri"
+                        
+                    if driver1 == "Daniel Ricciardo" and driver2 == "Nyck De Vries":
+                        continue
+                    elif driver1 == "Nyck De Vries" and driver2 == "Daniel Ricciardo":
+                        continue
                     # check if the drivers are different, not already paired, and belong to the same team
                     if i != j and (driver2, driver1) not in unique_pairs and team1 == team2:
                         unique_pairs.add((driver1, driver2))
@@ -182,13 +194,15 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
 
                         driver1_positions, driver2_positions = driver_positions[driver1], driver_positions[driver2]
                         
-                        # compare the positions of the two drivers in each session
-                        for k in range(len(driver1_positions)):
+                        num_races = min(len(driver1_positions), len(driver2_positions))
+
+                        for k in range(num_races):
+                            print("c")
                             if driver1_positions[k] < driver2_positions[k]:
                                 wins += 1
                             elif driver1_positions[k] > driver2_positions[k]:
                                 losses += 1
-                        
+                        print("d")
                         emoji1, emoji2 = team_emoji_ids.get(team1), team_emoji_ids.get(team2)
                         
                         if emoji1 and emoji2:
@@ -213,6 +227,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
             message_embed.add_field(name="Driver", value=driver_name2, inline=True)
 
     except Exception as e:
+        traceback.print_exc()
         message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
         message_embed.description = f"Error Occured :( {e}" 
         print(f"Error: {e}")
