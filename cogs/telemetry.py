@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
 import matplotlib
-from matplotlib.ticker import (MultipleLocator)
+# from matplotlib.ticker import (MultipleLocator)
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
@@ -43,16 +43,17 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
-    fig, ax = plt.subplots(3, figsize=(9,6))
+    fig, ax = plt.subplots(3, figsize=(13,9))
     fig.set_facecolor('black')
+    plt.xlabel('Lap Percentage',fontproperties=bold_font)
     ax[1].set_ylim([0, 105])
-    ax[0].set_ylim([0, 360])
+    # ax[0].set_ylim([0, 360])
     ax[2].set_ylim([0,1.1])
     ax[0].set_facecolor('black')    
     ax[1].set_facecolor('black')    
     ax[2].set_facecolor('black')    
 
-    plt.subplots_adjust(left = 0.06, right = 0.99, top = 0.9, hspace=0.8)
+    plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.89, hspace=0.8)
     try:
         # year given is invalid
         if year == None:
@@ -77,7 +78,9 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         d1_name = driver1
         
         d2_laps = race.laps.pick_driver(driver2)
+        # print(d2_laps)
         d2_fastest = d2_laps.pick_fastest()
+        # print(d2_fastest)
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
         d1_fl = (race.laps.pick_driver(d1_number).pick_fastest()["LapTime"])
@@ -89,8 +92,32 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         if (not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')) and (
             not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png')):
             try:
+                # get lap telemetry
                 d1_tel = d1_fastest.get_telemetry()
                 d2_tel = d2_fastest.get_telemetry()
+                
+                # set graph limit based on data
+                ax[0].set_ylim([0, max(max(d1_tel['Speed']),max(d2_tel['Speed']))+10])
+
+                # get maximum index of dataframe
+                d1_max_index = max(d1_tel.index)
+                d2_max_index = max(d2_tel.index)
+                
+                # convert (probably) mismatched dataframe indices to a scale of 0 to 1
+                d1_index_list = (d1_tel.index/d1_max_index).to_list()
+                d2_index_list = (d2_tel.index/d2_max_index).to_list()
+                
+                # get speed, throttle, and brake data
+                d1_speed_list = d1_tel['Speed'].to_list()
+                d2_speed_list = d2_tel['Speed'].to_list()
+                
+                d1_throttle_list = d1_tel['Throttle'].to_list()
+                d2_throttle_list = d2_tel['Throttle'].to_list()
+                
+                d1_brake_list = d1_tel['Brake'].to_list()
+                d2_brake_list = d2_tel['Brake'].to_list()
+
+                
                 # get driver color
                 if (year == now.year):
                     d1_color = f1plt.driver_color(d1_name)
@@ -104,21 +131,30 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 d1_patch = mpatches.Patch(color=d1_color, label=d1_name)
                 d2_patch = mpatches.Patch(color=d2_color, label=d2_name)
                 
-                ax[0].yaxis.set_major_locator(MultipleLocator(100))
-
-                ax[0].plot(d1_tel["Speed"],color=d1_color)
-                ax[0].plot(d2_tel["Speed"],color=d2_color)
+                # graph labelling
+                ax[2].set_yticks(ticks = [0,1],labels= ['Off','On'])
+                ax[0].set_ylabel('Speed (km/h)',fontproperties=regular_font)
                 ax[0].set_title("Speed", fontproperties=bold_font, fontsize=15)
-                ax[1].plot(d1_tel["Throttle"],color=d1_color)
-                ax[1].plot(d2_tel["Throttle"],color=d2_color)
+                ax[1].set_ylabel('Throttle %',fontproperties=regular_font)
                 ax[1].set_title("Throttle", fontproperties=bold_font, fontsize=15)
-                ax[2].plot(d1_tel["Brake"],color=d1_color)
-                ax[2].plot(d2_tel["Brake"],color=d2_color)
                 ax[2].set_title("Brake", fontproperties=bold_font, fontsize=15)
+
+                # plot the data
+                ax[0].plot(d1_index_list,d1_speed_list,color=d1_color)
+                ax[0].plot(d2_index_list,d2_speed_list,color=d2_color)
+                
+                ax[1].plot(d1_index_list,d1_throttle_list,color=d1_color)
+                ax[1].plot(d2_index_list,d2_throttle_list,color=d2_color)
+                
+                ax[2].plot(d1_index_list,d1_brake_list,color=d1_color)
+                ax[2].plot(d2_index_list,d2_brake_list,color=d2_color)
+                
 
                 total=len(d1_tel)
                 for i in range(3):
-                    ax[i].set_xlim([0, total])
+                    ax[i].xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1, decimals=0))
+                    ax[i].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(base=0.1))
+                    ax[i].set_xlim([0, 1])
                     for label in ax[i].get_xticklabels():
                         label.set_fontproperties(regular_font)
                     for label in ax[i].get_yticklabels():
@@ -150,8 +186,8 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 
                 throttle_string += f"{d1_name} was on full throttle for {d1_throttle_percent:.2f}% of the lap\n"
                 throttle_string += f"{d2_name} was on full throttle for {d2_throttle_percent:.2f}% of the lap\n"
-                brake_string += f"{d1_name} was on full throttle for {d1_brake_percent:.2f}% of the lap\n"
-                brake_string += f"{d2_name} was on full throttle for {d2_brake_percent:.2f}% of the lap\n"
+                brake_string += f"{d1_name} was on brakes for {d1_brake_percent:.2f}% of the lap\n"
+                brake_string += f"{d2_name} was on brakes for {d2_brake_percent:.2f}% of the lap\n"
                 print(throttle_string)
                 print(brake_string)
                         
@@ -256,4 +292,4 @@ class Telemetry(commands.Cog):
 async def setup(bot):
     await bot.add_cog(Telemetry(bot))
 
-# telemetry_results(2023,1,"PER","VER",1)
+# telemetry_results("VER","HAM",'hungary',2023,'race')
