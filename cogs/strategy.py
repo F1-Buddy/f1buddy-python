@@ -1,4 +1,5 @@
 import json
+import traceback
 import discord
 import asyncio
 import fastf1
@@ -50,6 +51,7 @@ message_embed.set_thumbnail(
 url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
 def tire_strategy(round, year):
+    global compound_colors
     # pyplot setup
     f1plt.setup_mpl()
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -90,9 +92,10 @@ def tire_strategy(round, year):
         race.load(laps=True,telemetry=False,weather=False,messages=False)
         laps = race.laps
         racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-        print(racename)
         if event_year <= 2018:
             compound_colors = compound_colors_2018
+
+
         # check if graph already exists, if not create it
         message_embed.description = f"Tire strategies during the {racename}"
         file_exist = not os.path.exists("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png')
@@ -108,19 +111,22 @@ def tire_strategy(round, year):
 
             for driver in drivers:
                 driver_stints = stints.loc[stints["Driver"] == driver]
-
                 previous_stint_end = 0
+
                 for idx, row in driver_stints.iterrows():
                     # each row contains the compound name and stint length
                     # we can use these information to draw horizontal bars
-                    plt.barh(
-                        y=driver,
-                        width=row["StintLength"],
-                        left=previous_stint_end,
-                        color=compound_colors[row["Compound"]],
-                        edgecolor="black",
-                        fill=True
-                    )
+                    try:
+                        plt.barh(
+                            y=driver,
+                            width=row["StintLength"],
+                            left=previous_stint_end,
+                            color=compound_colors[row["Compound"]],
+                            edgecolor="black",
+                            fill=True
+                        )
+                    except Exception as e:
+                        print(e)
 
                     previous_stint_end += row["StintLength"]
             plt.rcParams['savefig.dpi'] = 300
@@ -150,10 +156,14 @@ def tire_strategy(round, year):
         
         except Exception as e:
             print(e)
+            traceback_str = traceback.format_exc()
+            print(traceback_str)
             message_embed.set_footer(text=e)
     # 
     except Exception as e:
         print(e)
+        traceback_str = traceback.format_exc()
+        print(traceback_str)
         message_embed.description = "Unknown error occured"
         message_embed.set_footer(text = e)
 
