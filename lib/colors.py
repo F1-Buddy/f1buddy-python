@@ -25,5 +25,5 @@ class colors:
     hot_pink = 0xff69b4
     
     # CHANGE THIS LINE TO CHANGE COLORS OF ALL COMMANDS IN UR BRANCH
-    default = blurple
+    default = aqua
 
