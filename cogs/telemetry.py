@@ -39,7 +39,10 @@ def td_to_laptime(td):
 
 def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
     message_embed.description = ""
-    message_embed.title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
+    if sessiontype.name.startswith("FP"):
+        message_embed.title = f"Fastest Lap {sessiontype.name} Telemetry"
+    else:
+        message_embed.title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
@@ -166,7 +169,10 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+                if sessiontype.name.startswith("FP"):
+                    message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+                else:
+                    message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
                 # message_embed.description += "\n" + throttle_string + brake_string
                 # reset plot just in case
                 plt.clf()
@@ -216,6 +222,9 @@ class Telemetry(commands.Cog):
     @app_commands.command(name='telemetry', description='See telemetry between 2 drivers on their fastest laps in a race')
     @app_commands.describe(sessiontype='Choose between Race or Qualifying')
     @app_commands.choices(sessiontype=[
+        app_commands.Choice(name="FP1", value="FP1"),
+        app_commands.Choice(name="FP2", value="FP2"),
+        app_commands.Choice(name="FP3", value="FP3"),
         app_commands.Choice(name="Qualifying", value="Q"),
         app_commands.Choice(name="Race", value="R"),
         ])
