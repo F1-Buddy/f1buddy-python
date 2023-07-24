@@ -48,7 +48,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
     f1plt.setup_mpl()
     fig, ax = plt.subplots(3, figsize=(13,9))
     fig.set_facecolor('black')
-    plt.xlabel('Lap Percentage',fontproperties=bold_font)
+    plt.xlabel('Lap Percentage',fontproperties=bold_font, labelpad=10)
     ax[1].set_ylim([0, 105])
     # ax[0].set_ylim([0, 360])
     ax[2].set_ylim([0,1.1])
@@ -136,9 +136,9 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 
                 # graph labelling
                 ax[2].set_yticks(ticks = [0,1],labels= ['Off','On'])
-                ax[0].set_ylabel('Speed (km/h)',fontproperties=regular_font)
+                ax[0].set_ylabel('Speed (km/h)',fontproperties=regular_font, labelpad=8)
                 ax[0].set_title("Speed", fontproperties=bold_font, fontsize=15)
-                ax[1].set_ylabel('Throttle %',fontproperties=regular_font)
+                ax[1].set_ylabel('Throttle %',fontproperties=regular_font, labelpad=8)
                 ax[1].set_title("Throttle", fontproperties=bold_font, fontsize=15)
                 ax[2].set_title("Brake", fontproperties=bold_font, fontsize=15)
 
@@ -162,7 +162,6 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                         label.set_fontproperties(regular_font)
                     for label in ax[i].get_yticklabels():
                         label.set_fontproperties(bold_font)
-
                     
                 d1_throttle_percent = 0
                 d2_throttle_percent = 0
