@@ -66,7 +66,7 @@ def quali_gap(round, year):
             event_round = round
 
         race = fastf1.get_session(event_year, event_round, 'Q')
-        race.load()
+        race.load(laps=False,telemetry=False,weather=False,messages=False)
         racename = '' + str(race.date.year)+' '+str(race.event.EventName)
         
         resultsTable = race.results

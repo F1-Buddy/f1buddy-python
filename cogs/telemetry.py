@@ -73,7 +73,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
 
         race = fastf1.get_session(event_year, event_round, sessiontype.value)
         # check if graph already exists, if not create it
-        race.load()
+        race.load(laps=True,telemetry=True,weather=False,messages=False)
         message_embed.description = race.event.EventName
         d1_laps = race.laps.pick_driver(driver1)
         d1_fastest = d1_laps.pick_fastest()

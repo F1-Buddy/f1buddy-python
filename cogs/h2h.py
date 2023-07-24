@@ -277,7 +277,7 @@ class Head2Head(commands.Cog):
     async def on_ready(self):
         print('Head2Head cog loaded')
         
-    @app_commands.command(name='h2h', description='See head to head stats of specific drivers or teammate pairings. May take some time to load.')
+    @app_commands.command(name='h2h', description='See head to head stats of specific drivers or teammate pairings.')
     @app_commands.describe(event='Choose between Qualifying or Race')
     @app_commands.choices(event=[app_commands.Choice(name="Race", value="Race"), 
                                  app_commands.Choice(name="Qualifying", value="Qualifying"),])
