@@ -3,8 +3,11 @@ import os
 import discord
 import fastf1
 from matplotlib.ticker import MultipleLocator
+import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from matplotlib import cbook, image, pyplot as plt
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
@@ -43,13 +46,11 @@ def plot_avg_positions(event):
         driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
         avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
         
-        print(driver_teams)
         driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
-        print("//////")
-        print(driver_codes)
-        print(avg_positions)
-        print(driver_teams)
+
+        watermark_img = plt.imread('botPics/f1pythonpfp.png')
         fig, ax = plt.subplots(figsize=(16.8, 10.5)) # create the bar plot and size
+        
         
         bar_colors = [team_colors.get(team, 'gray') for team in driver_teams]
         ric_index = driver_codes.index("RIC")
@@ -88,6 +89,26 @@ def plot_avg_positions(event):
         # set blackground
         ax.set_facecolor('black')    
         fig.set_facecolor('black')
+        # Step 3: Overlay the image at the bottom left corner of the chart
+        # Adjust the position (x and y) to place the watermark as desired
+        try:
+            watermark_box = OffsetImage(watermark_img, zoom=0.2)  # Adjust the zoom factor as needed
+            ab = AnnotationBbox(watermark_box, (0,1), xycoords='axes fraction', frameon=False)
+            ax.add_artist(ab)
+
+            # Step 4: Add text on top of the image to further customize the watermark
+            # Replace 'Your Watermark Text' with your desired text
+            ax.text(0.02, 0.02, 'Your Watermark Text', transform=ax.transAxes,
+                    fontsize=12, color='gray', alpha=0.7)
+        except Exception as e:
+            print(e)
+        # np.random.seed(19680801)
+        # ax.plot(np.random.rand(20), '-o', ms=20, lw=2, alpha=0.7, mfc='orange')
+        # ax.grid()
+
+        # ax.text(0.5, 0.5, 'created with matplotlib', transform=ax.transAxes,
+        #         fontsize=40, color='gray', alpha=0.5,
+        #         ha='center', va='center', rotation=30)
 
         # adds position number near bars
         for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
