@@ -43,16 +43,27 @@ def plot_avg_positions(event):
         driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
         avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
         
+        print(driver_teams)
         driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
+        print("//////")
+        print(driver_codes)
+        print(avg_positions)
+        print(driver_teams)
         fig, ax = plt.subplots(figsize=(16.8, 10.5)) # create the bar plot and size
-        ax.barh(range(len(driver_codes)), avg_positions, color=[team_colors.get(team, 'gray') for team in driver_teams]) # plotting the horizontal bar chart
+        
+        bar_colors = [team_colors.get(team, 'gray') for team in driver_teams]
+        ric_index = driver_codes.index("RIC")
+        bar_colors[ric_index] = '#5E8FAA'
 
+        ax.barh(range(len(driver_codes)), avg_positions, color=bar_colors)
+            
         # setting x-axis label, title
         ax.set_xlabel("Position", fontproperties=regular_font, fontsize=20, labelpad=20)
         ax.set_title(f"Average {sessiontype} Finish Position {current_year}", fontproperties=bold_font, fontsize=20, pad=20)
 
         # space between limits for the y-axis and x-axis
-        ax.set_ylim(-0.8, 19.8)
+        print(len(driver_codes))
+        ax.set_ylim(-0.8, len(driver_codes)-0.25)
         ax.set_xlim(0, 20.1)
         ax.invert_yaxis() # invert y axis, top to bottom
         ax.xaxis.set_major_locator(MultipleLocator(1)) # amount x-axis increments by 1
