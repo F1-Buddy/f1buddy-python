@@ -53,7 +53,7 @@ And more!!
 - [ ] implement user-input years for /h2h and /avgpos
 - [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
 - [ ] account for DNFs in h2h/avgpos
-- [ ] RIC color broken in /laptimes
+- [x] RIC color broken in /laptimes
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)

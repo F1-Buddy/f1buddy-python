@@ -63,7 +63,8 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             fig.set_facecolor('black')
             ax.set_facecolor('black')
             # get driver color
-            if (year == now.year):
+            # fastf1.plotting.driver_color does not have a value for Ricciardo
+            if (year == now.year & ('RIC' not in [driver1,driver2])):
                 d1_color = fastf1.plotting.driver_color(driver1)
                 d2_color = fastf1.plotting.driver_color(driver2)
             else:
