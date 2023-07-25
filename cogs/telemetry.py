@@ -39,13 +39,16 @@ def td_to_laptime(td):
 
 def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
     message_embed.description = ""
-    message_embed.title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
+    if sessiontype.name.startswith("FP"):
+        message_embed.title = f"Fastest Lap {sessiontype.name} Telemetry"
+    else:
+        message_embed.title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
     fig, ax = plt.subplots(3, figsize=(13,9))
     fig.set_facecolor('black')
-    plt.xlabel('Lap Percentage',fontproperties=bold_font)
+    plt.xlabel('Lap Percentage',fontproperties=bold_font, labelpad=10)
     ax[1].set_ylim([0, 105])
     # ax[0].set_ylim([0, 360])
     ax[2].set_ylim([0,1.1])
@@ -70,7 +73,7 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
 
         race = fastf1.get_session(event_year, event_round, sessiontype.value)
         # check if graph already exists, if not create it
-        race.load()
+        race.load(laps=True,telemetry=True,weather=False,messages=False)
         message_embed.description = race.event.EventName
         d1_laps = race.laps.pick_driver(driver1)
         d1_fastest = d1_laps.pick_fastest()
@@ -133,9 +136,9 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 
                 # graph labelling
                 ax[2].set_yticks(ticks = [0,1],labels= ['Off','On'])
-                ax[0].set_ylabel('Speed (km/h)',fontproperties=regular_font)
+                ax[0].set_ylabel('Speed (km/h)',fontproperties=regular_font, labelpad=8)
                 ax[0].set_title("Speed", fontproperties=bold_font, fontsize=15)
-                ax[1].set_ylabel('Throttle %',fontproperties=regular_font)
+                ax[1].set_ylabel('Throttle %',fontproperties=regular_font, labelpad=8)
                 ax[1].set_title("Throttle", fontproperties=bold_font, fontsize=15)
                 ax[2].set_title("Brake", fontproperties=bold_font, fontsize=15)
 
@@ -159,7 +162,6 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                         label.set_fontproperties(regular_font)
                     for label in ax[i].get_yticklabels():
                         label.set_fontproperties(bold_font)
-
                     
                 d1_throttle_percent = 0
                 d2_throttle_percent = 0
@@ -202,7 +204,10 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+                if sessiontype.name.startswith("FP"):
+                    message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+                else:
+                    message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
                 # message_embed.description += "\n" + throttle_string + brake_string
                 # reset plot just in case
                 plt.clf()
@@ -252,6 +257,9 @@ class Telemetry(commands.Cog):
     @app_commands.command(name='telemetry', description='See telemetry between 2 drivers on their fastest laps in a race')
     @app_commands.describe(sessiontype='Choose between Race or Qualifying')
     @app_commands.choices(sessiontype=[
+        app_commands.Choice(name="FP1", value="FP1"),
+        app_commands.Choice(name="FP2", value="FP2"),
+        app_commands.Choice(name="FP3", value="FP3"),
         app_commands.Choice(name="Qualifying", value="Q"),
         app_commands.Choice(name="Race", value="R"),
         ])

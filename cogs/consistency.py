@@ -66,7 +66,7 @@ def laptime_consistency(driver, year, round):
         
     raceName = f"{year} {result_session.event.EventName}"
     # load session
-    result_session.load()
+    result_session.load(laps=True,telemetry=False,weather=False,messages=False)
     # print(result_session.results) 
     
     try:

@@ -31,7 +31,10 @@ url='https://cdn.discordapp.com/attachments/884602392249770087/10594645322395812
 
 def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
     message_embed.description = ""
-    message_embed.title = f"Track Dominance during {sessiontype.name.capitalize()}"
+    if sessiontype.name.startswith("FP"):
+        message_embed.title = f"Track Dominance during {sessiontype.name}"
+    else:
+        message_embed.title = f"Track Dominance during {sessiontype.name.capitalize()}"
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
@@ -252,6 +255,9 @@ class Speed(commands.Cog):
     # inputs
     @app_commands.describe(sessiontype='Choose between Race or Qualifying')
     @app_commands.choices(sessiontype=[
+        app_commands.Choice(name="FP1", value="FP1"),
+        app_commands.Choice(name="FP2", value="FP2"),
+        app_commands.Choice(name="FP3", value="FP3"),
         app_commands.Choice(name="Qualifying", value="Q"),
         app_commands.Choice(name="Race", value="R"),
         ])
