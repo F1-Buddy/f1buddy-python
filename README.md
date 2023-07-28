@@ -54,7 +54,7 @@ And more!!
 - [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
 - [ ] account for DNFs in h2h/avgpos
 - [x] RIC color broken in /laptimes
-
+ 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
 - [ ] telemetry will bug out and display nothing for a graph if called upon multiple times in quick succession
