@@ -38,7 +38,7 @@ def plot_avg_positions(event):
         else:
             sessionTime = year_sched.loc[round_check,"Session2Date"].tz_convert('America/New_York') 
     try:
-        race = fastf1.get_session(current_year, round_check-1, f"{sessiontype}") 
+        race = fastf1.get_session(current_year, round_check, f"{sessiontype}") 
     except Exception as e:
         race = fastf1.get_session(current_year, 1, f"{sessiontype}") 
         print(e)
@@ -52,12 +52,6 @@ def plot_avg_positions(event):
         avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
         
         driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
-        try:
-            race.load(laps=True,telemetry=False,weather=False,messages=False)
-            resultsTable = race.results
-        except Exception as e:
-            print(e)
-            pass
         colors_for_drivers = ['#' + driver_colors.get(code, 'gray') for code in driver_codes]
             
         watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
@@ -82,7 +76,6 @@ def plot_avg_positions(event):
         ax.set_yticklabels(driver_codes, fontproperties=bold_font, fontsize=20)
         ax.set_yticks(range(len(driver_codes)))
         ax.tick_params(axis='both', length=0, pad=8)
-        # ax.tick_params(axis='y', length=0)
 
         # remove all lines, bar the x-axis grid lines
         ax.yaxis.grid(False)
@@ -113,6 +106,7 @@ def plot_avg_positions(event):
             ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font, fontsize=20)
             
         plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png") # save plot
+        # plt.clear() # noticed that plt.clear() will generate plot, but won't post to discord on first request, will use generated image on followup request
         
     try:
         file = discord.File(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png", filename="image.png")
@@ -125,7 +119,7 @@ def avg_pos(sessiontype):
     # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
-    driver_positions, driver_teams, driver_colors, driver_code_team_map, driver_status = {}, [], {}, {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
+    driver_positions, driver_teams, driver_colors, driver_code_team_map = {}, [], {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
 
     for round_num in range(1, num_rounds + 1):
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
@@ -155,7 +149,6 @@ def avg_pos(sessiontype):
                 
                 driver_colors[driver_code] = team_color
                 driver_code_team_map[driver_code] = team_name
-                driver_status[driver_code] = status
                 driver_teams.append(team_name)  # add team name to the separate list    
                 # checks if driver has finished the race
                 # note that qualifying has blank column for Status
