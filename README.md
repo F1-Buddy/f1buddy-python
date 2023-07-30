@@ -60,4 +60,4 @@ And more!!
 - [ ] telemetry will bug out and display nothing for a graph if called upon multiple times in quick succession
 - [ ] calling consistency more than once with the same args throws an error
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
-- [ ] may need to call /fl, /avgpos a couple of times after first call to get output
+- [ ] may need to call /fl a couple of times after first call to get output
