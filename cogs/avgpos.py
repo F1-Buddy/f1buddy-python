@@ -44,7 +44,8 @@ def plot_avg_positions(event):
         print(e)
         pass
     
-    filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png"
+    event_status = "future" if now.tz_localize('America/New_York') < sessionTime else "completed"
+    filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png"
     if not os.path.exists(filename): # checks if image has already been generated
         # calculate average positions
         driver_positions, driver_teams, driver_colors, driver_code_team_map = avg_pos(sessiontype)
@@ -105,11 +106,11 @@ def plot_avg_positions(event):
         for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
             ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font, fontsize=20)
             
-        plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png") # save plot
+        plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png") # save plot
         # plt.clear() # noticed that plt.clear() will generate plot, but won't post to discord on first request, will use generated image on followup request
         
     try:
-        file = discord.File(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png", filename="image.png")
+        file = discord.File(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png", filename="image.png")
         return file
     except Exception as e:
         print(e)
