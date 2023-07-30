@@ -47,13 +47,9 @@ And more!!
 
 
 ## To-do
-- [ ] add predictions command
 - [ ] (maybe) make round an optional input for laptime and positions
-- [x] align /laptimes to 0 on graph
 - [ ] implement user-input years for /h2h and /avgpos
 - [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
-- [x] account for DNFs in h2h/avgpos
-- [x] RIC color broken in /laptimes
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
