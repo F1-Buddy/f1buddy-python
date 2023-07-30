@@ -49,11 +49,11 @@ And more!!
 ## To-do
 - [ ] add predictions command
 - [ ] (maybe) make round an optional input for laptime and positions
-- [ ] align /laptimes to 0 on graph
+- [x] align /laptimes to 0 on graph
 - [ ] implement user-input years for /h2h and /avgpos
 - [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
-- [ ] account for DNFs in h2h/avgpos
-- [ ] RIC color broken in /laptimes
+- [x] account for DNFs in h2h/avgpos
+- [x] RIC color broken in /laptimes
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
@@ -61,4 +61,3 @@ And more!!
 - [ ] calling consistency more than once with the same args throws an error
 - [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
 - [ ] may need to call /fl, /avgpos a couple of times after first call to get output
-- [ ] h2h broken again when calling quali right now, will probably break for race after belgium

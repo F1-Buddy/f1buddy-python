@@ -78,7 +78,6 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                             print(e)
                         team1,team2=team_drivers
                         team1, team2 = team_emoji_ids.get(team1), team_emoji_ids.get(team2)
-                        print(team1+team2)
                         if team1 and team2:
                                 driver_name1.append(f"{(str)(self.bot.get_emoji(team1))} {driver1}")
                                 score.append(f"`{wins}` - `{losses}`")
@@ -227,6 +226,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                     # check if the drivers are different, not already paired, and belong to the same team
                     if i != j and (driver2, driver1) not in unique_pairs and team1 == team2:
                         unique_pairs.add((driver1, driver2))
+
                         wins, losses = 0, 0
 
                         driver1_positions, driver2_positions = driver_positions[driver1], driver_positions[driver2]
@@ -254,7 +254,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 team_emojis.append(f"`{wins}` \u00A0\u00A0 `{losses}`  ")
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
-                                                
+                                                                            
             driver_name1, driver_name2, team_emojis = '\n'.join(driver_name1), '\n'.join(driver_name2), '\n'.join(team_emojis)
             message_embed.title = f"Teammate Head to Head {sessiontype} Battles {current_year}" 
             message_embed.add_field(name="Driver", value=driver_name1, inline=True)

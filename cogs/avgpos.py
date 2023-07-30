@@ -162,10 +162,11 @@ def avg_pos(sessiontype):
                 if sessiontype == "Race":
                     if status == 'Finished' or ('+' in status and ('Lap' in status or 'Laps' in status)):
                         driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
+                else:
+                    driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
         except Exception as e:
             print(e)    
             continue
-            
     return driver_positions, driver_teams, driver_colors, driver_code_team_map # driver_positions returns positions of drivers through races, driver_teams is the corresponding team names for each driver
 
 class AveragePos(commands.Cog):
