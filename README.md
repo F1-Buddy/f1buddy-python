@@ -50,6 +50,7 @@ And more!!
 - [ ] (maybe) make round an optional input for laptime and positions
 - [ ] implement user-input years for /h2h and /avgpos
 - [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
+- [ ] add watermark to all graphs? 
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
