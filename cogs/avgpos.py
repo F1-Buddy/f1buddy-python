@@ -37,7 +37,12 @@ def plot_avg_positions(event):
             sessionTime = year_sched.loc[round_check,"Session4Date"].tz_convert('America/New_York')
         else:
             sessionTime = year_sched.loc[round_check,"Session2Date"].tz_convert('America/New_York') 
-    race = fastf1.get_session(current_year, round_check, f"{sessiontype}") 
+    try:
+        race = fastf1.get_session(current_year, round_check-1, f"{sessiontype}") 
+    except Exception as e:
+        race = fastf1.get_session(current_year, 1, f"{sessiontype}") 
+        print(e)
+        pass
     
     filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype}.png"
     if not os.path.exists(filename): # checks if image has already been generated
@@ -47,11 +52,15 @@ def plot_avg_positions(event):
         avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
         
         driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
-        race.load(laps=True,telemetry=False,weather=False,messages=False)
-        resultsTable = race.results
+        try:
+            race.load(laps=True,telemetry=False,weather=False,messages=False)
+            resultsTable = race.results
+        except Exception as e:
+            print(e)
+            pass
         colors_for_drivers = ['#' + driver_colors.get(code, 'gray') for code in driver_codes]
             
-        watermark_img = plt.imread('botPics/f1pythonpfp.png')
+        watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
         fig, ax = plt.subplots(figsize=(16.8, 10.5)) # create the bar plot and size
 
         ax.barh(range(len(driver_codes)), avg_positions, color=colors_for_drivers)
@@ -86,26 +95,18 @@ def plot_avg_positions(event):
         # set blackground
         ax.set_facecolor('black')    
         fig.set_facecolor('black')
-        # Step 3: Overlay the image at the bottom left corner of the chart
-        # Adjust the position (x and y) to place the watermark as desired
+
         try:
-            watermark_box = OffsetImage(watermark_img, zoom=0.2)  # Adjust the zoom factor as needed
-            ab = AnnotationBbox(watermark_box, (0,1), xycoords='axes fraction', frameon=False)
+            # add f1buddy pfp
+            watermark_box = OffsetImage(watermark_img, zoom=0.2) 
+            ab = AnnotationBbox(watermark_box, (-0.115,1.1), xycoords='axes fraction', frameon=False)
             ax.add_artist(ab)
 
-            # Step 4: Add text on top of the image to further customize the watermark
-            # Replace 'Your Watermark Text' with your desired text
-            ax.text(0.02, 0.02, 'Your Watermark Text', transform=ax.transAxes,
-                    fontsize=12, color='gray', alpha=0.7)
+            # add text next to it
+            ax.text(-0.075,1.085, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                    fontsize=16,fontproperties=bold_font)
         except Exception as e:
             print(e)
-        # np.random.seed(19680801)
-        # ax.plot(np.random.rand(20), '-o', ms=20, lw=2, alpha=0.7, mfc='orange')
-        # ax.grid()
-
-        # ax.text(0.5, 0.5, 'created with matplotlib', transform=ax.transAxes,
-        #         fontsize=40, color='gray', alpha=0.5,
-        #         ha='center', va='center', rotation=30)
 
         # adds position number near bars
         for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
@@ -124,60 +125,48 @@ def avg_pos(sessiontype):
     # get latest completed session by starting from the end of calendar and going back towards the beginning of the season
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
-    driver_positions, driver_teams, driver_colors, driver_code_team_map = {}, [], {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
+    driver_positions, driver_teams, driver_colors, driver_code_team_map, driver_status = {}, [], {}, {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
 
     for round_num in range(1, num_rounds + 1):
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
-        if now.tz_localize('America/New_York') < sessionTime:
-            break
-        
+        try:
+            if now.tz_localize('America/New_York') < sessionTime:
+                break
+        except Exception as e:
+            print(e)
+            continue
+
         try:
             result_session = fastf1.get_session(current_year, round_num, sessiontype)
-            result_session.load(laps=False,telemetry=False,weather=False,messages=False)
-            resultsTable = result_session.results
+            try:
+                result_session.load(laps=False, telemetry=False, weather=False, messages=False)
+                resultsTable = result_session.results
+            except Exception as e:
+                print(e)
         except Exception as e:
             print(f"An error occurred in round {round_num}: {e}")
-            continue
 
         try:
             for index, row in resultsTable.iterrows():
                 driver_code = row['Abbreviation']
                 team_color = row['TeamColor']
                 team_name = row['TeamName']
+                status = row['Status']
                 
                 driver_colors[driver_code] = team_color
                 driver_code_team_map[driver_code] = team_name
+                driver_status[driver_code] = status
+                driver_teams.append(team_name)  # add team name to the separate list    
+                # checks if driver has finished the race
+                # note that qualifying has blank column for Status
+                if sessiontype == "Race":
+                    if status == 'Finished' or ('+' in status and ('Lap' in status or 'Laps' in status)):
+                        driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
         except Exception as e:
-            print(e)
-
-        for i in resultsTable.DriverNumber.values:
-            try:
-                team_name = resultsTable.loc[i, 'TeamName']
-            except:
-                pass
-            driver_positions.setdefault(resultsTable.loc[i, 'FullName'], []).append(int(resultsTable.loc[i, 'Position']))
-            driver_teams.append(team_name)  # add team name to the separate list
+            print(e)    
+            continue
             
     return driver_positions, driver_teams, driver_colors, driver_code_team_map # driver_positions returns positions of drivers through races, driver_teams is the corresponding team names for each driver
-
-def head_to_head_results():
-    driver_positions = avg_pos()
-    head_to_head = {}
-
-    for driver1 in driver_positions:
-        for driver2 in driver_positions:
-            if driver1 != driver2:
-                driver1_positions = driver_positions[driver1]
-                driver2_positions = driver_positions[driver2]
-
-                # Calculate the number of times each driver finished ahead of the other
-                driver1_wins = sum(pos1 < pos2 for pos1, pos2 in zip(driver1_positions, driver2_positions))
-                driver2_wins = sum(pos1 > pos2 for pos1, pos2 in zip(driver1_positions, driver2_positions))
-
-                head_to_head_key = f"{driver1} vs {driver2}"
-                head_to_head[head_to_head_key] = f"{driver1_wins}-{driver2_wins}"
-
-    return head_to_head
 
 class AveragePos(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -201,6 +190,7 @@ class AveragePos(commands.Cog):
         file = await loop.run_in_executor(None, plot_avg_positions, event)
         try:
             message_embed.set_image(url='attachment://image.png')
+            message_embed.description = "Excluding DNF/DNS"
             await interaction.followup.send(embed=message_embed,file=file)
         except Exception as e:
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
