@@ -121,8 +121,10 @@ def avg_pos(sessiontype):
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
     driver_positions, driver_teams, driver_colors, driver_code_team_map = {}, [], {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
-
-    for round_num in range(1, num_rounds + 1):
+    for i in range(10):
+        driver_positions.setdefault('Daniel Ricciardo', []).append(0)
+    all_rounds = set(range(1, num_rounds + 1))
+    for round_num in all_rounds:
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
         try:
             if now.tz_localize('America/New_York') < sessionTime:
@@ -146,7 +148,7 @@ def avg_pos(sessiontype):
                 driver_code = row['Abbreviation']
                 team_color = row['TeamColor']
                 team_name = row['TeamName']
-                status = row['Status']
+                status = (str)(row['Status'])
                 
                 driver_colors[driver_code] = team_color
                 driver_code_team_map[driver_code] = team_name
@@ -154,13 +156,17 @@ def avg_pos(sessiontype):
                 # checks if driver has finished the race
                 # note that qualifying has blank column for Status
                 if sessiontype == "Race":
-                    if status == 'Finished' or ('+' in status and ('Lap' in status or 'Laps' in status)):
+                    if status == 'Finished' or ('+' in status):
                         driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
+                    else:
+                        driver_positions.setdefault(row['FullName'], []).append(0)
                 else:
                     driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
         except Exception as e:
             print(e)    
             continue
+        
+    print(driver_positions)
     return driver_positions, driver_teams, driver_colors, driver_code_team_map # driver_positions returns positions of drivers through races, driver_teams is the corresponding team names for each driver
 
 class AveragePos(commands.Cog):
