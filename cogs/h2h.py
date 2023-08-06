@@ -238,10 +238,8 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 continue
                             
                             if driver1_positions[k] < driver2_positions[k]:
-                                print(f"{driver1} {driver1_positions[k]} {driver2} {driver2_positions[k]}")
                                 wins += 1
                             elif driver1_positions[k] > driver2_positions[k]:
-                                print(f"{driver1} {driver1_positions[k]} {driver2} {driver2_positions[k]}")
                                 losses += 1
                         emoji1, emoji2 = team_emoji_ids.get(team1), team_emoji_ids.get(team2)
                         
