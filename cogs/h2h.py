@@ -263,6 +263,8 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
             message_embed.add_field(name="Driver", value=driver_name1, inline=True)
             message_embed.add_field(name="Team", value=team_emojis, inline=True)
             message_embed.add_field(name="Driver", value=driver_name2, inline=True)
+            if sessiontype == "Race":
+                message_embed.set_footer(text="Excludes race when either driver DNFs",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
 
     except Exception as e:
         traceback.print_exc()
