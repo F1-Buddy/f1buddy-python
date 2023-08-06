@@ -48,9 +48,9 @@ And more!!
 
 ## To-do
 - [ ] (maybe) make round an optional input for laptime and positions
-- [ ] implement user-input years for /h2h and /avgpos
-- [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
+- [ ] fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
 - [ ] add watermark to all graphs? 
+- [ ] fix consistency bugging out when session occurs, but no data for session (working on it, using recursion)
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
