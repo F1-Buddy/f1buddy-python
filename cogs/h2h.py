@@ -254,6 +254,9 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                     team_emojis.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{wins}`  ")
                                 else:
                                     team_emojis.append(f"`{losses}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{wins}`  ")
+                                temp = driver2
+                                driver2 = driver1
+                                driver1 = temp
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
                         else:
@@ -261,6 +264,9 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 team_emojis.append(f"`{wins}` `{losses}`  ")
                             else:
                                 team_emojis.append(f"`{wins}` \u00A0\u00A0 `{losses}`  ")
+                            temp = driver2
+                            driver2 = driver1
+                            driver1 = temp
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
                                                                             
