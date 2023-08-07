@@ -244,10 +244,16 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                         emoji1, emoji2 = team_emoji_ids.get(team1), team_emoji_ids.get(team2)
                         
                         if emoji1 and emoji2:
-                            if losses > 9 or wins > 9:      
-                                team_emojis.append(f"`{wins}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
-                            else:
-                                team_emojis.append(f"`{wins}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                            if wins > losses or wins == losses:
+                                if losses > 9 or wins > 9:      
+                                    team_emojis.append(f"`{wins}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                                else:
+                                    team_emojis.append(f"`{wins}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                            elif losses > wins:
+                                if losses > 9 or wins > 9:      
+                                    team_emojis.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{wins}`  ")
+                                else:
+                                    team_emojis.append(f"`{losses}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{wins}`  ")
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
                         else:
