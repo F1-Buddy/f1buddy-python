@@ -97,7 +97,7 @@ def tire_strategy(round, year):
 
 
         # check if graph already exists, if not create it
-        message_embed.description = f"Tire strategies during the {racename}"
+        message_embed.description = f"Tire strategies During the {racename}"
         file_exist = not os.path.exists("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png')
         # file_exist = True
         if (file_exist):

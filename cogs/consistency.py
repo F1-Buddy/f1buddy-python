@@ -155,7 +155,7 @@ def laptime_consistency(driver, year, round):
                 seconds = int(tick % 60)
                 converted_labels.append("{:02d}:{:02d}".format(minutes, seconds))
             ax.set_yticklabels(converted_labels)
-            ax.set_title(f"{specified_driver} Laptime Consistency during \n{raceName}", fontproperties=bold_font)
+            ax.set_title(f"{specified_driver} Laptime Consistency During \n{raceName}", fontproperties=bold_font)
             ax.set_xlabel("Lap Number", fontproperties=regular_font, labelpad=10)
             ax.set_ylabel("Lap Time", fontproperties=regular_font, labelpad=10)
             for label in ax.get_xticklabels() + ax.get_yticklabels():
