@@ -11,13 +11,11 @@ from matplotlib import cbook, image, pyplot as plt
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
-import unidecode
 from lib.colors import colors
 from lib.drivernames import driver_names
 from lib.teamcolors import team_colors
 from datetime import datetime
 from lib.f1font import regular_font, bold_font
-from fastf1.ergast import Ergast
 current_year = datetime.now().year
 now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
@@ -52,8 +50,10 @@ def plot_avg_positions(event):
         # calculate average positions
         driver_positions, driver_teams, driver_colors, driver_code_team_map = avg_pos(sessiontype)
         driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
-        avg_positions = [round(sum(positions) / len(positions), 2) for positions in driver_positions.values()]
-        
+        avg_positions = [
+            round(sum(position for position in positions if position != 0) / len([position for position in positions if position != 0]), 2)
+            for positions in driver_positions.values()
+        ]        
         driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
         colors_for_drivers = ['#' + driver_colors.get(code, 'gray') for code in driver_codes]
             
@@ -123,18 +123,9 @@ def avg_pos(sessiontype):
     year_sched = fastf1.get_event_schedule(current_year, include_testing=False)
     num_rounds = year_sched.shape[0]
     driver_positions, driver_teams, driver_colors, driver_code_team_map = {}, [], {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
-    ergast = Ergast()
-    driver_info = ergast.get_driver_info(season=current_year)
-    full_name = []
-    for _, row in driver_info.iterrows():
-        given_name = unidecode.unidecode(row['givenName'])
-        family_name = unidecode.unidecode(row['familyName'])
-        full_name_str = given_name + ' ' + family_name
-        full_name.append(full_name_str)
     for i in range(10):
         driver_positions.setdefault('Daniel Ricciardo', []).append(0)
     all_rounds = set(range(1, num_rounds + 1))
-    current_round = 0
     for round_num in all_rounds:
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
         try:
@@ -166,7 +157,6 @@ def avg_pos(sessiontype):
                 driver_teams.append(team_name)  # add team name to the separate list    
                 # checks if driver has finished the race
                 # note that qualifying has blank column for Status
-                
                 if sessiontype == "Race":
                     if status == 'Finished' or ('+' in status):
                         driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
@@ -177,12 +167,7 @@ def avg_pos(sessiontype):
         except Exception as e:
             print(e)    
             continue
-        current_round = round_num
-    # length_of_positions = {driver: len(positions) for driver, positions in driver_positions.items()}
-    # print(length_of_positions)
-    # for driver, total_races in lengthx    _of_positions.items():
-    #     num_missing_races = current_round - total_races
-    #     print(f"{driver} : {num_missing_races}")
+        
     return driver_positions, driver_teams, driver_colors, driver_code_team_map # driver_positions returns positions of drivers through races, driver_teams is the corresponding team names for each driver
 
 class AveragePos(commands.Cog):
