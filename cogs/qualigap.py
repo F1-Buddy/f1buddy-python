@@ -40,11 +40,6 @@ def addlabels(x,y,driver_colors, regular_font):
             string = "No Time"
         plt.text(min(max(y),5)+0.09, i, string, va = 'center', fontproperties=regular_font)
 
-f1plt._enable_fastf1_color_scheme()
-f1plt.setup_mpl(misc_mpl_mods=False)
-fig, ax = plt.subplots(figsize=(8.25, 5.5))
-fig.set_facecolor('black')
-ax.set_facecolor('black')
 
 def quali_gap(round, year):
     # get current time
@@ -73,7 +68,16 @@ def quali_gap(round, year):
         # check if graph already exists, if not create it
         message_embed.description = racename
         if (not os.path.exists("cogs/plots/qualigap/"+race.date.strftime('%Y-%m-%d_%I%M')+"_QualiGap"+'.png')):
+            
+            # plot setup
+            f1plt._enable_fastf1_color_scheme()
+            f1plt.setup_mpl(misc_mpl_mods=False)
+            fig, ax = plt.subplots(figsize=(8.25, 5.5))
+            fig.set_facecolor('black')
+            ax.set_facecolor('black')
 
+            
+            
             # get fastest lap time in session
             fastest_lap = resultsTable.loc[resultsTable.index[0],'Q3']
 
@@ -117,7 +121,7 @@ def quali_gap(round, year):
             plt.grid(visible=False, which='both')
             plt.title(f"Qualifying Gap for {str(race.date.year)+' '+str(race.event.EventName)}",fontproperties=bold_font, pad=20)
             plt.xlabel("Delta (Seconds)",fontproperties=regular_font)
-            plt.subplots_adjust(right=0.88,left=0.16,bottom = 0.16,top = 0.78)
+            plt.subplots_adjust(right=0.88,left=0.12,bottom = 0.16,top = 0.78)
             for label in ax.get_xticklabels():
                 label.set_fontproperties(regular_font)
             for label in ax.get_yticklabels():
