@@ -47,10 +47,11 @@ And more!!
 
 
 ## To-do
-- [ ] (maybe) make round an optional input for laptime and positions
-- [ ] fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
+- [ ] qualigap bugs out repeatedly, wrong stats, wrong numbers, etc.
 - [ ] add watermark to all graphs? 
-- [ ] fix consistency bugging out when session occurs, but no data for session (working on it, using recursion)
+- [ ] fix consistency bugging out when session occurs, but no data for session
+- [ ] (low priority) (maybe) make round an optional input for laptime and positions
+- [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
