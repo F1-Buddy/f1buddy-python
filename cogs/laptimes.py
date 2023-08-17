@@ -11,6 +11,7 @@ from lib.colors import colors
 from lib.f1font import regular_font, bold_font
 import pandas as pd
 import traceback
+import fastf1.plotting as f1plt
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -63,16 +64,22 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             fig.set_facecolor('black')
             ax.set_facecolor('black')
             # get driver color
-            # fastf1.plotting.driver_color does not have a value for Ricciardo
-            if (year == now.year & ('RIC' not in [driver1,driver2])):
-                d1_color = fastf1.plotting.driver_color(driver1)
-                d2_color = fastf1.plotting.driver_color(driver2)
-            else:
-                d1_color = f"#{race.results.loc[d1_number,'TeamColor']}"
-                d2_color = f"#{race.results.loc[d2_number,'TeamColor']}"
+
+            # if (year == now.year):
+            #     print(driver1)
+            #     d1_color = f1plt.driver_color(driver1)
+            #     d2_color = f1plt.driver_color(driver2)
+            # else:
+            d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
+            d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
+
             # if comparing teammates, change one drive color to white to be able to differentiate
+            print(d1_color)
+            print(d2_color)
             if d1_color == d2_color:
                 d2_color = 'white'
+            print(d1_color)
+            print(d2_color)
             # plot laptimes
             ax.plot(d1['LapNumber'], d1['LapTime'], color=d1_color, label = driver1)
             ax.plot(d2['LapNumber'], d2['LapTime'], color=d2_color, label = driver2)

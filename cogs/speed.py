@@ -32,9 +32,9 @@ url='https://cdn.discordapp.com/attachments/884602392249770087/10594645322395812
 def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
     message_embed.description = ""
     if sessiontype.name.startswith("FP"):
-        message_embed.title = f"Track Dominance during {sessiontype.name}"
+        message_embed.title = f"Track Dominance During {sessiontype.name}"
     else:
-        message_embed.title = f"Track Dominance during {sessiontype.name.capitalize()}"
+        message_embed.title = f"Track Dominance During {sessiontype.name.capitalize()}"
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()

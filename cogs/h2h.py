@@ -78,7 +78,6 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                             print(e)
                         team1,team2=team_drivers
                         team1, team2 = team_emoji_ids.get(team1), team_emoji_ids.get(team2)
-                        print(team1+team2)
                         if team1 and team2:
                                 driver_name1.append(f"{(str)(self.bot.get_emoji(team1))} {driver1}")
                                 score.append(f"`{wins}` - `{losses}`")
@@ -227,6 +226,7 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                     # check if the drivers are different, not already paired, and belong to the same team
                     if i != j and (driver2, driver1) not in unique_pairs and team1 == team2:
                         unique_pairs.add((driver1, driver2))
+
                         wins, losses = 0, 0
 
                         driver1_positions, driver2_positions = driver_positions[driver1], driver_positions[driver2]
@@ -234,6 +234,9 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                         num_races = min(len(driver1_positions), len(driver2_positions))
 
                         for k in range(num_races):
+                            if driver1_positions[k] == 0 or driver2_positions[k] == 0:
+                                continue
+                            
                             if driver1_positions[k] < driver2_positions[k]:
                                 wins += 1
                             elif driver1_positions[k] > driver2_positions[k]:
@@ -241,10 +244,19 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                         emoji1, emoji2 = team_emoji_ids.get(team1), team_emoji_ids.get(team2)
                         
                         if emoji1 and emoji2:
-                            if losses > 9 or wins > 9:      
-                                team_emojis.append(f"`{wins}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
-                            else:
-                                team_emojis.append(f"`{wins}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                            if wins > losses or wins == losses:
+                                if losses > 9 or wins > 9:      
+                                    team_emojis.append(f"`{wins}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                                else:
+                                    team_emojis.append(f"`{wins}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{losses}`  ")
+                            elif losses > wins:
+                                if losses > 9 or wins > 9:      
+                                    team_emojis.append(f"`{losses}` {(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{wins}`  ")
+                                else:
+                                    team_emojis.append(f"`{losses}` \u00A0\u00A0{(str)(self.bot.get_emoji(emoji1))} \u00A0\u00A0`{wins}`  ")
+                                temp = driver2
+                                driver2 = driver1
+                                driver1 = temp
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
                         else:
@@ -252,14 +264,19 @@ def head_to_head(self, driver1_code, driver2_code, sessiontype):
                                 team_emojis.append(f"`{wins}` `{losses}`  ")
                             else:
                                 team_emojis.append(f"`{wins}` \u00A0\u00A0 `{losses}`  ")
+                            temp = driver2
+                            driver2 = driver1
+                            driver1 = temp
                             driver_name1.append(f"`{driver1}`")
                             driver_name2.append(f"`{driver2}`")
-                                                
+                                                                            
             driver_name1, driver_name2, team_emojis = '\n'.join(driver_name1), '\n'.join(driver_name2), '\n'.join(team_emojis)
             message_embed.title = f"Teammate Head to Head {sessiontype} Battles {current_year}" 
             message_embed.add_field(name="Driver", value=driver_name1, inline=True)
             message_embed.add_field(name="Team", value=team_emojis, inline=True)
             message_embed.add_field(name="Driver", value=driver_name2, inline=True)
+            if sessiontype == "Race":
+                message_embed.set_footer(text="Excludes race when either driver DNFs",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
 
     except Exception as e:
         traceback.print_exc()

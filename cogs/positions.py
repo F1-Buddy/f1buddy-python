@@ -89,7 +89,7 @@ def positions_result(round, year):
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
             
-            plt.title('Position Changes during '+racename, fontproperties=bold_font)
+            plt.title('Position Changes During '+racename, fontproperties=bold_font)
             plt.grid(visible=False, which='both')
             plt.rcParams['savefig.dpi'] = 300
             for label in ax.get_xticklabels() + ax.get_yticklabels():

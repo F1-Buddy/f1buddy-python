@@ -121,13 +121,13 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 d2_brake_list = d2_tel['Brake'].to_list()
 
                 
-                # get driver color
-                if (year == now.year):
-                    d1_color = f1plt.driver_color(d1_name)
-                    d2_color = f1plt.driver_color(d2_name)
-                else:
-                    d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
-                    d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
+                # # get driver color
+                # if (year == now.year):
+                #     d1_color = f1plt.driver_color(d1_name)
+                #     d2_color = f1plt.driver_color(d2_name)
+                # else:
+                d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
+                d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
                 if d1_color == d2_color:
                     d2_color = 'white'
                     
