@@ -1,4 +1,3 @@
-# basic help command
 import asyncio
 import typing
 import discord

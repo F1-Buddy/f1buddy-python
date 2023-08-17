@@ -4,15 +4,13 @@ import os
 import traceback
 import typing
 import fastf1
-from matplotlib import patches, pyplot as plt, ticker
+from matplotlib import patches, pyplot as plt
 import pandas as pd
-# from lib.drivernames import driver_names
 from lib.f1font import regular_font, bold_font
 from lib.colors import colors
 import discord
 from discord import app_commands
 from discord.ext import commands
-# import traceback
 lap_colors = []
 now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
