@@ -11,6 +11,7 @@ test3.py
 /__pycache__/
 /cogs/__pycache__/
 /lib/__pycache__/
+/lib/colors.py
 
 # plots
 !/cogs/plots/.gitkeep 

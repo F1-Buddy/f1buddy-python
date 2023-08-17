@@ -62,6 +62,7 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             fig.set_facecolor('black')
             ax.set_facecolor('black')
             # get driver color
+
             # if (year == now.year):
             #     print(driver1)
             #     d1_color = f1plt.driver_color(driver1)
@@ -69,6 +70,7 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             # else:
             d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
             d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
+
             # if comparing teammates, change one drive color to white to be able to differentiate
             if d1_color == d2_color:
                 d2_color = 'white'
@@ -77,9 +79,11 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             ax.plot(d1['LapNumber'], d1['LapTime'], color=d1_color, label = driver1)
             ax.plot(d2['LapNumber'], d2['LapTime'], color=d2_color, label = driver2)
             # pyplot setup
+            max_lap_count = max(max(d1['LapNumber']),max(d2['LapNumber']))
             ax.set_title(racename+ ' '+driver1+" vs "+driver2, fontproperties=bold_font)
-            ax.set_xlabel("Lap Number", fontproperties=regular_font, labelpad=10)
+            ax.set_xlabel(f"Lap Number (of {max_lap_count:.0f})", fontproperties=regular_font, labelpad=10)
             ax.set_ylabel("Lap Time", fontproperties=regular_font, labelpad=10)
+            ax.set_xlim([0,max_lap_count])
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontproperties(regular_font)
             ax.legend(loc="upper right", prop=regular_font)
