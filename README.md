@@ -47,7 +47,6 @@ And more!!
 
 
 ## To-do
-- [ ] qualigap bugs out repeatedly, wrong stats, wrong numbers, etc.
 - [ ] add watermark to all graphs? 
 - [ ] fix consistency bugging out when session occurs, but no data for session
 - [ ] (low priority) (maybe) make round an optional input for laptime and positions
