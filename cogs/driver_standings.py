@@ -31,7 +31,7 @@ def get_driver_standings(self, year):
         constructor_name = constructor_name[0]
         try:
             # discord runs out of character space after 21 drivers
-            if (len(driver_standings) <= 21):
+            if (len(driver_standings) <= 22):
                 emoji_id = team_emoji_ids.get(constructor_name)
                 emoji = self.bot.get_emoji(emoji_id)
                 if emoji:
