@@ -3,17 +3,15 @@ import os
 import discord
 import fastf1
 from matplotlib.ticker import MultipleLocator
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from matplotlib import cbook, image, pyplot as plt
+from matplotlib import pyplot as plt
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
 from lib.colors import colors
 from lib.drivernames import driver_names
-from lib.teamcolors import team_colors
 from datetime import datetime
 from lib.f1font import regular_font, bold_font
 current_year = datetime.now().year

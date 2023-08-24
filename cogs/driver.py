@@ -1,8 +1,6 @@
 import asyncio
 import re
-import traceback
 import discord
-import pandas as pd
 import wikipedia
 import requests
 import json

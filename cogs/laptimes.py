@@ -11,7 +11,6 @@ from lib.colors import colors
 from lib.f1font import regular_font, bold_font
 import pandas as pd
 import traceback
-import fastf1.plotting as f1plt
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -59,7 +58,6 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             d2 = race.laps.pick_driver(driver2)
             d1_number = d1.iloc[0].loc['DriverNumber']
             d2_number = d2.iloc[0].loc['DriverNumber']
-            # print(d2)
             fig, ax = plt.subplots(figsize=(9, 6))
             fig.set_facecolor('black')
             ax.set_facecolor('black')
@@ -74,12 +72,9 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
 
             # if comparing teammates, change one drive color to white to be able to differentiate
-            print(d1_color)
-            print(d2_color)
             if d1_color == d2_color:
                 d2_color = 'white'
-            print(d1_color)
-            print(d2_color)
+
             # plot laptimes
             ax.plot(d1['LapNumber'], d1['LapTime'], color=d1_color, label = driver1)
             ax.plot(d2['LapNumber'], d2['LapTime'], color=d2_color, label = driver2)
