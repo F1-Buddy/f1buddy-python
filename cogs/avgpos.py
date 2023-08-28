@@ -41,74 +41,85 @@ def plot_avg_positions(event):
         race = fastf1.get_session(current_year, 1, f"{sessiontype}") 
         print(e)
         pass
-    
-    event_status = "future" if now.tz_localize('America/New_York') < sessionTime else "completed"
+
+    aware_datetime = now.tz_localize('America/New_York')
+    naive_datetime = aware_datetime.replace(tzinfo=None)
+    try:
+        event_status = "future" if naive_datetime < race.date else "completed"
+    except Exception as e:
+        print(e)
+    try:
+        print(event_status)
+    except Exception as e:
+        print(e)
     filename = f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png"
-    if not os.path.exists(filename): # checks if image has already been generated
-        # calculate average positions
-        driver_positions, driver_teams, driver_colors, driver_code_team_map = avg_pos(sessiontype)
-        driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
-        avg_positions = [
-            round(sum(position for position in positions if position != 0) / len([position for position in positions if position != 0]), 2)
-            for positions in driver_positions.values()
-        ]        
-        driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
-        colors_for_drivers = ['#' + driver_colors.get(code, 'gray') for code in driver_codes]
+    try:
+        if not os.path.exists(filename): # checks if image has already been generated
+            # calculate average positions
+            driver_positions, driver_teams, driver_colors, driver_code_team_map = avg_pos(sessiontype)
+            driver_codes = [driver_names.get(name) for name in driver_positions.keys()] # converts to three-letter driver code
+            avg_positions = [
+                round(sum(position for position in positions if position != 0) / len([position for position in positions if position != 0]), 2)
+                for positions in driver_positions.values()
+            ]        
+            driver_codes, avg_positions, driver_teams = zip(*sorted(zip(driver_codes, avg_positions, driver_teams), key=lambda x: x[1])) # sort drivers based on average positions
+            colors_for_drivers = ['#' + driver_colors.get(code, 'FFFFFF') for code in driver_codes]
+                
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            fig, ax = plt.subplots(figsize=(16.8, 10.5)) # create the bar plot and size
+
+            ax.barh(range(len(driver_codes)), avg_positions, color=colors_for_drivers)
+                
+            # setting x-axis label, title
+            ax.set_xlabel("Position", fontproperties=regular_font, fontsize=20, labelpad=20)
+            ax.set_title(f"Average {sessiontype} Finish Position {current_year}", fontproperties=bold_font, fontsize=20, pad=20)
+
+            # space between limits for the y-axis and x-axis
+            ax.set_ylim(-0.8, len(driver_codes)-0.25)
+            ax.set_xlim(0, 20.1)
+            ax.invert_yaxis() # invert y axis, top to bottom
+            ax.xaxis.set_major_locator(MultipleLocator(1)) # amount x-axis increments by 1
+
+            # remove ticks, keep labels
+            ax.xaxis.set_tick_params(labelsize=12)
+            ax.yaxis.set_tick_params(labelsize=12)
+            ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font, fontsize=20)
+            ax.set_yticklabels(driver_codes, fontproperties=bold_font, fontsize=20)
+            ax.set_yticks(range(len(driver_codes)))
+            ax.tick_params(axis='both', length=0, pad=8)
+
+            # remove all lines, bar the x-axis grid lines
+            ax.yaxis.grid(False)
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.minorticks_off()
             
-        watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
-        fig, ax = plt.subplots(figsize=(16.8, 10.5)) # create the bar plot and size
+            # set blackground
+            ax.set_facecolor('black')    
+            fig.set_facecolor('black')
 
-        ax.barh(range(len(driver_codes)), avg_positions, color=colors_for_drivers)
-            
-        # setting x-axis label, title
-        ax.set_xlabel("Position", fontproperties=regular_font, fontsize=20, labelpad=20)
-        ax.set_title(f"Average {sessiontype} Finish Position {current_year}", fontproperties=bold_font, fontsize=20, pad=20)
+            try:
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.2) 
+                ab = AnnotationBbox(watermark_box, (-0.115,1.1), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
 
-        # space between limits for the y-axis and x-axis
-        ax.set_ylim(-0.8, len(driver_codes)-0.25)
-        ax.set_xlim(0, 20.1)
-        ax.invert_yaxis() # invert y axis, top to bottom
-        ax.xaxis.set_major_locator(MultipleLocator(1)) # amount x-axis increments by 1
+                # add text next to it
+                ax.text(-0.075,1.085, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=16,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
 
-        # remove ticks, keep labels
-        ax.xaxis.set_tick_params(labelsize=12)
-        ax.yaxis.set_tick_params(labelsize=12)
-        ax.set_xticklabels(ax.get_xticklabels(), fontproperties=regular_font, fontsize=20)
-        ax.set_yticklabels(driver_codes, fontproperties=bold_font, fontsize=20)
-        ax.set_yticks(range(len(driver_codes)))
-        ax.tick_params(axis='both', length=0, pad=8)
-
-        # remove all lines, bar the x-axis grid lines
-        ax.yaxis.grid(False)
-        ax.spines['top'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.minorticks_off()
-        
-        # set blackground
-        ax.set_facecolor('black')    
-        fig.set_facecolor('black')
-
-        try:
-            # add f1buddy pfp
-            watermark_box = OffsetImage(watermark_img, zoom=0.2) 
-            ab = AnnotationBbox(watermark_box, (-0.115,1.1), xycoords='axes fraction', frameon=False)
-            ax.add_artist(ab)
-
-            # add text next to it
-            ax.text(-0.075,1.085, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
-                    fontsize=16,fontproperties=bold_font)
-        except Exception as e:
-            print(e)
-
-        # adds position number near bars
-        for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
-            ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font, fontsize=20)
-            
-        plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png") # save plot
-        # plt.clear() # noticed that plt.clear() will generate plot, but won't post to discord on first request, will use generated image on followup request
-        
+            # adds position number near bars
+            for i, (code, position, team) in enumerate(zip(driver_codes, avg_positions, driver_teams)):
+                ax.text(position + 0.1, i, f"   {str(position)}", va='center', fontproperties=regular_font, fontsize=20)
+                
+            plt.savefig(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png") # save plot
+            # plt.clear() # noticed that plt.clear() will generate plot, but won't post to discord on first request, will use generated image on followup request
+    except Exception as e:
+        print(e) 
     try:
         file = discord.File(f"cogs/plots/avgpos/avgpos_{race.date.strftime('%Y-%m-%d_%I%M')}_{event_status}_{sessiontype}.png", filename="image.png")
         return file
@@ -123,6 +134,8 @@ def avg_pos(sessiontype):
     driver_positions, driver_teams, driver_colors, driver_code_team_map = {}, [], {}, {} # driver_pos keeps driver name and pos, driver_teams keeps order of driver positions by teamname
     for i in range(10):
         driver_positions.setdefault('Daniel Ricciardo', []).append(0)
+    for i in range(12):
+        driver_positions.setdefault('Liam Lawson', []).append(0)
     all_rounds = set(range(1, num_rounds + 1))
     for round_num in all_rounds:
         sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
@@ -165,7 +178,8 @@ def avg_pos(sessiontype):
         except Exception as e:
             print(e)    
             continue
-        
+    print(driver_positions)
+    print(driver_colors)
     return driver_positions, driver_teams, driver_colors, driver_code_team_map # driver_positions returns positions of drivers through races, driver_teams is the corresponding team names for each driver
 
 class AveragePos(commands.Cog):
