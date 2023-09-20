@@ -11,6 +11,7 @@ test3.py
 /__pycache__/
 /cogs/__pycache__/
 /lib/__pycache__/
+/lib/colors.py
 
 # plots
 !/cogs/plots/.gitkeep 
@@ -41,6 +42,9 @@ test3.py
 
 /cogs/plots/consistency/*
 !/cogs/plots/consistency/.gitkeep 
+
+/cogs/plots/avggapteam/*
+!/cogs/plots/avggapteam/.gitkeep 
 
 /cogs/fiaDocs/*
 !/cogs/fiaDocs/.gitkeep 

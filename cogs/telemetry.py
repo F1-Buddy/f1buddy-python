@@ -7,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from numpy import mean
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
 import matplotlib
@@ -121,13 +122,13 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 d2_brake_list = d2_tel['Brake'].to_list()
 
                 
-                # get driver color
-                if (year == now.year):
-                    d1_color = f1plt.driver_color(d1_name)
-                    d2_color = f1plt.driver_color(d2_name)
-                else:
-                    d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
-                    d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
+                # # get driver color
+                # if (year == now.year):
+                #     d1_color = f1plt.driver_color(d1_name)
+                #     d2_color = f1plt.driver_color(d2_name)
+                # else:
+                d1_color = f"#{race.results.loc[str(d1_number),'TeamColor']}"
+                d2_color = f"#{race.results.loc[str(d2_number),'TeamColor']}"
                 if d1_color == d2_color:
                     d2_color = 'white'
                     
@@ -145,6 +146,10 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 # plot the data
                 ax[0].plot(d1_index_list,d1_speed_list,color=d1_color)
                 ax[0].plot(d2_index_list,d2_speed_list,color=d2_color)
+                
+                # added average speed plotted
+                ax[0].axhline(mean(d1_speed_list), linestyle='--', label='D1 avg speed', c=d1_color, lw = 0.5)
+                ax[0].axhline(mean(d2_speed_list), linestyle='--', label='D2 avg speed', c=d2_color, lw = 0.5)
                 
                 ax[1].plot(d1_index_list,d1_throttle_list,color=d1_color)
                 ax[1].plot(d2_index_list,d2_throttle_list,color=d2_color)

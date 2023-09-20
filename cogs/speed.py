@@ -7,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
 from matplotlib.collections import LineCollection
@@ -32,9 +33,9 @@ url='https://cdn.discordapp.com/attachments/884602392249770087/10594645322395812
 def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
     message_embed.description = ""
     if sessiontype.name.startswith("FP"):
-        message_embed.title = f"Track Dominance during {sessiontype.name}"
+        message_embed.title = f"Track Dominance During {sessiontype.name}"
     else:
-        message_embed.title = f"Track Dominance during {sessiontype.name.capitalize()}"
+        message_embed.title = f"Track Dominance During {sessiontype.name.capitalize()}"
     message_embed.set_footer(text="")
     # pyplot setup
     f1plt.setup_mpl()
@@ -202,6 +203,18 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 plt.legend(handles=[d1_patch, d2_patch], prop=bold_font)
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
+                watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+                try:
+                    # add f1buddy pfp
+                    watermark_box = OffsetImage(watermark_img, zoom=0.2) 
+                    ab = AnnotationBbox(watermark_box, (-0.075,-0.05), xycoords='axes fraction', frameon=False)
+                    ax.add_artist(ab)
+
+                    # add text next to it
+                    ax.text(0.025,-0.075, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                            fontsize=12,fontproperties=bold_font)
+                except Exception as e:
+                    print(e)
                 # plt.show()
                 # plt.show()
                 plt.savefig("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png')

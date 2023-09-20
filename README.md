@@ -2,14 +2,14 @@
 
 # f1buddy-python
 
-A python version of the discordjs-f1-bot! 
-Rewritten in python to use fastf1
-
+A discord bot with all kinds F1 statistics and tools!
 Invite it to your server!
 
 <a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=2147798016&scope=bot">
-    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="157" height="112">
+    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="79" height="56">
 </a>
+
+Preview a few of our commands below:
 
 # Command Previews
 <details><summary><b>General Commands</b></summary>
@@ -47,13 +47,16 @@ And more!!
 
 
 ## To-do
-- [ ] (maybe) make round an optional input for laptime and positions
-- [ ] implement user-input years for /h2h and /avgpos
-- [ ] fix hardcoded removal of DEV vs RIC comparison in h2h
+- [ ] add watermark to all graphs? 
+- [ ] add error handling embed for consistency when can't find race (e.g. 2018)
+- [ ] fix consistency bugging out when session occurs, but no data for session
+- [ ] (low priority) (maybe) make round an optional input for laptime and positions
+- [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
 
 ## Bugs
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
-- [ ] telemetry will bug out and display nothing for a graph if called upon multiple times in quick succession
-- [ ] calling consistency more than once with the same args throws an error
-- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred)
-- [ ] may need to call /fl a couple of times after first call to get output
+- [ ] telemetry will bug out and display nothing or very weird outputs for a graph if called upon multiple times in quick succession
+- [ ] if lap time data cannot be loaded from ergast (e.g. just after race results) for latest round, consistency will get stuck when calling without round/year args
+- [x] may need to call /fl a couple of times after first call to get output (seems to work just fine, cannot reproduce this bug)
+- [x] calling consistency more than once with the same args throws an error (seems to work just fine, cannot reproduce this bug)
+- [x] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) (fixed, probably)

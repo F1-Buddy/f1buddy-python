@@ -9,7 +9,6 @@ from discord import app_commands
 import country_converter as coco
 from lib.emojiid import nation_dictionary
 from discord.ext import commands
-from fastf1.ergast import Ergast
 from lib.emojiid import tire_emoji_ids, tire_emoji_ids_2018, team_emoji_ids
 from lib.colors import colors
 fastf1.Cache.enable_cache('cache/')
@@ -99,6 +98,8 @@ def get_fastest_lap(self, round, year):
     fastest_lap_embed.add_field(name="GP     Name", value=tyre_age,inline=True)     
     fastest_lap_embed.add_field(name="Laptime", value=driver_laptime,inline=True)
     fastest_lap_embed.add_field(name="Age", value=grand_prix,inline=True)
+    if year <= 2018:
+        fastest_lap_embed.set_footer(text=f"{year} tires used",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
     return fastest_lap_embed
      
 class fastest_lap(commands.Cog):
