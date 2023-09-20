@@ -33,7 +33,7 @@ def results_result(self, year, round):
             sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Race')
         # most recent session found, load it
-        result_session.load()
+        result_session.load(laps=False, telemetry=False, weather=False, messages=False)
     # round was given as number
     else:
         event_round = None
@@ -50,7 +50,7 @@ def results_result(self, year, round):
         
 
     # load session
-    result_session.load()
+    result_session.load(laps=False, telemetry=False, weather=False, messages=False)
     resultsTable = result_session.results
     
     # strings for embed
