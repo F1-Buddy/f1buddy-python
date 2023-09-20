@@ -294,7 +294,13 @@ def avg_pos(sessiontype):
         try:
             for index, row in resultsTable.iterrows():
                 driver_code = row['Abbreviation']
-                team_color = row['TeamColor']
+                try:
+                    if row['TeamColor'] == 'nan':
+                        continue
+                    else:
+                        team_color = row['TeamColor']
+                except:
+                    continue
                 team_name = row['TeamName']
                 status = (str)(row['Status'])
                 

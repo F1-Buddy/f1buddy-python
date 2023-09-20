@@ -48,6 +48,7 @@ And more!!
 
 ## To-do
 - [ ] add watermark to all graphs? 
+- [ ] add error handling embed for consistency when can't find race (e.g. 2018)
 - [ ] fix consistency bugging out when session occurs, but no data for session
 - [ ] (low priority) (maybe) make round an optional input for laptime and positions
 - [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
