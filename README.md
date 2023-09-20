@@ -2,14 +2,14 @@
 
 # f1buddy-python
 
-A python version of the discordjs-f1-bot! 
-Rewritten in python to use fastf1
-
+A discord bot with all kinds F1 statistics and tools!
 Invite it to your server!
 
 <a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=2147798016&scope=bot">
-    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="157" height="112">
+    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="79" height="56">
 </a>
+
+Preview a few of our commands below:
 
 # Command Previews
 <details><summary><b>General Commands</b></summary>
