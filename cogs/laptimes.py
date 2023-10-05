@@ -7,6 +7,7 @@ from fastf1 import plotting
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from lib.colors import colors
 from lib.f1font import regular_font, bold_font
 import pandas as pd
@@ -86,8 +87,20 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             ax.set_xlim([0,max_lap_count])
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontproperties(regular_font)
-            ax.legend(loc="upper right", prop=regular_font)
+            ax.legend(loc="upper right", prop=bold_font)
             plt.rcParams['savefig.dpi'] = 300
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.115,1.110), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+
+                # add text next to it
+                ax.text(-0.07,1.1, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=10,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
             # save plot
             plt.savefig("cogs/plots/laptime/"+race.date.strftime('%Y-%m-%d_%I%M')+"_laptimes"+driver1+'vs'+driver2+'.png')
             # reset plot just in case
