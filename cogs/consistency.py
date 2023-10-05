@@ -5,6 +5,7 @@ import traceback
 import typing
 import fastf1
 from matplotlib import patches, pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import pandas as pd
 from lib.f1font import regular_font, bold_font
 from lib.colors import colors
@@ -27,7 +28,6 @@ fastf1.Cache.enable_cache('cache/')
 consistency_embed = discord.Embed(title="Laptime Consistency", description="")
 
 def laptime_consistency(driver, year, round):
-    print("a")
     # print(f"year = {year}")
     # print(f"round = {round}")
     # print(f"type(year) = {type(year)}")
@@ -47,7 +47,6 @@ def laptime_consistency(driver, year, round):
             round -= 1
             sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Race')
-        print(f"rojund {round}")
         # most recent session found, load it
         # result_session.load()
     # round was given as number
@@ -106,7 +105,6 @@ def laptime_consistency(driver, year, round):
     try:
         filename_a = f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png"
         if not os.path.exists(filename_a):
-            print("repeat")
             fig, ax = plt.subplots(figsize=(9,6))
             # plt.subplots_adjust(left=0.1)
             # set blackground
@@ -165,7 +163,18 @@ def laptime_consistency(driver, year, round):
             outlier_patch = patches.Patch(color="#F91536", label="Outlier")
             quickest_patch = patches.Patch(color="#B138DD", label="Fastest Lap")
             plt.legend(handles=[mean_patch, quickest_patch, quick_patch, slow_patch, outlier_patch], prop=bold_font,bbox_to_anchor=(1.3,1))
-            print("repeat2")
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.115,1.15), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+
+                # add text next to it
+                ax.text(-0.07,1.135, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=11,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
             plt.savefig(f"cogs/plots/consistency/consistency{result_session.date.strftime('%Y-%m-%d_%I%M')}_{specified_driver}.png",bbox_inches='tight') # save plot
     except Exception as e:
         print(f"Error: {e}")
@@ -180,10 +189,7 @@ def laptime_consistency(driver, year, round):
     consistency_embed.colour = colors.default
     consistency_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     consistency_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-    print(f"first: {filename_a}")
     try:
-        print("here")
-        print(filename_a)
         file = discord.File(filename_a, filename="image.png")
     except Exception as e:
         print(f"{e}")

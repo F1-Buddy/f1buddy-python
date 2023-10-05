@@ -234,7 +234,6 @@ def plot_avg_positions(event):
             # set blackground
             ax.set_facecolor('black')    
             fig.set_facecolor('black')
-
             try:
                 # add f1buddy pfp
                 watermark_box = OffsetImage(watermark_img, zoom=0.2) 
