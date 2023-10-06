@@ -135,7 +135,7 @@ def quali_gap(round, year):
                 ab = AnnotationBbox(watermark_box, (-0.115,1.205), xycoords='axes fraction', frameon=False)
                 ax.add_artist(ab)
                 # add text next to it
-                ax.text(-0.075,1.195, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                ax.text(-0.07,1.195, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
                         fontsize=10,fontproperties=bold_font)
             except Exception as e:
                 print(e)
