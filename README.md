@@ -47,15 +47,15 @@ And more!!
 
 
 ## To-do
-- [ ] add watermark to all graphs? 
-- [ ] add error handling embed for consistency when can't find race (e.g. 2018)
-- [ ] fix consistency bugging out when session occurs, but no data for session
+- [x] add watermark to all graphs?
+- [ ] (should fix asap, easy) add error handling embed for consistency when can't find race (e.g. 2018)
+- [ ] (should fix asap, easy) /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) 
 - [ ] (low priority) (maybe) make round an optional input for laptime and positions
 - [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
 
 ## Bugs
-- [ ] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) 
 - [ ] telemetry will bug out and display nothing or very weird outputs for a graph if called upon multiple times in quick succession
+- [ ] fix consistency bugging out when session occurs, but no data for session
 - [ ] if lap time data cannot be loaded from ergast (e.g. just after race results) for latest round, consistency will get stuck when calling 
 without round/year args
 - [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
