@@ -7,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from numpy import mean
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
@@ -204,6 +205,17 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 d1_patch = mpatches.Patch(color=d1_color, label=d1_name)
                 d2_patch = mpatches.Patch(color=d2_color, label=d2_name)
                 plt.legend(handles=[d1_patch, d2_patch],bbox_to_anchor=(1.01, 5.2),loc='upper right', prop=regular_font)
+                watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+                try:
+                    # add f1buddy pfp
+                    watermark_box = OffsetImage(watermark_img, zoom=0.125) 
+                    ab = AnnotationBbox(watermark_box, (-0.045,1.35), xycoords='axes fraction', frameon=False)
+                    ax[0].add_artist(ab)
+                    # add text next to it
+                    ax[0].text(-0.015,1.3, 'Made by F1Buddy Discord Bot', transform=ax[0].transAxes,
+                            fontsize=13,fontproperties=bold_font)
+                except Exception as e:
+                    print(e)
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
                 plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
