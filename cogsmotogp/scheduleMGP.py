@@ -21,7 +21,7 @@ def countdown(totalseconds):
     return out_string
 
 def upcomingEvents(tag):
-    if 'upcoming' in tag.get_text():
+    if 'finished' not in tag.get_text():
         return tag
 def findRace(tag):
     if 'Race' in tag.get_text() and 'MotoGP™' in tag.get_text() and "Press Conference" not in tag.get_text():
