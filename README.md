@@ -41,12 +41,11 @@ And more!!
 
 ## Changelog
 
-- updated help command and readme images
-- added multiple new commands since last main merge, consistency, fl, h2h, fiadoc, avgpos, strategy
-- fixed all graph aesthetics
+- created cache script
 
 
 ## To-do
+- [ ] add telemetry option for just 1 driver
 - [ ] add watermark to all graphs? 
 - [ ] add error handling embed for consistency when can't find race (e.g. 2018)
 - [ ] fix consistency bugging out when session occurs, but no data for session
