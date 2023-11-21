@@ -20,7 +20,10 @@ def get_driver_standings(self, year):
     driver_standings = ergast.get_driver_standings(season=year).content[0]
     for index in range(len(driver_standings)):
         position = driver_standings.iloc[index]['position']
-        name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']}"
+        if index == 0 and year != now.year:
+            name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']} :crown:"
+        else:
+            name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']}"
         points = (driver_standings.iloc[index]['points'])
         if points == int(points):
             points = int(points)

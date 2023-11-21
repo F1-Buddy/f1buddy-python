@@ -59,7 +59,7 @@ class Schedule(commands.Cog):
     async def on_ready(self):
         print('Schedule cog loaded')
 
-    @app_commands.command(name='schedule', description='get race schedule')
+    @app_commands.command(name='schedulef1', description='get F1 race schedule')
     async def schedule(self, interaction: discord.Interaction):
         # defer response
         await interaction.response.defer()

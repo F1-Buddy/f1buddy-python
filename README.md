@@ -2,14 +2,14 @@
 
 # f1buddy-python
 
-A python version of the discordjs-f1-bot! 
-Rewritten in python to use fastf1
-
+A discord bot with all kinds F1 statistics and tools!
 Invite it to your server!
 
 <a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=2147798016&scope=bot">
-    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="157" height="112">
+    <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="79" height="56">
 </a>
+
+Preview a few of our commands below:
 
 # Command Previews
 <details><summary><b>General Commands</b></summary>
@@ -41,15 +41,16 @@ And more!!
 
 ## Changelog
 
-- updated help command and readme images
-- added multiple new commands since last main merge, consistency, fl, h2h, fiadoc, avgpos, strategy
-- fixed all graph aesthetics
+- created cache script
+- add watermark to all graphs?
 
 
 ## To-do
-- [x] add watermark to all graphs?
+- [ ] IMPORTANT add telemetry option for just 1 driver and specific lap number (consider other commands)
 - [ ] (should fix asap, easy) add error handling embed for consistency when can't find race (e.g. 2018)
 - [ ] (should fix asap, easy) /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) 
+- [ ] add error handling embed for consistency when can't find race (e.g. 2018)
+- [ ] fix consistency bugging out when session occurs, but no data for session
 - [ ] (low priority) (maybe) make round an optional input for laptime and positions
 - [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
 

@@ -28,6 +28,9 @@ async def load():
     for file in os.listdir('./cogs'):
         if file.endswith('.py'):
             await bot.load_extension(f'cogs.{file[:-3]}')
+    for file in os.listdir('./cogsmotogp'):
+        if file.endswith('.py'):
+            await bot.load_extension(f'cogsmotogp.{file[:-3]}')
 
 
 async def main():
