@@ -6,6 +6,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
@@ -94,6 +95,19 @@ def positions_result(round, year):
             plt.rcParams['savefig.dpi'] = 300
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontproperties(regular_font)
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                fig.set_figheight(6.5)
+                fig.set_figwidth(10.6)
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.075,1.1), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+                # add text next to it
+                ax.text(-0.04,1.095, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=10,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
             # save plot
             plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
             # clear plot

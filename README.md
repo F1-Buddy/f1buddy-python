@@ -42,20 +42,23 @@ And more!!
 ## Changelog
 
 - created cache script
+- add watermark to all graphs?
 
 
 ## To-do
-- [ ] add telemetry option for just 1 driver
-- [ ] add watermark to all graphs? 
+- [ ] IMPORTANT add telemetry option for just 1 driver and specific lap number (consider other commands)
+- [ ] (should fix asap, easy) add error handling embed for consistency when can't find race (e.g. 2018)
+- [ ] (should fix asap, easy) /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) 
 - [ ] add error handling embed for consistency when can't find race (e.g. 2018)
 - [ ] fix consistency bugging out when session occurs, but no data for session
 - [ ] (low priority) (maybe) make round an optional input for laptime and positions
 - [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
 
 ## Bugs
-- [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
 - [ ] telemetry will bug out and display nothing or very weird outputs for a graph if called upon multiple times in quick succession
-- [ ] if lap time data cannot be loaded from ergast (e.g. just after race results) for latest round, consistency will get stuck when calling without round/year args
+- [ ] fix consistency bugging out when session occurs, but no data for session
+- [ ] if lap time data cannot be loaded from ergast (e.g. just after race results) for latest round, consistency will get stuck when calling 
+without round/year args
+- [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
 - [x] may need to call /fl a couple of times after first call to get output (seems to work just fine, cannot reproduce this bug)
 - [x] calling consistency more than once with the same args throws an error (seems to work just fine, cannot reproduce this bug)
-- [x] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) (fixed, probably)

@@ -9,6 +9,7 @@ from discord import app_commands
 from typing import Dict, List
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
@@ -139,6 +140,17 @@ def tire_strategy(round, year):
                 label.set_fontsize(15)
             ax.tick_params(axis='y', pad=8)
             plt.subplots_adjust(top = 0.91)
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.06,-0.06), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+                # add text next to it
+                ax.text(-0.025,-0.07, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=13,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
             # save plot
             plt.savefig("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png')
             # plt.show()
