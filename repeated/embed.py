@@ -1,9 +1,5 @@
 import discord
 from lib.colors import colors
-import sys
- 
-# setting path
-sys.path.append('..\lib')
 
 class Embed:
     embed = discord.Embed(title=f"Default Embed", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
