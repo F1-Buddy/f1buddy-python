@@ -12,6 +12,7 @@ from discord.ext import commands
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 from bs4 import BeautifulSoup
+from repeated.embed import Embed
 from lib.colors import colors
 # from lib.station_codes import stations
 
@@ -67,11 +68,11 @@ class Schedule(commands.Cog):
         now = pd.Timestamp.now()
 
         # setup embed
-        message_embed = discord.Embed(title="Schedule", description="")
-        message_embed.colour = colors.default
-        message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-        message_embed.set_thumbnail(
-            url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        dc_embed = Embed(title="Scedule",colour=colors.hot_pink,author=['f1buddy','https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png'],thumbnail_url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        # message_embed = discord.Embed(title="Schedule", description="")
+        # message_embed.colour = colors.default
+        # message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+        # message_embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
         # schedule object
         schedule = fastf1.get_event_schedule(2023, include_testing=True)
@@ -131,7 +132,7 @@ class Schedule(commands.Cog):
                     names=schedule.loc[next_event, "Country"], to='ISO2')).lower()+":"
 
             # Rename embed title
-            message_embed.title = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
+            dc_embed.embed.tiitle = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
 
             # create a dictionary to store converted times
             # adjust emojis/session name according to weekend format
@@ -184,7 +185,7 @@ class Schedule(commands.Cog):
                 # calculate timezone using latitude/longitude
                 convert_timezone_fallback(location,converted_session_times)
 
-            message_embed.set_footer(text="Times are displayed in EST") 
+            dc_embed.embed.set_footer(text="Times are displayed in EST") 
             # strings to store session names and times
             sessions_string = ''
             times_string = ''
@@ -235,38 +236,38 @@ class Schedule(commands.Cog):
                     # print(f"Time: {datapoint['time']}\tTemperature: {datapoint['temp']} C\tPrecipitation: {datapoint['prcp']}")
             # print(f"{fp1_date}\n{fp2_date}\n{quali_date}\n{sprint_date}\n{race_date}")
             else:
-                message_embed.set_footer(text="Weather forecast available within 72 hours of race • Times are displayed in EST") 
+                dc_embed.embed.set_footer(text="Weather forecast available within 72 hours of race • Times are displayed in EST") 
 
             # add fields to embed
-            message_embed.add_field(name="Session", value=sessions_string,inline=True)
-            message_embed.add_field(name="Time", value=times_string,inline=True)
+            dc_embed.embed.add_field(name="Session", value=sessions_string,inline=True)
+            dc_embed.embed.add_field(name="Time", value=times_string,inline=True)
             if (race_within_3days):
                 days = "Friday\nSaturday\nSunday"
-                message_embed.add_field(name="Weather Forecast:", value="",inline=False)
-                message_embed.add_field(name="Day", value=days,inline=True)
-                message_embed.add_field(name="Temperature", value=weather_string,inline=True)
-                message_embed.add_field(name="Precipitation", value=precip_string,inline=True)
+                dc_embed.embed.add_field(name="Weather Forecast:", value="",inline=False)
+                dc_embed.embed.add_field(name="Day", value=days,inline=True)
+                dc_embed.embed.add_field(name="Temperature", value=weather_string,inline=True)
+                dc_embed.embed.add_field(name="Precipitation", value=precip_string,inline=True)
 
-            message_embed.set_image(url=image_url)
+            dc_embed.embed.set_image(url=image_url)
             
         # probably off season / unsure        
         
         except IndexError:
             out_string = ('It is currently off season! :crying_cat_face:')
-            message_embed.set_image(
+            dc_embed.embed.set_image(
                 url='https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif')
-            message_embed.set_footer(text="*probably*")
+            dc_embed.embed.set_footer(text="*probably*")
         # all other errors
         except Exception as e:
             print(e)
-            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+            dc_embed.embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             out_string = "Unknown error occured! Uh-Oh! Bad! :thermometer_face:"
 
         #######################################################################
         # add final string to embed and send it
         #  ***3/1/2023 ^^ no longer needed since out_string doesnt contain info other than the current time
-        message_embed.description = out_string
-        await interaction.followup.send(embed=message_embed)
+        dc_embed.embed.description = out_string
+        await interaction.followup.send(embed=dc_embed.embed)
 
 
 async def setup(bot):
