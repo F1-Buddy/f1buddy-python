@@ -24,6 +24,23 @@ def countdown(totalseconds):
     out_string += f"{days} days, {hours} hours, {minutes} minutes, and {seconds} seconds until the race!"
     return out_string
 
+def get_weather_data(location):
+    weatherURL = "https://weatherapi-com.p.rapidapi.com/forecast.json"
+    querystring = {"q":location,"days":"3"}
+    headers = {
+        "X-RapidAPI-Key": config.weatherapiKEY,
+        "X-RapidAPI-Host": 'weatherapi-com.p.rapidapi.com'
+    }
+    response = requests.request("GET", weatherURL, headers=headers, params=querystring)
+    results = json.loads(response.content)
+    forecast = results['forecast']['forecastday']
+    weather_string = ""
+    precip_string = ""
+    for i in range(len(forecast)):
+        weather_string += ((str)(forecast[i]['day']['avgtemp_c'])+' °C\n')
+        precip_string += ((str)(forecast[i]['day']['totalprecip_mm'])+' mm\n')
+    return weather_string,precip_string
+
 def get_schedule():
     now = pd.Timestamp.now().tz_localize('America/New_York')
     # for testing
@@ -31,12 +48,10 @@ def get_schedule():
     # now = now + pd.DateOffset(days=-14)
 
     schedule = fastf1.get_event_schedule(now.year, include_testing=False)
-
     first_event_index = schedule.index[0]
     first_event_date = schedule.loc[first_event_index,'Session5DateUtc'].tz_localize("UTC")
     # say its off season if more than 2 weeks away from first race
     first_event_date = first_event_date + pd.DateOffset(days=-14)
-    # now = first_event_date
     last_event_index = schedule.index[len(schedule.index)-1]
     last_event_date = schedule.loc[last_event_index,'Session5DateUtc'].tz_localize("UTC")
     off_season = (last_event_date < now) or (now < first_event_date)
@@ -95,33 +110,17 @@ def get_schedule():
         for i in image:
             if 'circuit' in str(i.get('alt')).lower():
                 track_url = (i.get('data-src'))
-            
-        
-        # get weather data if race is within 3 days
-        time_to_race = converted_session_times.get(":checkered_flag: Race")-now
-        race_within_3days = time_to_race.total_seconds() < 259200
-        print(race_within_3days)
-        if (race_within_3days):
-            weatherURL = "https://weatherapi-com.p.rapidapi.com/forecast.json"
-            querystring = {"q":schedule.loc[next_event, "Location"],"days":"3"}
-            headers = {
-                "X-RapidAPI-Key": config.weatherapiKEY,
-                "X-RapidAPI-Host": 'weatherapi-com.p.rapidapi.com'
-            }
-            response = requests.request("GET", weatherURL, headers=headers, params=querystring)
-            results = json.loads(response.content)
-            forecast = results['forecast']['forecastday']
-            weather_string = ""
-            precip_string = ""
-            for i in range(len(forecast)):
-                weather_string += ((str)(forecast[i]['day']['avgtemp_c'])+' °C\n')
-                precip_string += ((str)(forecast[i]['day']['totalprecip_mm'])+' mm\n')
         
         # add final fields to embed
         dc_embed = em.Embed(title=title_string, description=description_string, image_url=track_url, footer='Times are displayed in EST')
         dc_embed.embed.add_field(name="Session", value=sessions_string,inline=True)
         dc_embed.embed.add_field(name="Time", value=times_string,inline=True)
+        
+        # get weather data if race is within 3 days
+        time_to_race = converted_session_times.get(":checkered_flag: Race")-now
+        race_within_3days = time_to_race.total_seconds() < 259200
         if (race_within_3days):
+            weather_string, precip_string = get_weather_data(schedule.loc[next_event, "Location"])
             days = "Friday\nSaturday\nSunday"
             dc_embed.embed.add_field(name="Weather Forecast:", value="",inline=False)
             dc_embed.embed.add_field(name="Day", value=days,inline=True)
