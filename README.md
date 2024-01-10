@@ -40,9 +40,8 @@ And more!!
 
 
 ## Changelog
-- started moving repeated code into classes (currently in repeated folder, rename later)
-- created cache script
-- add watermark to all graphs?
+- cleaned up schedule code
+- added new embeds to class
 
 
 ## To-do
