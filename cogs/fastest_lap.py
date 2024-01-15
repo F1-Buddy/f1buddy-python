@@ -15,7 +15,7 @@ fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 nationality_dict = nation_dictionary()
 current_year = datetime.date.today().year
-
+fastest_lap_embed = discord.Embed(title=f"Fastest Lap {year}", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix):
     session = fastf1.get_session(year, round_num, 'Race')
     session.load(laps=True,telemetry=False,weather=False,messages=False)

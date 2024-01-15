@@ -285,6 +285,7 @@ def avg_pos(sessiontype):
             try:
                 result_session.load(laps=False, telemetry=False, weather=False, messages=False)
                 resultsTable = result_session.results
+                print(resultsTable)
             except Exception as e:
                 print(e)
         except Exception as e:
@@ -310,6 +311,7 @@ def avg_pos(sessiontype):
                 # note that qualifying has blank column for Status
                 if sessiontype == "Race":
                     if status == 'Finished' or ('+' in status):
+                        print(status)
                         driver_positions.setdefault(row['FullName'], []).append(int(row['Position']))
                     else:
                         driver_positions.setdefault(row['FullName'], []).append(0)
