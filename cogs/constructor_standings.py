@@ -24,11 +24,14 @@ def get_constructor_standings(self, year):
             points = int(points)
         team_position.append(position)
         team_points.append(points)
-        names = constructor_standings.iloc[index]['constructorName']
+        name = constructor_standings.iloc[index]['constructorName']
         try:
-            team_names.append((str)(self.bot.get_emoji(team_emoji_ids[names])) + ' ' + names)
+            emoji = (str)(self.bot.get_emoji(team_emoji_ids[name]))
+            if (now.year != year and index == 0):
+                name = f"{constructor_standings.iloc[index]['constructorName']} :crown:"
+            team_names.append(emoji + ' ' + name)
         except:
-            team_names.append(names)
+            team_names.append(name)
     
     message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')

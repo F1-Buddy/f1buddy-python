@@ -47,7 +47,7 @@ def quali_results(self,year,round):
         print(round)
         result_session = fastf1.get_session(year, round, 'Qualifying')
         # most recent session found, load it
-        result_session.load()
+        result_session.load(laps=False, telemetry=False, weather=False, messages=False)
     else:
         event_round = None
         try:
@@ -65,7 +65,7 @@ def quali_results(self,year,round):
         
 
     # load session
-    result_session.load()
+    result_session.load(laps=False, telemetry=False, weather=False, messages=False)
     resultsTable = result_session.results
 
     # test print
