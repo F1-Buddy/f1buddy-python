@@ -10,6 +10,7 @@ test3.py
 
 /__pycache__/
 /cogs/__pycache__/
+/repeated/__pycache__/
 /cogsmotogp/__pycache__/
 /lib/__pycache__/
 /lib/colors.py
