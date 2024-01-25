@@ -8,13 +8,25 @@ from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from lib.colors import colors
+import fastf1
 
-now = pd.Timestamp.now()
+now = pd.Timestamp.now().tz_localize('America/New_York')
         
 def get_driver_standings(self, year):
     driver_name, driver_position, driver_points = [], [], []
     ergast = Ergast()
-    year = datetime.datetime.now().year if (year == None) or (year < 1957) or (year >= now.year) else year # set year depending on input
+    
+    # fixed not working during new year off season but still not great
+    # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
+    year_OoB = (year == None) or (year <= 1957) or (year >= now.year)
+    if not year_OoB:
+        year = year
+    else:
+        schedule = fastf1.get_event_schedule(now.year, include_testing=False)
+        first_event_index = schedule.index[0]
+        first_event_time = schedule.loc[first_event_index,'Session5DateUtc'].tz_localize("UTC")
+        if now < first_event_time:
+            year = now.year - 1
             
     # go through each
     driver_standings = ergast.get_driver_standings(season=year).content[0]
@@ -32,6 +44,9 @@ def get_driver_standings(self, year):
         constructor_name = driver_standings.iloc[index]['constructorNames']
         # if driver has drove for multiple teams
         constructor_name = constructor_name[0]
+        
+        # COME UP WITH A BETTER SYSTEM
+        # maybe store names in list instead, check if too long and edit list from there, create string after
         try:
             # discord runs out of character space after 21 drivers
             if (len(driver_standings) <= 22):
