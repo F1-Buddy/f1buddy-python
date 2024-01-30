@@ -27,14 +27,41 @@ class lightsoutgame(commands.Cog):
     @app_commands.command(name='lightsoutgame', description='lightsoutgame')
     async def schedule(self, interaction: discord.Interaction):
         # defer response
-        await interaction.response.defer()     
-        await interaction.followup.send(content="hi")
+        await interaction.response.defer(thinking=True)     
+        
+        # :black_circle: 
+        # :red_circle: 
+        
+        dc_embed = em.Embed(title="lights",description=":black_circle: :black_circle: :black_circle: :black_circle: \n\
+                                                        :black_circle: :black_circle: :black_circle: :black_circle: ")
+        await interaction.followup.send(embed=dc_embed.embed)
+        
+        msg = await interaction.original_response()
+        await msg.add_reaction("🔴")
+        
         await asyncio.sleep(1)
-        await interaction.edit_original_response(content="hhh")
-        loop = asyncio.get_running_loop()
-        # run query and build embed
-        loop.run_in_executor(None, lights, interaction)
-        loop.close()
+        dc_embed.embed.description =":red_circle: :black_circle: :black_circle: :black_circle: \n\
+                                     :red_circle: :black_circle: :black_circle: :black_circle: "
+        await interaction.edit_original_response(embed=dc_embed.embed)
+        await asyncio.sleep(1)
+        dc_embed.embed.description =":red_circle: :red_circle: :black_circle: :black_circle: \n\
+                                     :red_circle: :red_circle: :black_circle: :black_circle: "
+        await interaction.edit_original_response(embed=dc_embed.embed)
+        await asyncio.sleep(1)
+        dc_embed.embed.description =":red_circle: :red_circle: :red_circle: :black_circle: \n\
+                                     :red_circle: :red_circle: :red_circle: :black_circle: "
+        await interaction.edit_original_response(embed=dc_embed.embed)
+        await asyncio.sleep(1)
+        dc_embed.embed.description =":red_circle: :red_circle: :red_circle: :red_circle: \n\
+                                     :red_circle: :red_circle: :red_circle: :red_circle: "
+        await interaction.edit_original_response(embed=dc_embed.embed)
+        # print(msg)
+        await asyncio.sleep(1)
+        
+        # loop = asyncio.get_running_loop()
+        # # run query and build embed
+        # loop.run_in_executor(None, lights, interaction)
+        # loop.close()
         
         
 async def setup(bot):
