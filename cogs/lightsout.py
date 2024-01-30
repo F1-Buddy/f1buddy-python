@@ -27,8 +27,7 @@ class lightsoutgame(commands.Cog):
     async def schedule(self, interaction: discord.Interaction):
         # defer response
         await interaction.response.defer()     
-        msg = await interaction.followup.send(content="hi",wait=True)
-        await print(type(msg))
+        await interaction.followup.send(content="hi")
         await interaction.edit_original_response(content="hhh")
         # await print(type(msg2))
         # await interaction.response.edit_message(content="hello")
