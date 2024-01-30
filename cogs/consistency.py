@@ -32,6 +32,8 @@ def laptime_consistency(driver, year, round):
     # print(f"round = {round}")
     # print(f"type(year) = {type(year)}")
     # print(f"type(round) = {type(round)}")
+    
+    # fix for offseason!!!
     # check if args are valid
     if (year == None):
         year = now.year

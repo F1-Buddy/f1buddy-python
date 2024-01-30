@@ -45,6 +45,7 @@ And more!!
 
 
 ## To-do
+- [ ] fix wdc hitting discord embed character limit. current implementation is hardcoded, just calculate and adjust as necessary
 - [ ] IMPORTANT add telemetry option for just 1 driver and specific lap number (consider other commands)
 - [ ] (should fix asap, easy) add error handling embed for consistency when can't find race (e.g. 2018)
 - [ ] (should fix asap, easy) /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) 

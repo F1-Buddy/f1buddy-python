@@ -6,29 +6,36 @@ import pandas as pd
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
-from pytube import Search, YouTube
+from pytube import Search
 from lib.colors import colors
-now = pd.Timestamp.now()
+import repeated.embed as em
 
 fastf1.Cache.enable_cache('cache/')
 
 def results_result(self, year, round):
+    now = pd.Timestamp.now().tz_localize('America/New_York')
     # embed setup
     message_embed = discord.Embed(title=f"Race Results", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     message_embed.colour = colors.default
 
+    year_OoB = (year == None) or (year <= 1957) or (year >= now.year)
+    if not year_OoB:
+        year = year
+    else:
+        schedule = fastf1.get_event_schedule(now.year, include_testing=False)
+        first_event_index = schedule.index[0]
+        first_event_time = schedule.loc[first_event_index,'Session5DateUtc'].tz_localize("UTC")
+        if now < first_event_time:
+            year = now.year - 1
+
     # check if args are valid
-    if (year == None):
-        year = now.year
-    elif (year > now.year):
-        year = now.year
     if (round == None):
         # get latest completed session by starting from the end of calendar and going back towards beginning of season
         year_sched = fastf1.get_event_schedule(year,include_testing=False)
         round = (year_sched.shape[0])
         sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         # print(sessionTime)
-        while (now.tz_localize('America/New_York') < sessionTime):
+        while (now < sessionTime):
             round -= 1
             sessionTime = year_sched.loc[round,"Session5Date"].tz_convert('America/New_York')
         result_session = fastf1.get_session(year, round, 'Race')
@@ -42,7 +49,7 @@ def results_result(self, year, round):
         except:
             event_round = round
         result_session = fastf1.get_session(year, event_round, 'Race')
-        if (now.tz_localize('America/New_York') - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
+        if (now - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
             message_embed.title = "Race hasn't happened yet!!"
             message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             message_embed.description = "Round \"" + (str)(event_round) + "\" not found!"
@@ -100,15 +107,15 @@ def results_result(self, year, round):
     video_url = 'https://www.youtube.com/watch?v='
     t = (str)(s.results[0])
     video_url += (t[t.index('videoId=')+8:-1])
-    thumbnail = YouTube(video_url).thumbnail_url
+    # thumbnail = YouTube(video_url).thumbnail_url
 
     # build embed and return it
     message_embed.add_field(name = "Position", value = position_string,inline = True)
     message_embed.add_field(name = "Driver", value = driver_names,inline = True)
     message_embed.add_field(name = "Points", value = points_string,inline = True)
-    message_embed.add_field(name = "Race Highlights", value = video_url,inline = False)
-    message_embed.set_image(url=thumbnail)
-    return message_embed
+    # message_embed.add_field(name = "Race Highlights", value = video_url,inline = False)
+    # message_embed.set_image(url=thumbnail)
+    return message_embed,video_url
 
 class Results2(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -124,10 +131,11 @@ class Results2(commands.Cog):
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
         # run results query and build embed
-        results_embed = await loop.run_in_executor(None, results_result, self, year, round)
+        results_embed,video_url = await loop.run_in_executor(None, results_result, self, year, round)
         results_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         # send embed
         await interaction.followup.send(embed = results_embed)
+        await interaction.followup.send(video_url)
         loop.close()
 
 async def setup(bot):

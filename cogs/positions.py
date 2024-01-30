@@ -40,6 +40,8 @@ def positions_result(round, year):
     # get current time
     now = pd.Timestamp.now()
 
+# fix for offseason
+# rewrite
     try:
         # year given is invalid
         if year == None:

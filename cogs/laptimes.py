@@ -28,6 +28,8 @@ message_embed.set_thumbnail(
 url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
 def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional[int]):
+    # fix for offseason
+    # rewrite
     try:
         # year given is invalid
         try:

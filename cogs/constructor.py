@@ -13,10 +13,13 @@ from lib.colors import colors
 import country_converter as coco
 now = pd.Timestamp.now()
 
-# check if given year and round number are valid
+
+# this shit sucks
+# fix later
 def check_year(year,round):
     if not(year == None) and not(1950 <= year and year <= now.year):
         return "bad year"
+    # lol 
     elif not(round == None) and not(round >= 1) and not(round < 25):
         return "bad round number"
     else:
