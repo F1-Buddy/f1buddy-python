@@ -90,19 +90,24 @@ def telemetry_results(driver1: str, driver2: typing.Optional[str], lap_number: t
             title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
         else:
             try:
-                d1_targetlap = d1_laps.pick_lap(int(lap_number))
-                d2_targetlap = d2_laps.pick_lap(int(lap_number))
-                d1_fl = (race.laps.pick_driver(d1_number).pick_lap(int(lap_number))["LapTime"])
-                d2_fl = (race.laps.pick_driver(d2_number).pick_lap(int(lap_number))["LapTime"])
-                title = f"Lap {int(lap_number)} Telemetry"
+                d1_targetlap = d1_laps.pick_lap((lap_number))
+                d2_targetlap = d2_laps.pick_lap((lap_number))
+                d1_fl=race.laps.pick_driver(d1_number).pick_lap((lap_number))
+                d1_fl = d1_fl.loc[d1_fl.index[0],"LapTime"]
+                # print(d1_fl)
+                d2_fl=race.laps.pick_driver(d2_number).pick_lap((lap_number))
+                d2_fl = d2_fl.loc[d2_fl.index[0],"LapTime"]
+                # d1_fl = (race.laps.pick_driver(d1_number).pick_lap((lap_number))["LapTime"])
+                # d2_fl = (race.laps.pick_driver(d2_number).pick_lap((lap_number))["LapTime"])
+                title = f"Lap {lap_number} Telemetry"
             except:
                 return em.ErrorEmbed(error_message="Invalid lap number given"),None
 
         throttle_string = ""
         brake_string = ""
         
-        if (not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')) and (
-            not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png')):
+        if (not os.path.exists(f"cogs/plots/telemetry/{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype.name}_lap{str(lap_number)}_telemetry_{d1_name}vs{d2_name}.png")) and (
+            not os.path.exists(f"cogs/plots/telemetry/{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype.name}_lap{str(lap_number)}_telemetry_{d2_name}vs{d1_name}.png")):
             try:
                 # get lap telemetry
                 d1_tel = d1_targetlap.get_telemetry()
@@ -225,8 +230,8 @@ def telemetry_results(driver1: str, driver2: typing.Optional[str], lap_number: t
                     print(e)
                 # save plot
                 plt.rcParams['savefig.dpi'] = 300
-                plt.savefig("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png')
-                file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+                plt.savefig(f"cogs/plots/telemetry/{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype.name}_lap{str(lap_number)}_telemetry_{d1_name}vs{d2_name}.png")
+                file = discord.File(f"cogs/plots/telemetry/{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype.name}_lap{str(lap_number)}_telemetry_{d1_name}vs{d2_name}.png", filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
                 if sessiontype.name.startswith("FP"):
                     description = f"{race.date.year} {race.event.EventName} {sessiontype.name}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
@@ -237,20 +242,21 @@ def telemetry_results(driver1: str, driver2: typing.Optional[str], lap_number: t
                 plt.clf()
                 plt.cla()
                 plt.close()
-                return em.Embed(
-                        title=title,
-                        description=description
-                    ), file
+                # print("\n\ntest\n\n")
+                # print(title)
+                # print(description)
+                return em.Embed(title=title,description=description), file
             except Exception as f:
                 return em.ErrorEmbed(error_message=f),None
         # try to access the graph
         try:
             print("already exists")
-            file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
+            file = discord.File(f"cogs/plots/telemetry/{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype.name}_lap{str(lap_number)}_telemetry_{d1_name}vs{d2_name}.png", filename="image.png")
             # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
             description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
             # message_embed.set_footer(text='')
             print('found file')
+            print(title)
             return em.Embed(
                         title=title,
                         description=description
@@ -260,11 +266,12 @@ def telemetry_results(driver1: str, driver2: typing.Optional[str], lap_number: t
             print(e)
             # try to access the graph by switching driver1 and driver2 in filename
             # try:
-            file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
+            file = discord.File(f"cogs/plots/telemetry/{race.date.strftime('%Y-%m-%d_%I%M')}_{sessiontype.name}_lap{str(lap_number)}_telemetry_{d2_name}vs{d1_name}.png", filename="image.png")
             # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
             description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
             # message_embed.set_footer(text='')
             print("Swapped drivers around and found a file")
+            print(title)
             return em.Embed(
                         title=title,
                         description=description
@@ -309,24 +316,21 @@ class Telemetry(commands.Cog):
         # make sure inputs uppercase
         driver1 = driver1.upper()
         driver2 = driver2.upper()
+        print(driver1 == driver2)
         if driver1 == driver2:
             # message_embed.description = "Use 2 different drivers!"
-            await interaction.followup.send(embed=em.ErrorEmbed(error_message="Use 2 different drivers!"))
-            return
-
-        loop = asyncio.get_running_loop()
-        # run results query and build embed
-        dc_embed,file = await loop.run_in_executor(None, telemetry_results, driver1, driver2, lap_number, round, year, sessiontype)
-        # send embed
-        try:
-            dc_embed.embed.set_image(url='attachment://image.png')
-            dc_embed.embed.set_footer(text="*Some lap data may be missing")
-            await interaction.followup.send(embed=dc_embed.embed,file=file)
-        except:
-            dc_embed.embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            dc_embed.embed.description += "\nError Occured :("            
-            await interaction.followup.send(embed=dc_embed.embed)
-        loop.close()
+            await interaction.followup.send(embed=em.ErrorEmbed(error_message="Use 2 different drivers!").embed)
+        else:
+            loop = asyncio.get_running_loop()
+            # run results query and build embed
+            dc_embed,file = await loop.run_in_executor(None, telemetry_results, driver1, driver2, lap_number, round, year, sessiontype)
+            # send embed
+            if file != None:
+                dc_embed.embed.set_image(url='attachment://image.png')
+                await interaction.followup.send(embed=dc_embed.embed,file=file)
+            else:
+                await interaction.followup.send(embed=dc_embed.embed)
+            loop.close()
 
 
 async def setup(bot):

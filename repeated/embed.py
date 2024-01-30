@@ -2,11 +2,18 @@ import discord
 from lib.colors import colors
 
 class Embed:
-    embed = discord.Embed(title=f"Default Embed", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+    embed = discord.Embed(title=f"Default Embed", description="",).set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     embed.colour = colors.default
+    # embed.set_image(url=None)
+    # embed.set_footer(text='')
+    # embed.description = ''
     def __init__(self, title = None, description = None, colour = None, image_url = None,thumbnail_url = None,author = None, footer = None):
+        # necessary or else other info is retained in new command's embed
         self.embed.clear_fields()
+        self.embed.set_image(url=None)
+        self.embed.set_footer(text='')
+        self.embed.description = ''
         if not (title == None):
             self.embed.title = title
         if not (description == None):
@@ -23,6 +30,8 @@ class Embed:
             self.embed.set_footer(text=footer)
 class ErrorEmbed(Embed):
     def __init__(self,title = None, error_message = None,footer_message = None):
+        self.embed.clear_fields()
+        
         gif_url = 'https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif'
         super().__init__(title=title,
                          description='Error Occured :(\n'+error_message , 
@@ -31,6 +40,7 @@ class ErrorEmbed(Embed):
                          )
 class OffseasonEmbed(Embed):
     def __init__(self):
+        self.embed.clear_fields()
         gif_url = 'https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif'
         super().__init__(title='Race Schedule', 
                          description='It is currently off season! :crying_cat_face:', 

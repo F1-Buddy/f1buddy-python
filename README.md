@@ -45,6 +45,7 @@ And more!!
 
 
 ## To-do
+- [ ] rewrite telemetry to take an optional second driver, also consider folder structure instead of current filenaming
 - [ ] fix wdc hitting discord embed character limit. current implementation is hardcoded, just calculate and adjust as necessary
 - [ ] IMPORTANT add telemetry option for just 1 driver and specific lap number (consider other commands)
 - [ ] (should fix asap, easy) add error handling embed for consistency when can't find race (e.g. 2018)
