@@ -137,7 +137,7 @@ class constructor(commands.Cog):
         try:
             # run query and build embed
             constructor_embed = await loop.run_in_executor(None, get_constructor_info, self, year, round)
-            constructor_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+            # constructor_embed.set_author(name='f1buddy', icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
             # send embed
             await interaction.followup.send(embed=constructor_embed)
         except Exception as e:
