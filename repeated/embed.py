@@ -22,12 +22,12 @@ class Embed:
         if not (footer == None):
             self.embed.set_footer(text=footer)
 class ErrorEmbed(Embed):
-    def __init__(self,title = None, error_message = None):
+    def __init__(self,title = None, error_message = None,footer_message = None):
         gif_url = 'https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif'
         super().__init__(title=title,
-                         description='Error Occured :(', 
+                         description='Error Occured :(\n'+error_message , 
                          image_url=gif_url,  
-                         footer=error_message
+                         footer=footer_message
                          )
 class OffseasonEmbed(Embed):
     def __init__(self):
