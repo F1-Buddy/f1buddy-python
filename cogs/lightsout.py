@@ -13,7 +13,8 @@ from discord.ext import commands
 import repeated.embed as em
 
 
-
+async def lights(interaction):
+    print(interaction)
         
 class lightsoutgame(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -28,10 +29,12 @@ class lightsoutgame(commands.Cog):
         # defer response
         await interaction.response.defer()     
         await interaction.followup.send(content="hi")
+        await asyncio.sleep(1)
         await interaction.edit_original_response(content="hhh")
-        # await print(type(msg2))
-        # await interaction.response.edit_message(content="hello")
-        # loop.close()
+        loop = asyncio.get_running_loop()
+        # run query and build embed
+        loop.run_in_executor(None, lights, interaction)
+        loop.close()
         
         
 async def setup(bot):

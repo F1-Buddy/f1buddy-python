@@ -14,7 +14,8 @@ import matplotlib.patches as mpatches
 import matplotlib
 # from matplotlib.ticker import (MultipleLocator)
 matplotlib.use('agg')
-from lib.colors import colors
+# from lib.colors import colors
+import repeated.embed as em
 import pandas as pd
 import fastf1.plotting as f1plt
 
@@ -25,11 +26,11 @@ now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
 
 # setup embed
-message_embed = discord.Embed(title="Fastest Lap Telemetry", description="")
-message_embed.colour = colors.default
-message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-message_embed.set_thumbnail(
-url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+# message_embed = discord.Embed(title="Fastest Lap Telemetry", description="")
+# message_embed.colour = colors.default
+# message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+# message_embed.set_thumbnail(
+# url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
 
 def td_to_laptime(td):
     td_microseconds = td.microseconds
@@ -39,14 +40,7 @@ def td_to_laptime(td):
     td_thousandths = str(td_microseconds)[:-3].zfill(3)
     return f"{td_minutes}:{td_seconds}.{td_thousandths}"
 
-def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Optional[int], sessiontype):
-    message_embed.description = ""
-    if sessiontype.name.startswith("FP"):
-        message_embed.title = f"Fastest Lap {sessiontype.name} Telemetry"
-    else:
-        message_embed.title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
-    message_embed.set_footer(text="")
-    # pyplot setup
+def telemetry_results(driver1: str, driver2: typing.Optional[str], lap_number: typing.Optional[int], round:typing.Optional[str], year: typing.Optional[int], sessiontype):
     f1plt.setup_mpl()
     fig, ax = plt.subplots(3, figsize=(13,9))
     fig.set_facecolor('black')
@@ -73,23 +67,36 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
         except ValueError:
             event_round = round
 
-        race = fastf1.get_session(event_year, event_round, sessiontype.value)
-        # check if graph already exists, if not create it
-        race.load(laps=True,telemetry=True,weather=False,messages=False)
-        message_embed.description = race.event.EventName
+        try:
+            race = fastf1.get_session(event_year, event_round, sessiontype.value)
+            race.load(laps=True,telemetry=True,weather=False,messages=False)
+        except:
+            return em.ErrorEmbed(error_message=f"{event_year} Round {event_round} not found"), None
+        
+        # message_embed.description = race.event.EventName
         d1_laps = race.laps.pick_driver(driver1)
-        d1_fastest = d1_laps.pick_fastest()
         d1_number = d1_laps.iloc[0].loc['DriverNumber']
         d1_name = driver1
         
         d2_laps = race.laps.pick_driver(driver2)
-        # print(d2_laps)
-        d2_fastest = d2_laps.pick_fastest()
-        # print(d2_fastest)
         d2_number = d2_laps.iloc[0].loc['DriverNumber']
         d2_name = driver2
-        d1_fl = (race.laps.pick_driver(d1_number).pick_fastest()["LapTime"])
-        d2_fl = (race.laps.pick_driver(d2_number).pick_fastest()["LapTime"])
+        
+        if lap_number == None:
+            d1_targetlap = d1_laps.pick_fastest()
+            d2_targetlap = d2_laps.pick_fastest()
+            d1_fl = (race.laps.pick_driver(d1_number).pick_fastest()["LapTime"])
+            d2_fl = (race.laps.pick_driver(d2_number).pick_fastest()["LapTime"])
+            title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
+        else:
+            try:
+                d1_targetlap = d1_laps.pick_lap(int(lap_number))
+                d2_targetlap = d2_laps.pick_lap(int(lap_number))
+                d1_fl = (race.laps.pick_driver(d1_number).pick_lap(int(lap_number))["LapTime"])
+                d2_fl = (race.laps.pick_driver(d2_number).pick_lap(int(lap_number))["LapTime"])
+                title = f"Lap {int(lap_number)} Telemetry"
+            except:
+                return em.ErrorEmbed(error_message="Invalid lap number given"),None
 
         throttle_string = ""
         brake_string = ""
@@ -98,8 +105,8 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
             not os.path.exists("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png')):
             try:
                 # get lap telemetry
-                d1_tel = d1_fastest.get_telemetry()
-                d2_tel = d2_fastest.get_telemetry()
+                d1_tel = d1_targetlap.get_telemetry()
+                d2_tel = d2_targetlap.get_telemetry()
                 
                 # set graph limit based on data
                 ax[0].set_ylim([0, max(max(d1_tel['Speed']),max(d2_tel['Speed']))+10])
@@ -222,46 +229,54 @@ def telemetry_results(driver1: str, driver2: str, round:str, year: typing.Option
                 file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
                 # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
                 if sessiontype.name.startswith("FP"):
-                    message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+                    description = f"{race.date.year} {race.event.EventName} {sessiontype.name}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
                 else:
-                    message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+                    description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
                 # message_embed.description += "\n" + throttle_string + brake_string
                 # reset plot just in case
                 plt.clf()
                 plt.cla()
                 plt.close()
-                return file
+                return em.Embed(
+                        title=title,
+                        description=description
+                    ), file
             except Exception as f:
-                traceback.print_exc()
+                return em.ErrorEmbed(error_message=f),None
         # try to access the graph
         try:
             print("already exists")
             file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-            message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
-            message_embed.set_footer(text='')
+            description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+            # message_embed.set_footer(text='')
             print('found file')
-            return file
+            return em.Embed(
+                        title=title,
+                        description=description
+                    ), file
         
         except Exception as e:
             print(e)
             # try to access the graph by switching driver1 and driver2 in filename
-            try:
-                file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
-                # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
-                message_embed.description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
-                message_embed.set_footer(text='')
-                print("Swapped drivers around and found a file")
-                return file
+            # try:
+            file = discord.File("cogs/plots/telemetry/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_telemetry_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
+            # message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ " "+sessiontype.name.capitalize()+ '\n' + driver1+" vs "+driver2
+            description = f"{race.date.year} {race.event.EventName} {sessiontype.name.capitalize()}\n{driver1}: {td_to_laptime(d1_fl)}\n{driver2}: {td_to_laptime(d2_fl)}\nΔ = ±{td_to_laptime(abs(d1_fl-d2_fl))}"
+            # message_embed.set_footer(text='')
+            print("Swapped drivers around and found a file")
+            return em.Embed(
+                        title=title,
+                        description=description
+                    ), file
             # file does not exist and could not be created
-            except:
-                message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
-                return
+            # except:
+            #     message_embed.set_footer(text="Likely an unsupported input (year/round) was given \n *(2018+)*")
+            #     return
     # 
     except Exception as e:
-        print(e)
-        traceback.print_exc()
-        message_embed.set_footer(text = e)
+        # other error, should not be possible
+        return em.ErrorEmbed(error_message=e), None
     
 class Telemetry(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -271,7 +286,7 @@ class Telemetry(commands.Cog):
     async def on_ready(self):
         print('Telemetry cog loaded')
 
-    @app_commands.command(name='telemetry', description='See telemetry between 2 drivers on their fastest laps in a race')
+    @app_commands.command(name='telemetry', description='Compare telemetry between 2 drivers on a specific lap, leave blank for respective fastest laps')
     @app_commands.describe(sessiontype='Choose between Race or Qualifying')
     @app_commands.choices(sessiontype=[
         app_commands.Choice(name="FP1", value="FP1"),
@@ -287,7 +302,7 @@ class Telemetry(commands.Cog):
     @app_commands.describe(year = "Year")
     
     # command
-    async def telemetry(self, interaction: discord.Interaction, driver1: str, driver2: str, round:str, sessiontype: app_commands.Choice[str], year: typing.Optional[int]):
+    async def telemetry(self, interaction: discord.Interaction, driver1: str, driver2: str, lap_number: typing.Optional[int], round:str, sessiontype: app_commands.Choice[str], year: typing.Optional[int]):
         # defer reply for later
         await interaction.response.defer()
             
@@ -295,22 +310,22 @@ class Telemetry(commands.Cog):
         driver1 = driver1.upper()
         driver2 = driver2.upper()
         if driver1 == driver2:
-            message_embed.description = "Use 2 different drivers!"
-            await interaction.followup.send(embed=message_embed)
+            # message_embed.description = "Use 2 different drivers!"
+            await interaction.followup.send(embed=em.ErrorEmbed(error_message="Use 2 different drivers!"))
             return
 
         loop = asyncio.get_running_loop()
         # run results query and build embed
-        file = await loop.run_in_executor(None, telemetry_results, driver1, driver2, round, year, sessiontype)
+        dc_embed,file = await loop.run_in_executor(None, telemetry_results, driver1, driver2, lap_number, round, year, sessiontype)
         # send embed
         try:
-            message_embed.set_image(url='attachment://image.png')
-            message_embed.set_footer(text="*Some lap data may be missing")
-            await interaction.followup.send(embed=message_embed,file=file)
+            dc_embed.embed.set_image(url='attachment://image.png')
+            dc_embed.embed.set_footer(text="*Some lap data may be missing")
+            await interaction.followup.send(embed=dc_embed.embed,file=file)
         except:
-            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            message_embed.description += "\nError Occured :("            
-            await interaction.followup.send(embed=message_embed)
+            dc_embed.embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+            dc_embed.embed.description += "\nError Occured :("            
+            await interaction.followup.send(embed=dc_embed.embed)
         loop.close()
 
 
