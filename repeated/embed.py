@@ -1,6 +1,6 @@
 import discord
 from lib.colors import colors
-
+import random
 class Embed:
     
     # embed.set_image(url=None)
@@ -48,8 +48,13 @@ class OffseasonEmbed(Embed):
         self.embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         self.embed.colour = colors.default
         self.embed.clear_fields()
-        gif_url = 'https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif'
+        gif_urls = ['https://media.tenor.com/kdIoxRG4W4QAAAAC/crying-crying-kid.gif',
+                    'https://media1.tenor.com/m/Aopm1M7LJSUAAAAd/toto-smash-toto-wolff.gif',
+                    'https://media1.tenor.com/m/SM_22nlNWhkAAAAC/fernando-alonso-alonso.gif',
+                    'https://media1.tenor.com/m/9atYe_gKtbMAAAAd/sainz-sainz-jr.gif',
+                    'https://media1.tenor.com/m/YlbGgdszkpEAAAAC/george-russel-f1.gif',
+                    ]
         super().__init__(title='Race Schedule', 
                          description='It is currently off season! :crying_cat_face:', 
-                         image_url=gif_url
+                         image_url=random.choice(gif_urls)
                          )
