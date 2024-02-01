@@ -11,6 +11,7 @@ from discord import app_commands
 from discord.ext import commands
 from bs4 import BeautifulSoup
 import repeated.embed as em
+import repeated.common as cm
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -51,23 +52,14 @@ def get_schedule():
 
     schedule = fastf1.get_event_schedule(now.year, include_testing=False)
     first_event_index = schedule.index[0]
-    first_event_date = schedule.loc[first_event_index,'Session5DateUtc'].tz_localize("UTC")
-    # say its off season if more than 2 weeks away from first race
-    first_event_date = first_event_date + pd.DateOffset(days=-14)
-    last_event_index = schedule.index[len(schedule.index)-1]
-    last_event_date = schedule.loc[last_event_index,'Session5DateUtc'].tz_localize("UTC")
-    off_season = (last_event_date < now) or (now < first_event_date)
+    off_season = cm.currently_offseason()[0] | cm.currently_offseason()[1]
 
     if off_season:
         dc_embed = em.OffseasonEmbed()
         return dc_embed
     else:
         # get next event
-        next_event = first_event_index
-        curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
-        while (curr_event_date < now):
-            next_event += 1
-            curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
+        next_event = cm.latest_completed_index(year=now.year) + 1
 
         # convert each session to EST  
         if (schedule.loc[next_event, "EventFormat"] == 'conventional'):
