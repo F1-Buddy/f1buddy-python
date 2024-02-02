@@ -217,20 +217,19 @@ class Telemetry(commands.Cog):
         await interaction.response.defer()
             
         driver1 = driver1.upper()
-        if not driver2 == None:
+        if not (driver2 == None):
             driver2 = driver2.upper()
             if driver1 == driver2:
                 await interaction.followup.send(embed=em.ErrorEmbed(error_message="Use 2 different drivers!").embed)
+        loop = asyncio.get_running_loop()
+        # run results query and build embed
+        dc_embed,file = await loop.run_in_executor(None, get_embed_and_image, driver1, driver2, year, round, lap_number, sessiontype.name)
+        # send embed
+        if file != None:
+            await interaction.followup.send(embed=dc_embed.embed,file=file)
         else:
-            loop = asyncio.get_running_loop()
-            # run results query and build embed
-            dc_embed,file = await loop.run_in_executor(None, get_embed_and_image, driver1, driver2, year, round, lap_number, sessiontype.name)
-            # send embed
-            if file != None:
-                await interaction.followup.send(embed=dc_embed.embed,file=file)
-            else:
-                await interaction.followup.send(embed=dc_embed.embed)
-            loop.close()
+            await interaction.followup.send(embed=dc_embed.embed)
+        loop.close()
 
 
 async def setup(bot):
