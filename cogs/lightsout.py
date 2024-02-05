@@ -1,17 +1,9 @@
 import asyncio
 import random
-import datetime
-import time
 import discord
-import typing
 import traceback
-import pandas as pd
-# from fastf1.ergast import Ergast
-# import fastf1
 from discord import app_commands
 from discord.ext import commands
-# from lib.emojiid import team_emoji_ids
-# from lib.colors import colors
 import repeated.embed as em
 
 
