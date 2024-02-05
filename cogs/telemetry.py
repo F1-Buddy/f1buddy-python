@@ -176,7 +176,8 @@ def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype):
         round_num = (round_num[round_num.index('Round')+6:round_num.index(':')])
         
         folder_path = f'./cogs/plots/telemetry/{event_year}/{round_num}/{sessiontype.name}/'
-        file_path = f'./cogs/plots/telemetry/{event_year}/{round_num}/{sessiontype.name}/{lap_number}_{''.join(driver_list)}.png'
+        file_name = f'{lap_number}_{''.join(driver_list)}.png'
+        file_path = f'./cogs/plots/telemetry/{{event_year}}/{{round_num}}/{{sessiontype.name}}/{file_name}'
         if not (os.path.exists(file_path)):
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
