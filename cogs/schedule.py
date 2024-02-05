@@ -144,9 +144,9 @@ class Schedulenew(commands.Cog):
 
     @app_commands.command(name='schedule', description='get F1 race schedule')
     async def schedule(self, interaction: discord.Interaction):
+        await interaction.response.defer()
         # defer response
         try:
-            await interaction.response.defer()     
             loop = asyncio.get_running_loop()   
             dc_embed = await loop.run_in_executor(None, get_schedule)
             await interaction.followup.send(embed=dc_embed.embed)
