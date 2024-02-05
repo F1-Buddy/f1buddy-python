@@ -38,7 +38,7 @@ class ErrorEmbed(Embed):
         
         gif_url = 'https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif'
         super().__init__(title=title,
-                         description='Error Occured :(\n'+error_message , 
+                         description='Error Occured :(\n'+str(error_message) , 
                          image_url=gif_url,  
                          footer=footer_message
                          )
@@ -56,5 +56,6 @@ class OffseasonEmbed(Embed):
                     ]
         super().__init__(title='Race Schedule', 
                          description='It is currently off season! :crying_cat_face:', 
-                         image_url=random.choice(gif_urls)
+                         image_url=random.choice(gif_urls),
+                         footer="Schedule will be available 2 weeks before the first GP"
                          )

@@ -28,7 +28,7 @@ class Sync(commands.Cog):
             print("Synced commands")
             user = self.bot.get_user(ctx.message.author.id)
             # send message
-            await ctx.send(f'{user} synced {commands} commands')
+            await ctx.send(f'{user.mention} synced {commands} commands')
             print("Replied")
         # other user tries to sync
         else:

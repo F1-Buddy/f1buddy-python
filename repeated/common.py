@@ -19,15 +19,15 @@ def currently_offseason():
 
 def latest_completed_index(year):
     now = pd.Timestamp.now().tz_localize('America/New_York')
+    # for testing
     # now = pd.Timestamp(year=2023, month=5, day=6).tz_localize('America/New_York')
     schedule = fastf1.get_event_schedule(year, include_testing=False)
     first_index = schedule.index[0]
     next_event = first_index
     curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
     while ((curr_event_date < now) & (next_event < schedule.index[len(schedule.index)-1]) ):
+        # print(schedule.loc[next_event,'EventName'])
         next_event += 1
         curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
+    # print(schedule.loc[next_event,'EventName'])
     return next_event
-
-# print(fastf1.get_event_schedule(2023, include_testing=False))
-# print(fastf1.get_event(2023,latest_completed_index(2023)))

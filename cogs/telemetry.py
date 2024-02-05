@@ -66,7 +66,7 @@ def plot_telem(driver_list, lap_number: typing.Optional[int], event_round, event
 
     plt.subplots_adjust(left = 0.07, right = 0.98, top = 0.89, hspace=0.8)
 
-    race = fastf1.get_session(event_year, event_round, sessiontype)
+    race = fastf1.get_session(event_year, event_round, sessiontype.value)
     race.load(laps=True,telemetry=True,weather=False,messages=False)
     f = open(file_path[:-3]+'txt', 'w')
     f.write(f'{str(race)}\n')
@@ -150,7 +150,10 @@ def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype):
         return em.ErrorEmbed(error_message="Enter a valid year from 2018 to now"), None
     else:
         event_year = year
-    event_round = round
+    try:
+        event_round = int(round)
+    except:
+        event_round = round
     driver_list = []
 
     driver_list.append(driver1.upper())
@@ -159,21 +162,21 @@ def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype):
     driver_list = sorted(driver_list)
     
     if lap_number == None:
-        title = f"Fastest Lap {sessiontype.capitalize()} Telemetry"
+        title = f"Fastest Lap {sessiontype.name.capitalize()} Telemetry"
     else:
         title = f"Lap {lap_number} Telemetry"
-
     try:
-        race = fastf1.get_session(event_year, event_round, sessiontype)
+        race = fastf1.get_session(event_year, event_round, sessiontype.value)
     except Exception as e:
         # catch bad round
+        traceback.print_exc()
         return em.ErrorEmbed(error_message=f"{type(e)}: {str(e)}\nError getting round, likely bad input given"), None
     try:
         round_num = str(race)
         round_num = (round_num[round_num.index('Round')+6:round_num.index(':')])
         
-        folder_path = f'./cogs/plots/telemetry/{event_year}/{round_num}/{sessiontype}/'
-        file_path = f'./cogs/plots/telemetry/{event_year}/{round_num}/{sessiontype}/{lap_number}_{''.join(driver_list)}.png'
+        folder_path = f'./cogs/plots/telemetry/{event_year}/{round_num}/{sessiontype.name}/'
+        file_path = f'./cogs/plots/telemetry/{event_year}/{round_num}/{sessiontype.name}/{lap_number}_{''.join(driver_list)}.png'
         if not (os.path.exists(file_path)):
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
@@ -221,9 +224,10 @@ class Telemetry(commands.Cog):
             driver2 = driver2.upper()
             if driver1 == driver2:
                 await interaction.followup.send(embed=em.ErrorEmbed(error_message="Use 2 different drivers!").embed)
+                return
         loop = asyncio.get_running_loop()
         # run results query and build embed
-        dc_embed,file = await loop.run_in_executor(None, get_embed_and_image, driver1, driver2, year, round, lap_number, sessiontype.name)
+        dc_embed,file = await loop.run_in_executor(None, get_embed_and_image, driver1, driver2, year, round, lap_number, sessiontype)
         # send embed
         if file != None:
             await interaction.followup.send(embed=dc_embed.embed,file=file)
