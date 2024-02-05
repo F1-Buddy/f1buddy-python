@@ -90,7 +90,9 @@ def get_schedule():
             sessions_string = ''
             times_string = ''
             for key in converted_session_times.keys():
-                times_string += f'<t:{(converted_session_times.get(key) - pd.Timestamp("1970-01-01").tz_localize('UTC')) // pd.Timedelta('1s')}:f>\n'
+                curr_time = converted_session_times.get(key)
+                tdelta = int((curr_time - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
+                times_string += f'<t:{tdelta}:f>\n'
                 # times_string += '`'+(converted_session_times.get(key)).strftime('%I:%M%p on %Y/%m/%d') + "`\n"
                 sessions_string += key + '\n'
             
