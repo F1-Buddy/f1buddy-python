@@ -37,7 +37,7 @@ def get_data(year, session_type):
     # the code for this is kinda bad and complicated so imma leave comments for when i forget what any of this does
     team_list = {}
     driver_country = {}
-    outstring = ''
+    # outstring = ''
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
     for c in range(min(schedule.index), max(schedule.index)+1):
     # for c in range(min(schedule.index),min(schedule.index)+5):
@@ -86,11 +86,10 @@ def get_data(year, session_type):
             
             # figure out which races to ignore
             both_drivers_finished = True
-            dnf = ['D','E','W','F','N']
+            dnf = ['R','D','E','W','F','N']
             for driver in team_results.index:
-                if ((team_results.loc[driver,'ClassifiedPosition']) in dnf):# | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
-                    if (team_results.loc[driver,'Abbreviation'] == 'SAR'):
-                        outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
+                if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
+                    # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did {team_results.loc[driver,'ClassifiedPosition']}\n')
                     both_drivers_finished = False
             
             # if include this race, then update the driver pairing's h2h "points"
@@ -104,7 +103,7 @@ def get_data(year, session_type):
                     # print(f'curr_value = {curr_value}')
                     team_list.get(i).get(pairing).update({curr_abbr:curr_value+1})
                     team_list.get(i).get(pairing).update({'round_updated':True})
-    return team_list,driver_country , outstring
+    return team_list,driver_country #, outstring
 
 def print_data(data):
     for team in data.keys():
@@ -118,23 +117,59 @@ def print_data(data):
 def h2h_embed(self,data,year,session_type):
     title = f"Teammate {session_type.name} Head to Head {year}"
     description = ''
-    for team in data.keys():
-        description += f'{self.bot.get_emoji(emoji.team_emoji_ids.get(team))}\n'
+    print(title)
+    try:
+        for team in data.keys():
+            for pairing in data.get(team).keys():
+                drivers = []
+                for driver in data.get(team).get(pairing):
+                    if not (driver == 'round_updated'):
+                        drivers.append(driver)
+                description += f' {drivers[0]} {data.get(team).get(pairing).get(drivers[0])} {self.bot.get_emoji(emoji.team_emoji_ids.get(team))} {data.get(team).get(pairing).get(drivers[1])} {drivers[1]}\n'
+    except:
+        traceback.print_exc()
     print(description)
+    return title, description
     
 
-def main(year, session_type):
+def get_embed(self, year, session_type):
     if (year is None):
         year = now.year
         if cm.currently_offseason()[0]:
             year = year - 1
     
-    data,countries, out = get_data(year, session_type)
+    data,countries = get_data(year, session_type)
     # for country in countries.values():
     #     print(f":flag_{coco.convert(names=country,to="ISO2",not_found=None).lower()}:")
     print_data(data)
-    # h2h_embed(data,year,session_type)
+    return h2h_embed(self, data,year,session_type)
     # print(out)
     
-sessiontype = session_type('Race','r')
-main(2023, sessiontype)
+# sessiontype = session_type('Race','r')
+# main(2023, sessiontype)
+class h2hnew(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print('H2H V2 cog loaded')  
+    @app_commands.command(name='h2h', description='See head to head stats of specific drivers or teammate pairings.')
+    @app_commands.describe(year = "Year")
+    @app_commands.describe(session_type='Choose between Qualifying or Race')
+    @app_commands.choices(session_type=[app_commands.Choice(name="Race", value="Race"), 
+                                 app_commands.Choice(name="Qualifying", value="Qualifying"),])
+    
+    async def h2hnew(self, interaction: discord.Interaction, year: typing.Optional[int], session_type: app_commands.Choice[str]):  
+        await interaction.response.defer()
+        loop = asyncio.get_running_loop()
+
+        title, description = await loop.run_in_executor(None, get_embed, self, year, session_type)
+        # results_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+        # send embed
+        await interaction.followup.send(content=f"{title}\n{description}")
+        # await interaction.followup.send(video_url)
+        loop.close()
+
+async def setup(bot):
+    await bot.add_cog(h2hnew(bot) # , guilds=[discord.Object(id=884602392249770084)]
+                      )
