@@ -12,6 +12,11 @@ from numpy import mean
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
 import matplotlib
+import matplotlib.image as mpim
+from PIL import Image
+import urllib.request
+import io
+import numpy as np
 # from matplotlib.ticker import (MultipleLocator)
 # matplotlib.use('agg')
 # from lib.colors import colors
@@ -36,6 +41,8 @@ class session_type:
 def get_data(year, session_type):
     # the code for this is kinda bad and complicated so imma leave comments for when i forget what any of this does
     team_list = {}
+    color_list = {}
+    check_list = {}
     driver_country = {}
     outstring = ''
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
@@ -55,21 +62,16 @@ def get_data(year, session_type):
         # EX: if VER finished ahead of PER, first VER is updated to +1, boolean is set to true, 
         # that way when loop gets to PER it doesnt add +1 to VER again since boolean is true
         # until the next race when they can be updated again
-        for i in team_list.keys():
-            for c in team_list.get(i).keys():
-                team_list.get(i).get(c).update({'round_updated':False})
+        for i in check_list.keys():
+            check_list.update({i:False})
         
-        for i in results['TeamName']:
-            team_results = results.loc[lambda df: df['TeamName'] == i]
+        for i in results['TeamId']:
+            team_results = results.loc[lambda df: df['TeamId'] == i]
+            # testing
             # if (i == "Ferrari"):
             #     print(team_results)
-            #     print(team_results.loc[team_results.index[1],'ClassifiedPosition'])
-            drivers = []
-            for j in team_results.index:
-                drivers.append(team_results.loc[j,'Abbreviation'])
-            drivers = sorted(drivers)
-            pairing = ''.join(drivers)
-            # create dictionary entries if not existing
+            # print(team_results[['Abbreviation','ClassifiedPosition','Status','TeamColor','TeamId']])
+                
             # dictionary format:
             # teamName:
             #   driverPairing:
@@ -77,34 +79,42 @@ def get_data(year, session_type):
             #       otherDriver: #ofRacesFinishedAheadofTeammate
             if (team_list.get(i) is None):
                 team_list.update({i:{}})
+                color_list.update({i:team_results.loc[min(team_results.index),'TeamColor']})
+
+            drivers = []
+            for j in team_results.index:
+                drivers.append(team_results.loc[j,'Abbreviation'])
+            drivers = sorted(drivers)
+            pairing = ''.join(drivers)
+
             if (team_list.get(i).get(pairing) is None):
                 team_list.get(i).update({pairing:{}})
-            
-            # print(pairing)
-            # print(team_list)
+
             curr_abbr = team_results.loc[team_results.index[0],'Abbreviation']
             
             # figure out which races to ignore
             both_drivers_finished = True
             dnf = ['D','E','W','F','N']
             for driver in team_results.index:
-                if ((team_results.loc[driver,'ClassifiedPosition']) in dnf):# | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
-                    if (team_results.loc[driver,'Abbreviation'] == 'SAR'):
-                        outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
+                if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
+                    # for testing
+                    # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
                     both_drivers_finished = False
             
-            # if include this race, then update the driver pairing's h2h "points"
-            if (both_drivers_finished):
-                if (team_list.get(i).get(pairing).get(curr_abbr) is None):
-                    team_list.get(i).get(pairing).update({curr_abbr:0})
-                if (team_list.get(i).get(pairing).get('round_updated') is None):
-                    team_list.get(i).get(pairing).update({'round_updated':False})
-                if not team_list.get(i).get(pairing).get('round_updated'):
-                    curr_value = team_list.get(i).get(pairing).get(curr_abbr)
-                    # print(f'curr_value = {curr_value}')
+            if (team_list.get(i).get(pairing).get(curr_abbr) is None):
+                team_list.get(i).get(pairing).update({curr_abbr:0})
+            if (check_list.get(i) is None):
+                check_list.update({i:False})
+            if not check_list.get(i):
+                curr_value = team_list.get(i).get(pairing).get(curr_abbr)
+                # if include this race, then update the driver pairing's h2h "points"
+                if (both_drivers_finished):
                     team_list.get(i).get(pairing).update({curr_abbr:curr_value+1})
-                    team_list.get(i).get(pairing).update({'round_updated':True})
-    return team_list,driver_country , outstring
+                    check_list.update({i:True})
+            else:
+                curr_value = team_list.get(i).get(pairing).get(curr_abbr)
+                team_list.get(i).get(pairing).update({curr_abbr:curr_value})
+    return team_list,color_list #, outstring
 
 def print_data(data):
     for team in data.keys():
@@ -112,8 +122,7 @@ def print_data(data):
         for pairing in data.get(team).keys():
             print(f'    {pairing}:')
             for driver in data.get(team).get(pairing):
-                if not (driver == 'round_updated'):
-                    print(f'        {driver}: {data.get(team).get(pairing).get(driver)}')
+                print(f'        {driver}: {data.get(team).get(pairing).get(driver)}')
 
 def h2h_embed(self,data,year,session_type):
     title = f"Teammate {session_type.name} Head to Head {year}"
@@ -122,6 +131,55 @@ def h2h_embed(self,data,year,session_type):
         description += f'{self.bot.get_emoji(emoji.team_emoji_ids.get(team))}\n'
     print(description)
     
+def make_plot(data,colors,year,session_type):
+    f1plt.setup_mpl()
+    fig, ax = plt.subplots(1, figsize=(13,9))
+    fig.set_facecolor('black')
+    ax.set_facecolor('black')
+    fig.suptitle(f'{year} {session_type.name} Head to Head',fontproperties=bold_font,size=20,y=0.95)
+    offset = 0
+    for team in data.keys():
+        for pairing in data.get(team).keys():
+            drivers = list(data.get(team).get(pairing).keys())
+            driver_wins = list(data.get(team).get(pairing).values())
+            driver_wins[1] = -1 * driver_wins[1]
+            # print(drivers)
+            # print(driver_wins)
+            color = ''
+            if not ((colors.get(team).lower() == 'nan') | (colors.get(team).lower() == '')):
+                color = f'#{colors.get(team).lower()}'
+            ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
+            # url = f'https://cdn.discordapp.com/emojis/{emoji.team_emoji_ids.get(team)}.webp?&quality=lossless'
+            # print(url)
+            # with urllib.request.urlopen(url) as url:
+            #     f = io.BytesIO(url.read())
+            # image = Image.open(f)
+            # image = np.array(image)
+            image = mpim.imread(f'lib/cars/logos/{team}.webp')
+            zoom = .2
+            imagebox = OffsetImage(image, zoom=zoom)
+            ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
+            ax.add_artist(ab)
+            # ax.text(driver_wins, pairing,'hi')
+            # for position in enumerate(driver_wins):
+            for i in range(len(drivers)):
+                x = 0
+                wins_string = ''
+                if (driver_wins[i] < 0):
+                    x = driver_wins[i] - 0.5
+                    wins_string = f"{str(driver_wins[i])}    "
+                else:
+                    x = driver_wins[i] + 0.5
+                    wins_string = f"    {str(driver_wins[i])}"
+                print(x)
+                ax.text(x, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20)
+            offset += 1
+    xabs_max = abs(max(ax.get_xlim(), key=abs))
+    ax.set_xlim(xmin=-xabs_max, xmax=xabs_max)
+    # yabs_max = abs(max(ax.get_ylim(), key=abs))
+    # ax.set_ylim(ymin=-yabs_max, ymax=yabs_max)
+    plt.show()
+    
 
 def main(year, session_type):
     if (year is None):
@@ -129,10 +187,14 @@ def main(year, session_type):
         if cm.currently_offseason()[0]:
             year = year - 1
     
-    data,countries, out = get_data(year, session_type)
+    data,colors = get_data(year, session_type)
+    
     # for country in countries.values():
     #     print(f":flag_{coco.convert(names=country,to="ISO2",not_found=None).lower()}:")
     print_data(data)
+    # for team in colors.keys():
+    #     print(f'{team}: {colors.get(team)}')
+    make_plot(data,colors,year,session_type)
     # h2h_embed(data,year,session_type)
     # print(out)
     
