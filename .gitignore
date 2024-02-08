@@ -42,6 +42,8 @@ test3.py
 /cogs/plots/avgpos/*
 !/cogs/plots/avgpos/.gitkeep 
 
+/cogs/plots/h2h/*
+
 /cogs/plots/consistency/*
 !/cogs/plots/consistency/.gitkeep 
 

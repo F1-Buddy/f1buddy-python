@@ -139,7 +139,7 @@ def h2h_embed(self,data,year,session_type):
         description += f'{self.bot.get_emoji(emoji.team_emoji_ids.get(team))}\n'
     print(description)
     
-def make_plot(data,colors,year,session_type, team_names):
+def make_plot(data,colors,year,session_type, team_names, file_path):
     plt.clf()
     f1plt.setup_mpl()
     fig, ax = plt.subplots(1, figsize=(13,9))
@@ -204,7 +204,10 @@ def make_plot(data,colors,year,session_type, team_names):
         else:
             ax.text(-xabs_max, math.floor(offset)-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
         offset+=0.5
-    plt.show()
+    
+    plt.rcParams['savefig.dpi'] = 300
+    plt.savefig(file_path)
+    
     
 
 def main(year, session_type):
@@ -213,16 +216,20 @@ def main(year, session_type):
         if cm.currently_offseason()[0]:
             year = year - 1
     
+    folder_path = f'./cogs/plots/h2h/{year}/{session_type.name}'
+    file_path = f'./cogs/plots/h2h/{year}/{session_type.name}/{cm.latest_completed_index(year)}.png'
     data,colors,names = get_data(year, session_type)
-    
-    # for country in countries.values():
-    #     print(f":flag_{coco.convert(names=country,to="ISO2",not_found=None).lower()}:")
-    # print_data(data)
-    # for team in colors.keys():
-    #     print(f'{team}: {colors.get(team)}')
-    make_plot(data,colors,year,session_type,names)
-    # h2h_embed(data,year,session_type)
-    # print(out)
+    if not (os.path.exists(file_path)):
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        try:
+            title = make_plot(data,colors,year,session_type,names,file_path)    
+        except:
+            return em.ErrorEmbed('Error while drawing', error_message=traceback.format_exc()), None
+    file = discord.File(file_path,filename="image.png")
+    return em.Embed(title=title,image_url='attachment://image.png'), file
+        
+
     
 sessiontype = session_type('Race','r')
-main(2021, sessiontype)
+main(2023, sessiontype)
