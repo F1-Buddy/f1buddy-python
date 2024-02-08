@@ -1,3 +1,4 @@
+import math
 import discord
 import asyncio
 import fastf1
@@ -11,6 +12,7 @@ from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from numpy import mean
 from lib.f1font import regular_font, bold_font
 import matplotlib.patches as mpatches
+import matplotlib.patheffects as pe
 import matplotlib
 import matplotlib.image as mpim
 from PIL import Image
@@ -90,6 +92,10 @@ def get_data(year, session_type):
             if (team_list.get(i).get(pairing) is None):
                 team_list.get(i).update({pairing:{}})
 
+            for abbreviation in team_results['Abbreviation']:
+                if team_list.get(i).get(pairing).get(abbreviation) is None:
+                    team_list.get(i).get(pairing).update({abbreviation:0})
+
             curr_abbr = team_results.loc[team_results.index[0],'Abbreviation']
             
             # figure out which races to ignore
@@ -101,8 +107,8 @@ def get_data(year, session_type):
                     # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
                     both_drivers_finished = False
             
-            if (team_list.get(i).get(pairing).get(curr_abbr) is None):
-                team_list.get(i).get(pairing).update({curr_abbr:0})
+            # if (team_list.get(i).get(pairing).get(curr_abbr) is None):
+            #     team_list.get(i).get(pairing).update({curr_abbr:0})
             if (check_list.get(i) is None):
                 check_list.update({i:False})
             if not check_list.get(i):
@@ -138,10 +144,12 @@ def make_plot(data,colors,year,session_type):
     ax.set_facecolor('black')
     fig.suptitle(f'{year} {session_type.name} Head to Head',fontproperties=bold_font,size=20,y=0.95)
     offset = 0
+    driver_names = []
     for team in data.keys():
         for pairing in data.get(team).keys():
             drivers = list(data.get(team).get(pairing).keys())
             driver_wins = list(data.get(team).get(pairing).values())
+            # print(data.get(team))
             driver_wins[1] = -1 * driver_wins[1]
             # print(drivers)
             # print(driver_wins)
@@ -160,22 +168,58 @@ def make_plot(data,colors,year,session_type):
             imagebox = OffsetImage(image, zoom=zoom)
             ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
             ax.add_artist(ab)
+            
+            for i in range(len(drivers)):
+                
+                if driver_wins[i] <= 0:
+                    driver_name = f'{list(data.get(team).get(pairing).keys())[i]}'
+                    driver_names.append(driver_name)
+                    wins_string = f'{-1*driver_wins[i]}'
+                    ax.text(min(driver_wins[i] - 0.6,-1.2), offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+                else:
+                    driver_name = f'{list(data.get(team).get(pairing).keys())[i]}'
+                    driver_names.append(driver_name)
+                    wins_string = f'{driver_wins[i]}'
+                    ax.text(driver_wins[i] + 0.6, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+                    
             # ax.text(driver_wins, pairing,'hi')
             # for position in enumerate(driver_wins):
-            for i in range(len(drivers)):
-                x = 0
-                wins_string = ''
-                if (driver_wins[i] < 0):
-                    x = driver_wins[i] - 0.5
-                    wins_string = f"{str(driver_wins[i])}    "
-                else:
-                    x = driver_wins[i] + 0.5
-                    wins_string = f"    {str(driver_wins[i])}"
-                print(x)
-                ax.text(x, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20)
+            # for i in range(len(drivers)):
+            #     x = 0
+            #     wins_string = ''
+            #     team_data = data.get(team).get(pairing)
+            #     # print(drivers[i])
+            #     print(team_data)
+                
+                
+            #     if (driver_wins[i] <= 0):
+            #         index_of_driver = list(team_data.values()).index(driver_wins[i]*-1)
+            #         print(str(int(not(bool(index_of_driver)))))
+            #         wins_string = f"{str(-1*driver_wins[i])} {list(team_data.keys())[int(not(bool(index_of_driver)))]}"
+            #         print(wins_string)
+            #         x = driver_wins[i] -0.4
+            #     else:
+            #         index_of_driver = list(team_data.values()).index(driver_wins[i])
+            #         # print(str(int(not(bool(index_of_driver)))))
+            #         wins_string = f"{list(team_data.keys())[index_of_driver]} {str(driver_wins[i])}"
+            #         print(wins_string)
+            #         x = driver_wins[i] + 0.4
+                    
+            #     # print(x)
+            #     if (x < 0):
+            #         ax.text(x, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+            #     else:
+            #         ax.text(x, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
             offset += 1
-    xabs_max = abs(max(ax.get_xlim(), key=abs))
+    xabs_max = abs(max(ax.get_xlim(), key=abs))+7
     ax.set_xlim(xmin=-xabs_max, xmax=xabs_max)
+    offset = 0
+    for i in range(len(driver_names)):
+        if (i % 2) == 0:
+            ax.text(xabs_max, offset-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+        else:
+            ax.text(-xabs_max, math.floor(offset)-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+        offset+=0.5
     # yabs_max = abs(max(ax.get_ylim(), key=abs))
     # ax.set_ylim(ymin=-yabs_max, ymax=yabs_max)
     plt.show()
