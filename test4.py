@@ -45,6 +45,7 @@ def get_data(year, session_type):
     team_list = {}
     color_list = {}
     check_list = {}
+    team_fullName = {}
     driver_country = {}
     outstring = ''
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
@@ -80,6 +81,7 @@ def get_data(year, session_type):
             #       driver: #ofRacesFinishedAheadofTeammate
             #       otherDriver: #ofRacesFinishedAheadofTeammate
             if (team_list.get(i) is None):
+                team_fullName.update({i:team_results.loc[min(team_results.index),'TeamName']})
                 team_list.update({i:{}})
                 color_list.update({i:team_results.loc[min(team_results.index),'TeamColor']})
 
@@ -120,7 +122,7 @@ def get_data(year, session_type):
             else:
                 curr_value = team_list.get(i).get(pairing).get(curr_abbr)
                 team_list.get(i).get(pairing).update({curr_abbr:curr_value})
-    return team_list,color_list #, outstring
+    return team_list,color_list, team_fullName #, outstring
 
 def print_data(data):
     for team in data.keys():
@@ -137,7 +139,8 @@ def h2h_embed(self,data,year,session_type):
         description += f'{self.bot.get_emoji(emoji.team_emoji_ids.get(team))}\n'
     print(description)
     
-def make_plot(data,colors,year,session_type):
+def make_plot(data,colors,year,session_type, team_names):
+    plt.clf()
     f1plt.setup_mpl()
     fig, ax = plt.subplots(1, figsize=(13,9))
     fig.set_facecolor('black')
@@ -145,32 +148,28 @@ def make_plot(data,colors,year,session_type):
     fig.suptitle(f'{year} {session_type.name} Head to Head',fontproperties=bold_font,size=20,y=0.95)
     offset = 0
     driver_names = []
+    y_ticks = []
     for team in data.keys():
         for pairing in data.get(team).keys():
+            y_ticks.append(team_names.get(team))
             drivers = list(data.get(team).get(pairing).keys())
             driver_wins = list(data.get(team).get(pairing).values())
-            # print(data.get(team))
+            # flip second driver to draw back to back
             driver_wins[1] = -1 * driver_wins[1]
-            # print(drivers)
-            # print(driver_wins)
+            # team color
             color = ''
             if not ((colors.get(team).lower() == 'nan') | (colors.get(team).lower() == '')):
                 color = f'#{colors.get(team).lower()}'
             ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
-            # url = f'https://cdn.discordapp.com/emojis/{emoji.team_emoji_ids.get(team)}.webp?&quality=lossless'
-            # print(url)
-            # with urllib.request.urlopen(url) as url:
-            #     f = io.BytesIO(url.read())
-            # image = Image.open(f)
-            # image = np.array(image)
+            # team logo
             image = mpim.imread(f'lib/cars/logos/{team}.webp')
             zoom = .2
             imagebox = OffsetImage(image, zoom=zoom)
             ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
             ax.add_artist(ab)
             
+            # label the bars
             for i in range(len(drivers)):
-                
                 if driver_wins[i] <= 0:
                     driver_name = f'{list(data.get(team).get(pairing).keys())[i]}'
                     driver_names.append(driver_name)
@@ -181,47 +180,30 @@ def make_plot(data,colors,year,session_type):
                     driver_names.append(driver_name)
                     wins_string = f'{driver_wins[i]}'
                     ax.text(driver_wins[i] + 0.6, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
-                    
-            # ax.text(driver_wins, pairing,'hi')
-            # for position in enumerate(driver_wins):
-            # for i in range(len(drivers)):
-            #     x = 0
-            #     wins_string = ''
-            #     team_data = data.get(team).get(pairing)
-            #     # print(drivers[i])
-            #     print(team_data)
-                
-                
-            #     if (driver_wins[i] <= 0):
-            #         index_of_driver = list(team_data.values()).index(driver_wins[i]*-1)
-            #         print(str(int(not(bool(index_of_driver)))))
-            #         wins_string = f"{str(-1*driver_wins[i])} {list(team_data.keys())[int(not(bool(index_of_driver)))]}"
-            #         print(wins_string)
-            #         x = driver_wins[i] -0.4
-            #     else:
-            #         index_of_driver = list(team_data.values()).index(driver_wins[i])
-            #         # print(str(int(not(bool(index_of_driver)))))
-            #         wins_string = f"{list(team_data.keys())[index_of_driver]} {str(driver_wins[i])}"
-            #         print(wins_string)
-            #         x = driver_wins[i] + 0.4
-                    
-            #     # print(x)
-            #     if (x < 0):
-            #         ax.text(x, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
-            #     else:
-            #         ax.text(x, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
             offset += 1
+    # plot formatting
+    left = min(fig.subplotpars.left, 1 - fig.subplotpars.right)
+    bottom = min(fig.subplotpars.bottom, 1 - fig.subplotpars.top)
+    fig.subplots_adjust(left=left, right=1 - left, bottom=bottom, top=1 - bottom)
+    ax.get_xaxis().set_visible(False)
+    ax.yaxis.grid(False)
+    ax.get_yaxis().set_visible(False)
+    ax.set_yticklabels(y_ticks, fontproperties=regular_font, fontsize=10)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
     xabs_max = abs(max(ax.get_xlim(), key=abs))+7
+    
     ax.set_xlim(xmin=-xabs_max, xmax=xabs_max)
     offset = 0
+    # label drivers
     for i in range(len(driver_names)):
         if (i % 2) == 0:
             ax.text(xabs_max, offset-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
         else:
             ax.text(-xabs_max, math.floor(offset)-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
         offset+=0.5
-    # yabs_max = abs(max(ax.get_ylim(), key=abs))
-    # ax.set_ylim(ymin=-yabs_max, ymax=yabs_max)
     plt.show()
     
 
@@ -231,16 +213,16 @@ def main(year, session_type):
         if cm.currently_offseason()[0]:
             year = year - 1
     
-    data,colors = get_data(year, session_type)
+    data,colors,names = get_data(year, session_type)
     
     # for country in countries.values():
     #     print(f":flag_{coco.convert(names=country,to="ISO2",not_found=None).lower()}:")
-    print_data(data)
+    # print_data(data)
     # for team in colors.keys():
     #     print(f'{team}: {colors.get(team)}')
-    make_plot(data,colors,year,session_type)
+    make_plot(data,colors,year,session_type,names)
     # h2h_embed(data,year,session_type)
     # print(out)
     
 sessiontype = session_type('Race','r')
-main(2023, sessiontype)
+main(2021, sessiontype)
