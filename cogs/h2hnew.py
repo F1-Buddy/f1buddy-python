@@ -11,6 +11,7 @@ from matplotlib import pyplot as plt
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import matplotlib.patheffects as pe
 import matplotlib.image as mpim
+import numpy as np
 from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
@@ -93,12 +94,13 @@ def get_data(year, session_type):
             
             # figure out which races to ignore
             both_drivers_finished = True
-            dnf = ['D','E','W','F','N']
-            for driver in team_results.index:
-                if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
-                    # for testing
-                    # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
-                    both_drivers_finished = False
+            if (session_type.value == 'r'):
+                dnf = ['D','E','W','F','N']
+                for driver in team_results.index:
+                    if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
+                        # for testing
+                        # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
+                        both_drivers_finished = False
             
             # if (team_list.get(i).get(pairing).get(curr_abbr) is None):
             #     team_list.get(i).get(pairing).update({curr_abbr:0})
@@ -152,12 +154,17 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
             if not ((colors.get(team).lower() == 'nan') | (colors.get(team).lower() == '')):
                 color = f'#{colors.get(team).lower()}'
             ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
-            # team logo
-            image = mpim.imread(f'lib/cars/logos/{team}.webp')
-            zoom = .2
-            imagebox = OffsetImage(image, zoom=zoom)
-            ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
-            ax.add_artist(ab)
+            try:
+                # team logo
+                img = mpim.imread(f'lib/cars/logos/{team}.webp')
+                zoom = .2
+                imagebox = OffsetImage(img, zoom=zoom)
+                ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
+                ax.add_artist(ab)
+            except:
+                ax.text(0,offset,team,ha='center',fontsize=10, fontproperties=regular_font, path_effects=[pe.withStroke(linewidth=2, foreground="black")])
+                traceback.print_exc()
+            
             
             # label the bars
             for i in range(len(drivers)):
@@ -185,6 +192,14 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
     ax.spines['left'].set_visible(False)
     ax.spines['right'].set_visible(False)
     xabs_max = abs(max(ax.get_xlim(), key=abs))+7
+    
+    # watermark
+    watermark_img = plt.imread('botPics/f1pythoncircular.png')
+    watermark_box = OffsetImage(watermark_img, zoom=0.22) 
+    ab = AnnotationBbox(watermark_box, (-0.06,1.05), xycoords='axes fraction', frameon=False)
+    ax.add_artist(ab)
+    ax.text(0.1,1.03, 'Made by\nF1Buddy Discord Bot', transform=ax.transAxes,
+            fontsize=13,fontproperties=bold_font, ha='center')
     
     ax.set_xlim(xmin=-xabs_max, xmax=xabs_max)
     offset = 0
