@@ -11,12 +11,16 @@ from lib.emojiid import nation_dictionary
 from discord.ext import commands
 from lib.emojiid import tire_emoji_ids, tire_emoji_ids_2018, team_emoji_ids
 from lib.colors import colors
+import repeated.embed as em
 fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 nationality_dict = nation_dictionary()
 current_year = datetime.date.today().year
 
-def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix):
+# this code is fucked
+# actually the worst command atm
+
+def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix, emoji_list):
     session = fastf1.get_session(year, round_num, 'Race')
     session.load(laps=True,telemetry=False,weather=False,messages=False)
     fastest_lap = session.laps.pick_fastest()
@@ -39,6 +43,7 @@ def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_ag
         emoji = ":flag_" + \
             (coco.convert(names=nationality_dict[race_name][0], to='ISO2')).lower()+":"
     except Exception as e:
+        traceback.print_exc()
         print(e)
         
     try:
@@ -47,9 +52,11 @@ def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_ag
         try:
             grand_prix.append(f"{emoji}\u00A0\u00A0\u00A0\u00A0{(str)(self.bot.get_emoji(team))} {driver}")
         except Exception as e:
+            traceback.print_exc()
             grand_prix.append(f"{race_name} {(str)(self.bot.get_emoji(team))} {driver}")
             print(e)
     except Exception as e:
+        traceback.print_exc()
         print(e)
     return driver_name, driver_laptime, tyre_age, grand_prix
     
@@ -58,9 +65,10 @@ def get_fastest_lap(self, round, year):
     try:
         round = int(round)
     except ValueError:
+        traceback.print_exc()
         round = round
         
-    driver_name, driver_laptime, tyre_age, grand_prix = [],[],[],[]
+    driver_name, driver_laptime, tyre_age, grand_prix, emoji_list = [],[],[],[],[]
     year_sched = fastf1.get_event_schedule(year, include_testing=False)
     num_rounds = year_sched.shape[0]
     
@@ -77,31 +85,53 @@ def get_fastest_lap(self, round, year):
                 if now.tz_localize('America/New_York') < sessionTime:
                     break
                 try:
-                    driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix)
+                    driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix, emoji_list)
                 except Exception as e:
+                    traceback.print_exc()
                     print(f"An error occurred in round {round_num}: {e}")
                     continue
         except Exception as e:
-            fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            fastest_lap_embed.description = f"Error Occured :( {e}"        
+            traceback.print_exc()
+            return em.ErrorEmbed(error_message=traceback.format_exc())      
     else: # if round not none, get lap for that round
         try:
-            driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round, year,driver_name, driver_laptime, tyre_age, grand_prix)
+            driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round, year,driver_name, driver_laptime, tyre_age, grand_prix, emoji_list)
         except Exception as e:
-            fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            fastest_lap_embed.description = f"An error occurred in round {round}: :( {e}"   
-            print(f"An error occurred in round {round}: {e}")   
-            
-    driver_name, driver_laptime, tyre_age, grand_prix = '\n'.join(driver_name), '\n'.join(driver_laptime), '\n'.join(grand_prix), '\n'.join(tyre_age)
-    fastest_lap_embed = discord.Embed(title=f"Fastest Lap {year}", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-    fastest_lap_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-    fastest_lap_embed.colour = colors.default
-    fastest_lap_embed.add_field(name="GP     Name", value=tyre_age,inline=True)     
-    fastest_lap_embed.add_field(name="Laptime", value=driver_laptime,inline=True)
-    fastest_lap_embed.add_field(name="Age", value=grand_prix,inline=True)
+            traceback.print_exc()
+            return em.ErrorEmbed(error_message=traceback.format_exc())
+
+    # print('testing')
+    num_races = len(grand_prix)
+    range1 =range(0,num_races//2)
+    range2 =range(num_races//2,num_races)
+    # try:
+    #     print('\n'.join([grand_prix[i] for i in range1]))
+    # except:
+    #     traceback.print_exc()
+    # try:
+    #     print('\n'.join([grand_prix[i] for i in range2]))
+    # except:
+    #     traceback.print_exc()
+    # print('done testing')
+    
+    dc_embed1 = em.Embed(title=f"Fastest Lap {year}")
+    dc_embed1.embed.add_field(name="GP     Name", value='\n'.join([grand_prix[i] for i in range1]),inline=True)
+    dc_embed1.embed.add_field(name="Laptime", value='\n'.join([driver_laptime[i] for i in range1]),inline=True)
+    dc_embed1.embed.add_field(name="Age", value='\n'.join([tyre_age[i] for i in range1]),inline=True)
+    
+    dc_embed2 = em.Embed(title=f"Fastest Lap {year} Continued")
+    dc_embed2.embed.add_field(name="GP     Name", value='\n'.join([grand_prix[i] for i in range2]),inline=True)
+    dc_embed2.embed.add_field(name="Laptime", value='\n'.join([driver_laptime[i] for i in range2]),inline=True)
+    dc_embed2.embed.add_field(name="Age", value='\n'.join([tyre_age[i] for i in range2]),inline=True)
+    # fastest_lap_embed = discord.Embed(title=, description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+    # fastest_lap_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+    # fastest_lap_embed.colour = colors.default
+    # fastest_lap_embed.add_field(name="GP     Name", value=tyre_age,inline=True)     
+    # fastest_lap_embed.add_field(name="Laptime", value=driver_laptime,inline=True)
+    # fastest_lap_embed.add_field(name="Age", value=grand_prix,inline=True)
     if year <= 2018:
-        fastest_lap_embed.set_footer(text=f"{year} tires used",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
-    return fastest_lap_embed
+        dc_embed1.embed.set_footer(text=f"{year} tires used",icon_url="https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png")
+    return [dc_embed1,dc_embed2]
      
 class fastest_lap(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -115,10 +145,11 @@ class fastest_lap(commands.Cog):
     @app_commands.describe(year = "Year (supports 2018 and after)")
     async def fastest_lap(self, interaction: discord.Interaction, round: typing.Optional[str], year: typing.Optional[int]):
         await interaction.response.defer()
-        fastest_lap_embed = discord.Embed(title=f"Fastest Lap", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-        fastest_lap_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-        fastest_lap_embed.colour = colors.default
+        # fastest_lap_embed = discord.Embed(title=f"Fastest Lap", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        # fastest_lap_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
+        # fastest_lap_embed.colour = colors.default
         loop = asyncio.get_running_loop()
+        fastest_lap_embeds = None
         if round is None:
             round = 999
         if year is None:
@@ -129,6 +160,7 @@ class fastest_lap(commands.Cog):
             try:
                 event_round = int(round)
             except ValueError:
+                traceback.print_exc()
                 pass
             try:
                 if event_round:
@@ -136,22 +168,24 @@ class fastest_lap(commands.Cog):
                         raise RoundNotValidException(f"Enter a valid round number.")
             except:
                 pass
-            fastest_lap_embed = await loop.run_in_executor(None, get_fastest_lap, self, round, year)
-        except YearNotValidException as ynve:
-            fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            fastest_lap_embed.description = f"{ynve}" 
-        except RoundNotValidException as rnve:
-            fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            fastest_lap_embed.description = f"{rnve}"
+            fastest_lap_embeds = await loop.run_in_executor(None, get_fastest_lap, self, round, year)
+            # print(fastest_lap_embeds)
+        # except YearNotValidException as ynve:
+        #     fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+        #     fastest_lap_embed.description = f"{ynve}" 
+        # except RoundNotValidException as rnve:
+        #     fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+        #     fastest_lap_embed.description = f"{rnve}"
         except Exception as e:
-            fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            fastest_lap_embed.description = f"Error Occured :( {e}"            
+            traceback.print_exc()
+            fastest_lap_embeds = [em.ErrorEmbed()]
         try:
-            await interaction.followup.send(embed=fastest_lap_embed)
+            await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds])
         except Exception as e:
-            fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
-            fastest_lap_embed.description = f"Error Occured :( {e}" 
-            await interaction.followup.send(embed=fastest_lap_embed)
+            traceback.print_exc()
+            # fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
+            # fastest_lap_embed.description = f"Error Occured :( {e}" 
+            await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds])
             print(e)
         loop.close()
         
