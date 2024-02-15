@@ -1,3 +1,4 @@
+import traceback
 import discord
 import asyncio
 import fastf1
@@ -14,6 +15,7 @@ from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
 from matplotlib.ticker import (MultipleLocator)
+import repeated.common as cm
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -44,13 +46,12 @@ def positions_result(round, year):
 # rewrite
     try:
         # year given is invalid
-        if year == None:
+        if (year is None) or ((year > now.year) | (year < 2018)):
             event_year = now.year
+            if (cm.currently_offseason()[0]):
+                event_year -= 1
         else:
-            if (year > now.year | year < 2018):
-                event_year = now.year
-            else:
-                event_year = year
+            event_year = year
         try:
             event_round = int(round)
         except ValueError:
@@ -82,9 +83,11 @@ def positions_result(round, year):
                         # absolute and utter failure
                         except Exception as e:
                             print(e)
+                            traceback.print_exc()
                 except:
                     # mazepin has no data
                     print("no info for this driver")
+                    traceback.print_exc()
 
             # pyplot setup
             ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2, prop=bold_font)
@@ -110,6 +113,7 @@ def positions_result(round, year):
                         fontsize=10,fontproperties=bold_font)
             except Exception as e:
                 print(e)
+                traceback.print_exc()
             # save plot
             plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
             # clear plot
@@ -124,10 +128,12 @@ def positions_result(round, year):
         
         except Exception as e:
             print(e)
-            message_embed.set_footer(text=e)
+            traceback.print_exc()
+            message_embed.description = traceback.format_exc()
     # 
     except Exception as e:
         print(e)
+        traceback.print_exc()
         message_embed.set_footer(text = e)
 
 class Positions(commands.Cog):
