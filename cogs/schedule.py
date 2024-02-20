@@ -3,6 +3,7 @@ import traceback
 import discord
 import fastf1
 import pandas as pd
+import pycountry
 import country_converter as coco
 import requests
 import json
@@ -14,6 +15,11 @@ import repeated.embed as em
 import repeated.common as cm
 
 fastf1.Cache.enable_cache('cache/')
+
+# abu dhabi is hardcoded.
+# reason: currently unable to get session_info from not-yet-completed events
+# session_info contains the actual country (United Arab Emirates)
+# schedule.loc[index,'Country'] just gives Abu Dhabi which is not accepted  by pycountry or coco
 
 def countdown(totalseconds):
     out_string = ""
@@ -100,7 +106,17 @@ def get_schedule():
             
             # more strings for embed
             race_name = schedule.loc[next_event, 'EventName'][:-11] + " GP"
-            emoji = ":flag_" + (coco.convert(names=schedule.loc[next_event, "Country"], to='ISO2')).lower()+":"
+            # session = fastf1.get_session(now.year,next_event,'r')
+            # session.load(laps=False,telemetry=False,weather=False,messages=False)
+            # country_name = session.session_info['Meeting']['Country']['Name']
+            # alpha_2 = pycountry.countries.search_fuzzy(country_name)[0].alpha_2
+            # emoji = f":flag_{alpha_2.lower()}:"
+            alpha2 = (coco.convert(names=schedule.loc[next_event, "Country"], to='ISO2')).lower()
+            if not ('not found' in alpha2):
+                emoji = f":flag_{alpha2}:"
+            elif (schedule.loc[next_event,'Country'] == 'Abu Dhabi'):
+                emoji = ':flag_ae:'
+            
             time_until = schedule.loc[next_event, "Session5DateUtc"].tz_localize("UTC").tz_convert('America/New_York') - now
             description_string = countdown(time_until.total_seconds())
             title_string = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
@@ -110,6 +126,8 @@ def get_schedule():
                            f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html"
                            )
             for url in url_formats:
+                if (schedule.loc[next_event,'Country'] == 'Abu Dhabi'):
+                    url = f"https://www.formula1.com/en/racing/{now.year}/United_Arab_Emirates/Circuit.html"
                 response = requests.get(url)
                 soup = BeautifulSoup(response.content, 'html.parser')
                 image = soup.find_all(class_='f1-external-link--no-image')

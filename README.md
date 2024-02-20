@@ -44,6 +44,8 @@ And more!!
 ## Changelog
 - fix for not off season and latest completed = 0, schedule now works and all other year optional commands
 - fixed some cases where bitwise operators caused issues in short circuiting
+- fixed no emoji+track image for abu dhabi in schedule
+- fixed country flags for fl
 
 ## To-do
 - [ ] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10

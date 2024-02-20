@@ -6,7 +6,7 @@ import traceback
 import pandas as pd
 import fastf1
 from discord import app_commands
-import country_converter as coco
+import pycountry
 from lib.emojiid import nation_dictionary
 from discord.ext import commands
 from lib.emojiid import tire_emoji_ids, tire_emoji_ids_2018, team_emoji_ids
@@ -41,8 +41,10 @@ def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_ag
     race_name = race_name.replace(" Grand Prix", "")
     
     try:
-        emoji = ":flag_" + \
-            (coco.convert(names=nationality_dict[race_name][0], to='ISO2')).lower()+":"
+        country_name = session.session_info['Meeting']['Country']['Name']
+        country = pycountry.countries.search_fuzzy(country_name)[0]
+        alpha_2 = country.alpha_2
+        emoji = f":flag_{alpha_2.lower()}:"
     except Exception as e:
         traceback.print_exc()
         print(e)
@@ -103,27 +105,25 @@ def get_fastest_lap(self, round, year):
 
     # print('testing')
     num_races = len(grand_prix)
-    range1 =range(0,num_races//2)
-    range2 =range(num_races//2,num_races)
-    # try:
-    #     print('\n'.join([grand_prix[i] for i in range1]))
-    # except:
-    #     traceback.print_exc()
-    # try:
-    #     print('\n'.join([grand_prix[i] for i in range2]))
-    # except:
-    #     traceback.print_exc()
-    # print('done testing')
+    if (num_races > 10):
+        range1 =range(0,num_races//2)
+        range2 =range(num_races//2,num_races)
+        dc_embed1 = em.Embed(title=f"Fastest Lap {year}")
+        dc_embed1.embed.add_field(name="GP     Name", value='\n'.join([grand_prix[i] for i in range1]),inline=True)
+        dc_embed1.embed.add_field(name="Laptime", value='\n'.join([driver_laptime[i] for i in range1]),inline=True)
+        dc_embed1.embed.add_field(name="Age", value='\n'.join([tyre_age[i] for i in range1]),inline=True)
+        
+        dc_embed2 = em.Embed(title=f"Fastest Lap {year} Continued")
+        dc_embed2.embed.add_field(name="GP     Name", value='\n'.join([grand_prix[i] for i in range2]),inline=True)
+        dc_embed2.embed.add_field(name="Laptime", value='\n'.join([driver_laptime[i] for i in range2]),inline=True)
+        dc_embed2.embed.add_field(name="Age", value='\n'.join([tyre_age[i] for i in range2]),inline=True)
+    else:
+        dc_embed1 = em.Embed(title=f"Fastest Lap {year}")
+        dc_embed1.embed.add_field(name="GP     Name", value='\n'.join(grand_prix),inline=True)
+        dc_embed1.embed.add_field(name="Laptime", value='\n'.join(driver_laptime),inline=True)
+        dc_embed1.embed.add_field(name="Age", value='\n'.join(tyre_age),inline=True)
+        dc_embed2 = None
     
-    dc_embed1 = em.Embed(title=f"Fastest Lap {year}")
-    dc_embed1.embed.add_field(name="GP     Name", value='\n'.join([grand_prix[i] for i in range1]),inline=True)
-    dc_embed1.embed.add_field(name="Laptime", value='\n'.join([driver_laptime[i] for i in range1]),inline=True)
-    dc_embed1.embed.add_field(name="Age", value='\n'.join([tyre_age[i] for i in range1]),inline=True)
-    
-    dc_embed2 = em.Embed(title=f"Fastest Lap {year} Continued")
-    dc_embed2.embed.add_field(name="GP     Name", value='\n'.join([grand_prix[i] for i in range2]),inline=True)
-    dc_embed2.embed.add_field(name="Laptime", value='\n'.join([driver_laptime[i] for i in range2]),inline=True)
-    dc_embed2.embed.add_field(name="Age", value='\n'.join([tyre_age[i] for i in range2]),inline=True)
     # fastest_lap_embed = discord.Embed(title=, description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
     # fastest_lap_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
     # fastest_lap_embed.colour = colors.default
@@ -156,7 +156,7 @@ class fastest_lap(commands.Cog):
         if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
             year = now.year - 1
         try:
-            if year < 2018 or year > current_year:
+            if (year < 2018) or (year > current_year):
                 raise YearNotValidException(f"Year cannot be before 2018 or after {current_year}!")
             try:
                 event_round = int(round)
@@ -165,7 +165,7 @@ class fastest_lap(commands.Cog):
                 pass
             try:
                 if event_round:
-                    if event_round < 0 or (event_round > 30 and event_round != 999):
+                    if (event_round < 0) or (event_round > 30 and event_round != 999):
                         raise RoundNotValidException(f"Enter a valid round number.")
             except:
                 pass
@@ -181,7 +181,9 @@ class fastest_lap(commands.Cog):
             traceback.print_exc()
             fastest_lap_embeds = [em.ErrorEmbed()]
         try:
+            fastest_lap_embeds.remove(None)
             await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds])
+            
         except Exception as e:
             traceback.print_exc()
             # fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
