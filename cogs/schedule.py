@@ -21,18 +21,6 @@ fastf1.Cache.enable_cache('cache/')
 # session_info contains the actual country (United Arab Emirates)
 # schedule.loc[index,'Country'] just gives Abu Dhabi which is not accepted  by pycountry or coco
 
-def countdown(totalseconds):
-    out_string = ""
-    days = int(totalseconds // 86400)
-    totalseconds %= 86400
-    hours = int(totalseconds // 3600)
-    totalseconds %= 3600
-    minutes = int(totalseconds // 60)
-    seconds = totalseconds % 60
-    seconds = int(seconds // 1)
-    out_string += f"{days} days, {hours} hours, {minutes} minutes, and {seconds} seconds until the race!"
-    return out_string
-
 def get_weather_data(location):
     weatherURL = "https://weatherapi-com.p.rapidapi.com/forecast.json"
     querystring = {"q":location,"days":"3"}
@@ -117,8 +105,10 @@ def get_schedule():
             elif (schedule.loc[next_event,'Country'] == 'Abu Dhabi'):
                 emoji = ':flag_ae:'
             
-            time_until = schedule.loc[next_event, "Session5DateUtc"].tz_localize("UTC").tz_convert('America/New_York') - now
-            description_string = countdown(time_until.total_seconds())
+            # time_until = schedule.loc[next_event, "Session5DateUtc"].tz_localize("UTC").tz_convert('America/New_York') - now
+            race_ts = int((converted_session_times.get(f":checkered_flag: Race") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
+            quali_ts = int((converted_session_times.get(f":stopwatch: Qualifying") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
+            description_string = f'Qualifying is in <t:{quali_ts}:R>\nRace is in <t:{race_ts}:R>!'
             title_string = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
             
             # get track image
