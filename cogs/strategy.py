@@ -15,6 +15,7 @@ import pandas as pd
 import fastf1.plotting as f1plt
 from lib.f1font import regular_font, bold_font
 from matplotlib.ticker import (MultipleLocator)
+import repeated.common as cm
 
 # get current time
 now = pd.Timestamp.now()
@@ -77,11 +78,13 @@ def tire_strategy(round, year):
     
     try:
         # year given is invalid
-        if year == None:
+        if year is None:
             event_year = now.year
         else:
-            if (year > now.year | year < 2018):
+            if (year > now.year or year < 2018):
                 event_year = now.year
+                if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                    event_year = event_year - 1
             else:
                 event_year = year
         try:

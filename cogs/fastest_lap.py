@@ -10,8 +10,9 @@ import country_converter as coco
 from lib.emojiid import nation_dictionary
 from discord.ext import commands
 from lib.emojiid import tire_emoji_ids, tire_emoji_ids_2018, team_emoji_ids
-from lib.colors import colors
+# from lib.colors import colors
 import repeated.embed as em
+import repeated.common as cm
 fastf1.Cache.enable_cache('cache/')
 now = pd.Timestamp.now()
 nationality_dict = nation_dictionary()
@@ -152,8 +153,8 @@ class fastest_lap(commands.Cog):
         fastest_lap_embeds = None
         if round is None:
             round = 999
-        if year is None:
-            year = 2023
+        if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+            year = now.year - 1
         try:
             if year < 2018 or year > current_year:
                 raise YearNotValidException(f"Year cannot be before 2018 or after {current_year}!")

@@ -34,9 +34,9 @@ def laptime_consistency(driver, year, round):
     try:
         year_OoB = True
         if year != None:
-            year_OoB = (year > now.year) | (year < 2018)
+            year_OoB = (year > now.year) or (year < 2018)
         if (year_OoB):
-            if cm.currently_offseason()[0]:
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
                 year = now.year - 1
             else:
                 year = now.year
@@ -83,7 +83,7 @@ def laptime_consistency(driver, year, round):
             condition2 = outlier_laps['PitOutTime'].notnull()
             condition3 = outlier_laps['LapTime'].dt.total_seconds() >= (mean_lap_time + 10)
             # outlier_laps = outlier_laps[(outlier_laps['LapTime'].dt.total_seconds() >= (outlier_laps['LapTime'].mean().total_seconds() + 13))]
-            outlier_laps = outlier_laps[ condition2 | condition3]
+            outlier_laps = outlier_laps[ condition2 or condition3]
             # print(outlier_laps)
         except:
             traceback.print_exc()

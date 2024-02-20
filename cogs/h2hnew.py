@@ -97,7 +97,7 @@ def get_data(year, session_type):
             if (session_type.value == 'r'):
                 dnf = ['D','E','W','F','N']
                 for driver in team_results.index:
-                    if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) | (not ((team_results.loc[driver,'Status'] == 'Finished') | ('+' in team_results.loc[driver,'Status']))):
+                    if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) or (not ((team_results.loc[driver,'Status'] == 'Finished') or ('+' in team_results.loc[driver,'Status']))):
                         # for testing
                         # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
                         both_drivers_finished = False
@@ -151,7 +151,7 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
             driver_wins[1] = -1 * driver_wins[1]
             # team color
             color = ''
-            if not ((colors.get(team).lower() == 'nan') | (colors.get(team).lower() == '')):
+            if not ((colors.get(team).lower() == 'nan') or (colors.get(team).lower() == '')):
                 color = f'#{colors.get(team).lower()}'
             ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
             try:
@@ -217,7 +217,7 @@ def get_embed(self, year, session_type):
     try:
         if (year is None):
             year = now.year
-            if cm.currently_offseason()[0]:
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
                 year = year - 1
         
         folder_path = f'./cogs/plots/h2h/{year}/{session_type.name}'

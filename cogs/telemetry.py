@@ -146,7 +146,7 @@ def plot_telem(driver_list, lap_number: typing.Optional[int], event_round, event
 
 def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype):
     
-    if (year > now.year) | (year < 2018):
+    if (year > now.year) or (year < 2018):
         return em.ErrorEmbed(error_message="Enter a valid year from 2018 to now"), None
     else:
         event_year = year

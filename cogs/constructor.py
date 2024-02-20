@@ -19,16 +19,16 @@ import repeated.embed as em
 # fix later
 def check_year(year,round):
     now = pd.Timestamp.now()
-    if not(year == None) and not(1950 <= year and year <= now.year):
+    if not(year is None) and not(1950 <= year and year <= now.year):
         return "bad year"
     # lol 
     elif not(round == None) and not(round >= 1) and not(round < 25):
         return "bad round number"
     else:
-        if (year == None and round == None):
+        if (year is None and round == None):
             url =  f"http://ergast.com/api/f1/{now.year}/constructors.json"
             return url
-        elif (year == None):
+        elif (year is None):
             url = f"https://ergast.com/api/f1/{now.year}/{round}/constructors.json"
             return url
         elif (round == None):
@@ -46,7 +46,7 @@ def get_constructor_info(self, year):
     now = pd.Timestamp.now()
     if year is None:
         year = now.year
-        if cm.currently_offseason()[0]:
+        if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
             year = year - 1
     url = f"http://ergast.com/api/f1/{year}/constructors.json"
     # print(url)
@@ -63,7 +63,7 @@ def get_constructor_info(self, year):
         constructor = requests.get(url)
         response = json.loads(constructor.content)
     except json.JSONDecodeError:
-        if (year == None) or (1950 >= year and year >= now.year):
+        if (year is None) or (1950 >= year and year >= now.year):
             url = f"https://ergast.com/api/f1/current/constructors.json"
             constructor = requests.get(url)
             # round = 1

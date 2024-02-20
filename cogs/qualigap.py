@@ -13,6 +13,7 @@ from lib.colors import colors
 import pandas as pd
 from lib.f1font import regular_font, bold_font
 import fastf1.plotting as f1plt
+import repeated.common as cm
 fastf1.Cache.enable_cache('cache/')
 
 # setup embed
@@ -49,13 +50,12 @@ def quali_gap(round, year):
     event_round = None
     try:
         # year given is invalid
-        if year == None:
+        if (year is None) or ((year > now.year) or (year < 2018)):
             event_year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                    event_year = event_year - 1
         else:
-            if (year > now.year | year < 2018):
-                event_year = now.year
-            else:
-                event_year = year
+            event_year = year
         try:
             event_round = int(round)
         except ValueError:
