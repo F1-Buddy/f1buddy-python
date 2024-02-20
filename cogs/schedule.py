@@ -53,6 +53,7 @@ def get_schedule():
         # now = now + pd.DateOffset(days=-14)
 
         schedule = fastf1.get_event_schedule(now.year, include_testing=False)
+        # print(schedule)
         off_season = any(cm.currently_offseason())
         
         # for testing
@@ -63,6 +64,7 @@ def get_schedule():
             return dc_embed
         else:
             # get next event
+            # print(f'latest completed is: {cm.latest_completed_index(year=now.year)}')
             next_event = cm.latest_completed_index(year=now.year) + 1
 
             # convert each session to EST  
@@ -104,13 +106,23 @@ def get_schedule():
             title_string = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
             
             # get track image
-            url = f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11]}/Circuit.html"
-            response = requests.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            image = soup.find_all('img')
-            for i in image:
-                if 'circuit' in str(i.get('alt')).lower():
-                    track_url = (i.get('data-src'))
+            url_formats = (f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace(' ', '_')}/Circuit.html",
+                           f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html"
+                           )
+            for url in url_formats:
+                response = requests.get(url)
+                soup = BeautifulSoup(response.content, 'html.parser')
+                image = soup.find_all(class_='f1-external-link--no-image')
+                if (len(image) > 0):
+                    break
+            if (len(image) > 0):
+                for el in image:
+                    images = el.find('source').get('data-srcset')
+                    img_link = images[:images.index(',')]
+                    if ('circuit' in img_link.lower()):
+                        track_url =img_link
+            else:
+                track_url = ''
             
             # add final fields to embed
             dc_embed = em.Embed(title=title_string, description=description_string, image_url=track_url)

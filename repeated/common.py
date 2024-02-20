@@ -25,6 +25,9 @@ def latest_completed_index(year):
     first_index = schedule.index[0]
     next_event = first_index
     curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
+    # print(f'curr_event_date > now?: {curr_event_date > now}')
+    if (curr_event_date > now):
+        return 0
     while ((curr_event_date < now) & (next_event < schedule.index[len(schedule.index)-1]) ):
         # print(schedule.loc[next_event,'EventName'])
         next_event += 1
