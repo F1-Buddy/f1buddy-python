@@ -47,7 +47,7 @@ def get_constructor_info(self, year):
     if year is None:
         year = now.year
         if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-            year = year - 1
+            year -= 1
     url = f"http://ergast.com/api/f1/{year}/constructors.json"
     # print(url)
     description_string = ''

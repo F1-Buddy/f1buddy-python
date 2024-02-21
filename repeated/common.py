@@ -34,3 +34,5 @@ def latest_completed_index(year):
         curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
     # print(schedule.loc[next_event,'EventName'])
     return next_event
+
+# create function for input checking (year/round)

@@ -22,11 +22,12 @@ def get_driver_standings(self, year):
     if not year_OoB:
         year = year
     else:
+        year = now.year
         # schedule = fastf1.get_event_schedule(now.year, include_testing=False)
         # first_event_index = schedule.index[0]
         # first_event_time = schedule.loc[first_event_index,'Session5DateUtc'].tz_localize("UTC")
         if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-            year = now.year - 1
+            year -= 1
             
     # go through each
     driver_standings = ergast.get_driver_standings(season=year).content[0]

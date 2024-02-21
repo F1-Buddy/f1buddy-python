@@ -22,8 +22,9 @@ def get_constructor_standings(self, year):
     if not year_OoB:
         year = year
     else:
+        year = now.year
         if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-            year = now.year - 1
+            year -= 1
     
     constructor_standings = ergast.get_constructor_standings(season=year).content[0]
     for index in range(len(constructor_standings)):

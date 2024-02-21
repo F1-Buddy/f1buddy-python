@@ -38,7 +38,7 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
         except:
             year = now.year
             if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-                year = year - 1
+                year -= 1
         if (year > now.year or year < 2018):
             try:
                 race = fastf1.get_session(now.year, round, 'R')

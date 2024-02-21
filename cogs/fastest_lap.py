@@ -153,8 +153,10 @@ class fastest_lap(commands.Cog):
         fastest_lap_embeds = None
         if round is None:
             round = 999
-        if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-            year = now.year - 1
+        if (year is None):
+            year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                year -= 1
         try:
             if (year < 2018) or (year > current_year):
                 raise YearNotValidException(f"Year cannot be before 2018 or after {current_year}!")

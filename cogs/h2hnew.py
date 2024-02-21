@@ -218,7 +218,7 @@ def get_embed(self, year, session_type):
         if (year is None):
             year = now.year
             if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-                year = year - 1
+                year -= 1
         
         folder_path = f'./cogs/plots/h2h/{year}/{session_type.name}'
         file_path = f'./cogs/plots/h2h/{year}/{session_type.name}/{cm.latest_completed_index(year)}.png'
