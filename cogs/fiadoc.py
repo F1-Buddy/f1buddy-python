@@ -18,7 +18,7 @@ message_embed.colour = colors.default
 
 def get_fia_doc():
     # get fia site
-    url = 'https://www.fia.com/documents/championships/fia-formula-one-world-championship-14/season/season-2023-2042'
+    url = 'https://www.fia.com/documents/championships/fia-formula-one-world-championship-14/season/season-2024-2043'
     html = requests.get(url=url)
     s = BeautifulSoup(html.content, 'html.parser')
     # get latest document
