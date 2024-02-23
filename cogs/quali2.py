@@ -17,14 +17,13 @@ def quali_results(self,year,round):
     try:
         now = pd.Timestamp.now().tz_localize('America/New_York')
     
-        year_OoB = (year == None) or (year <= 1957) or (year >= now.year)
+        year_OoB = (year is None) or ((year <= 1957) or (year >= now.year))
         if not year_OoB:
             year = year
         else:
-            if cm.currently_offseason()[0]:
-                year = now.year-1
-            else:
-                year = now.year
+            year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                year -= 1
             
         if (round == None):
             # get latest completed session by starting from the end of calendar and going back towards beginning of season

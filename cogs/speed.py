@@ -16,6 +16,7 @@ from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
 import numpy as np
+import repeated.common as cm
 
 # get current time
 now = pd.Timestamp.now()
@@ -46,15 +47,12 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
     ax.axis('off')
     try:
         # no year given
-        if year == None:
+        if (year is None) or (year > now.year) or (year < 2018):
             event_year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                event_year -= 1
         else:
-            # given year invalid
-            if (year > now.year | year < 2018):
-                event_year = now.year
-            # year is valid
-            else:
-                event_year = year
+            event_year = year
         # get proper round (string/int)
         try:
             # given as int

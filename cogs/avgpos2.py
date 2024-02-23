@@ -163,7 +163,7 @@ def get_embed_and_image(year, session_type, category):
         now = pd.Timestamp.now()
         if (year is None) or (year > now.year):
                 year = now.year
-                if cm.currently_offseason()[0]:
+                if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
                     year = now.year - 1
         latest_event_index = cm.latest_completed_index(year)
         folder_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}'

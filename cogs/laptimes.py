@@ -12,6 +12,7 @@ from lib.colors import colors
 from lib.f1font import regular_font, bold_font
 import pandas as pd
 import traceback
+import repeated.common as cm
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -36,7 +37,9 @@ def laptime_results(driver1: str, driver2: str, round:str, year: typing.Optional
             year = int(year)
         except:
             year = now.year
-        if (year > now.year | year < 2018):
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                year -= 1
+        if (year > now.year or year < 2018):
             try:
                 race = fastf1.get_session(now.year, round, 'R')
             except:

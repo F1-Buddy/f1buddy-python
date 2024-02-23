@@ -42,27 +42,19 @@ And more!!
 
 
 ## Changelog
-- created lightsout game
-- fixed results, quali, wcc, wdc
-- fixed embed code overlapping with other commands
-
+- fixed fl ignoring user input
+- fix for not off season and latest completed = 0, schedule now works and all other year optional commands
+- fixed some cases where bitwise operators caused issues in short circuiting
+- fixed no emoji+track image for abu dhabi in schedule
+- fixed country flags for fl
 
 ## To-do
-- [ ] rewrite telemetry to take an optional second driver, also consider folder structure instead of current filenaming
-- [ ] fix wdc hitting discord embed character limit. current implementation is hardcoded, just calculate and adjust as necessary
-- [ ] IMPORTANT add telemetry option for just 1 driver and specific lap number (consider other commands)
-- [ ] (should fix asap, easy) add error handling embed for consistency when can't find race (e.g. 2018)
-- [ ] (should fix asap, easy) /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) 
-- [ ] add error handling embed for consistency when can't find race (e.g. 2018)
-- [ ] fix consistency bugging out when session occurs, but no data for session
-- [ ] (low priority) (maybe) make round an optional input for laptime and positions
-- [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
+- [ ] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
+- [ ] create a input checking function in common
+- [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
+- [ ] speed is excessively long, convert to use embed class
+- [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
+- [ ] fix outlier calculation for consistency
 
 ## Bugs
-- [ ] telemetry will bug out and display nothing or very weird outputs for a graph if called upon multiple times in quick succession
-- [ ] fix consistency bugging out when session occurs, but no data for session
-- [ ] if lap time data cannot be loaded from ergast (e.g. just after race results) for latest round, consistency will get stuck when calling 
-without round/year args
-- [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
-- [x] may need to call /fl a couple of times after first call to get output (seems to work just fine, cannot reproduce this bug)
-- [x] calling consistency more than once with the same args throws an error (seems to work just fine, cannot reproduce this bug)
+- [x] all old ones fixed
