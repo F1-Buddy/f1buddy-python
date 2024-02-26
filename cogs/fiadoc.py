@@ -28,6 +28,7 @@ def get_fia_doc():
     fileName = results[results.index('/sites/default/files/decision-document/')+len('/sites/default/files/decision-document/'):]
     message_embed.description = fileName[:-4]
     filePath = f"cogs/fiaDocs/{fileName[:-4]}"
+    images = []    
     # check if document already exists
     if not os.path.exists(f"{filePath}"):
         # make the file and save the pdf
@@ -45,6 +46,7 @@ def get_fia_doc():
                 pix = page.get_pixmap(matrix=(fitz.Matrix(300 / 72, 300 / 72)))
                 output = f"{filePath}/{page_num}.png"
                 pix.save(output)
+                images.append(discord.File(f"{filePath}/{page_num}.png", filename=f"{page_num}.png"))
                 page_num += 1
         except ValueError:
             pass
@@ -53,13 +55,8 @@ def get_fia_doc():
         os.remove(f"{filePath}/{fileName}")
     else:
         print("Already got this document")
-
-    # get images, turn into discord.File, put in list
-    files = []
-    for image in os.listdir(filePath):
-        files.append(discord.File(f"{filePath}/{image}", filename=f"{image}"))
-    # return images
-    return files
+        
+    return images
         
 class fia_doc(commands.Cog):
     def __init__(self, bot: commands.Bot):
