@@ -54,8 +54,9 @@ def get_fia_doc():
         # delete the pdf
         os.remove(f"{filePath}/{fileName}")
     else:
+        for image in os.listdir(filePath):
+            images.append(discord.File(f"{filePath}/{image}", filename=f"{image}"))
         print("Already got this document")
-        
     return images
         
 class fia_doc(commands.Cog):
