@@ -24,6 +24,9 @@ def currently_offseason():
 
 def latest_completed_index(year):
     now = pd.Timestamp.now().tz_localize('America/New_York')
+    # now = pd.Timestamp(2024,5,2).tz_localize('America/New_York') #miami may 05
+    # now = pd.Timestamp(2024,10,17).tz_localize('America/New_York') #cota oct 20
+    # now = pd.Timestamp(2024,11,19).tz_localize('America/New_York') #las vegas nov 23
     # for testing
     # now = pd.Timestamp(year=2023, month=5, day=6).tz_localize('America/New_York')
     schedule = fastf1.get_event_schedule(year, include_testing=False)

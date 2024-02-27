@@ -59,7 +59,9 @@ def get_schedule():
         else:
             # get next event
             # print(f'latest completed is: {cm.latest_completed_index(year=now.year)}')
-            next_event = cm.latest_completed_index(year=now.year) + 1
+            next_event = cm.latest_completed_index(year=now.year)
+            if next_event == 0:
+                next_event += 1 
 
             # convert each session to EST  
             if (schedule.loc[next_event, "EventFormat"] == 'conventional'):
@@ -108,12 +110,12 @@ def get_schedule():
             # time_until = schedule.loc[next_event, "Session5DateUtc"].tz_localize("UTC").tz_convert('America/New_York') - now
             race_ts = int((converted_session_times.get(f":checkered_flag: Race") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
             quali_ts = int((converted_session_times.get(f":stopwatch: Qualifying") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
-            description_string = f'Qualifying is in <t:{quali_ts}:R>\nRace is in <t:{race_ts}:R>!'
+            description_string = f'Race is in <t:{race_ts}:R>!'
             title_string = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
             
             # get track image
-            url_formats = ( f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html"
-                            f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace(' ', '_')}/Circuit.html",
+            url_formats = ( f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html",
+                            f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace(' ', '_')}/Circuit.html"
                            )
             for url in url_formats:
                 if (schedule.loc[next_event,'Country'] == 'Abu Dhabi'):
