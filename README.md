@@ -42,14 +42,11 @@ And more!!
 
 
 ## Changelog
-- fixed fl ignoring user input
-- fix for not off season and latest completed = 0, schedule now works and all other year optional commands
-- fixed some cases where bitwise operators caused issues in short circuiting
-- fixed no emoji+track image for abu dhabi in schedule
-- fixed country flags for fl
+- fixed fiadoc wrong order of images
 
 ## To-do
-- [ ] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
+- [ ] IMPORTANT fl is completely broken, 2020 doesnt work
+- [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
 - [ ] create a input checking function in common
 - [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
 - [ ] speed is excessively long, convert to use embed class

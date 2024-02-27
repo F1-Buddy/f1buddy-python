@@ -95,13 +95,13 @@ def get_fastest_lap(self, round, year):
                     continue
         except Exception as e:
             traceback.print_exc()
-            return em.ErrorEmbed(error_message=traceback.format_exc())      
+            return [em.ErrorEmbed(error_message=traceback.format_exc())]
     else: # if round not none, get lap for that round
         try:
             driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round, year,driver_name, driver_laptime, tyre_age, grand_prix, emoji_list)
         except Exception as e:
             traceback.print_exc()
-            return em.ErrorEmbed(error_message=traceback.format_exc())
+            return [em.ErrorEmbed(error_message=traceback.format_exc())]
 
     # print('testing')
     num_races = len(grand_prix)
@@ -183,7 +183,7 @@ class fastest_lap(commands.Cog):
             traceback.print_exc()
             fastest_lap_embeds = [em.ErrorEmbed()]
         try:
-            fastest_lap_embeds.remove(None)
+            # fastest_lap_embeds.remove(None)
             await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds])
             
         except Exception as e:
