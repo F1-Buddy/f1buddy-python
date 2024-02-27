@@ -32,13 +32,12 @@ consistency_embed = discord.Embed(title="Laptime Consistency", description="")
 
 def laptime_consistency(driver, year, round):
     try:
-        year_OoB = True
-        if year != None:
-            year_OoB = (year > now.year) or (year < 2018)
-        if (year_OoB):
-            year = now.year
-            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-                year -= 1
+        try:
+            year = cm.check_year(year,True)
+        except cm.YearNotValidException as e:
+            return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+        except:
+            return em.ErrorEmbed(error_message=traceback.format_exc()).embed
         if (round == None):
             round = cm.latest_completed_index(year)
             result_session = fastf1.get_session(year, round, 'Race')

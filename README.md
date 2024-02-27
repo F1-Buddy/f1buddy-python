@@ -48,6 +48,7 @@ And more!!
 ## To-do
 - [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
 - [x] create a input checking function in common
+- [ ] fix outlier calculation for consistency, currently awful
 - [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
 - [ ] speed is excessively long, convert to use embed class
 - [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
@@ -55,3 +56,4 @@ And more!!
 
 ## Bugs
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work
+- [ ] /consistency ver 2018

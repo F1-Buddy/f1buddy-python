@@ -160,11 +160,13 @@ def plot_avg(driver_positions, driver_colors,session_type,year,category,filepath
 
 def get_embed_and_image(year, session_type, category):
     try:
-        now = pd.Timestamp.now()
-        if (year is None) or (year > now.year):
-                year = now.year
-                if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-                    year = now.year - 1
+        # now = pd.Timestamp.now()
+        try:
+            year = cm.check_year(year)
+        except cm.YearNotValidException as e:
+            return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+        except:
+            return em.ErrorEmbed(error_message=traceback.format_exc()).embed
         latest_event_index = cm.latest_completed_index(year)
         folder_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}'
         file_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}/{latest_event_index}.png'

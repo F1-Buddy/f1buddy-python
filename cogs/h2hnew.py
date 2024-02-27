@@ -20,6 +20,8 @@ import repeated.common as cm
 import repeated.embed as em
 import pandas as pd
 import fastf1.plotting as f1plt
+import repeated.common as cm
+import repeated.embed as em
 
 
 # get current time
@@ -215,10 +217,12 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
   
 def get_embed(self, year, session_type):
     try:
-        if (year is None):
-            year = now.year
-            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-                year -= 1
+        try:
+            year = cm.check_year(year)
+        except cm.YearNotValidException as e:
+            return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+        except:
+            return em.ErrorEmbed(error_message=traceback.format_exc()).embed
         
         folder_path = f'./cogs/plots/h2h/{year}/{session_type.name}'
         file_path = f'./cogs/plots/h2h/{year}/{session_type.name}/{cm.latest_completed_index(year)}.png'

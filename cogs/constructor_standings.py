@@ -22,7 +22,6 @@ def get_constructor_standings(self, year):
     # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
     try:
         year = cm.check_year(year)
-        print(year)
     except cm.YearNotValidException as e:
         return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
     except:
