@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 import discord
 import typing
 import pandas as pd
@@ -9,6 +10,7 @@ from lib.emojiid import team_emoji_ids
 from lib.colors import colors
 # import fastf1
 import repeated.common as cm
+import repeated.embed as em
 
 now = pd.Timestamp.now().tz_localize('America/New_York')
         
@@ -18,17 +20,15 @@ def get_driver_standings(self, year):
     
     # fixed not working during new year off season but still not great
     # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
-    year_OoB = (year is None) or (year <= 1957) or (year >= now.year)
-    if not year_OoB:
-        year = year
-    else:
-        year = now.year
-        # schedule = fastf1.get_event_schedule(now.year, include_testing=False)
-        # first_event_index = schedule.index[0]
-        # first_event_time = schedule.loc[first_event_index,'Session5DateUtc'].tz_localize("UTC")
-        if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-            year -= 1
-            
+    try:
+        year = cm.check_year(year)
+        print(year)
+    except cm.YearNotValidException as e:
+        print("bad year")
+        return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+    except:
+        return em.ErrorEmbed(error_message=traceback.format_exc()).embed
+    
     # go through each
     driver_standings = ergast.get_driver_standings(season=year).content[0]
     for index in range(len(driver_standings)):

@@ -9,6 +9,8 @@ from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from lib.colors import colors
 import repeated.common as cm
+import repeated.embed as em
+import traceback
 
 now = pd.Timestamp.now().tz_localize('America/New_York')
 
@@ -18,13 +20,14 @@ def get_constructor_standings(self, year):
 
     # fixed not working during new year off season but still not great
     # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
-    year_OoB = (year is None) or (year <= 1957) or (year >= now.year)
-    if not year_OoB:
-        year = year
-    else:
-        year = now.year
-        if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
-            year -= 1
+    try:
+        year = cm.check_year(year)
+        print(year)
+    except cm.YearNotValidException as e:
+        print("bad year")
+        return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+    except:
+        return em.ErrorEmbed(error_message=traceback.format_exc()).embed
     
     constructor_standings = ergast.get_constructor_standings(season=year).content[0]
     for index in range(len(constructor_standings)):

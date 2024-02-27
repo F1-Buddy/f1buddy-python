@@ -4,6 +4,11 @@ import pandas as pd
 
 fastf1.Cache.enable_cache('cache/')
 
+class YearNotValidException(Exception):
+    pass
+class RoundNotValidException(Exception):
+    pass
+
 def currently_offseason():
     now = pd.Timestamp.now().tz_localize('America/New_York')
     schedule = fastf1.get_event_schedule(now.year, include_testing=False)
@@ -36,3 +41,21 @@ def latest_completed_index(year):
     return next_event
 
 # create function for input checking (year/round)
+def check_year(year,data=None):
+    now = pd.Timestamp.now().tz_localize('America/New_York')
+    upper_lim = now.year
+    if (latest_completed_index(upper_lim) == 0): 
+        upper_lim -= 1
+    if year is None:
+        return upper_lim
+    if (data):
+        if (year < 2018) or (year > upper_lim):
+            raise YearNotValidException(f"Year is invalid. Valid range for this data is 2018-{upper_lim}")
+        else:
+            return year
+    else:
+        if (year < 1958) or (year > upper_lim):
+            raise YearNotValidException(f"Year is invalid. Valid range for this data is 1958-{upper_lim}")
+        else:
+            return year
+        

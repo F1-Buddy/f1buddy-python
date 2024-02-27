@@ -31,20 +31,20 @@ class Embed:
             self.embed.set_footer(text=footer)
 class ErrorEmbed(Embed):
     def __init__(self,title = None, error_message = None,footer_message = None):
-        self.embed = discord.Embed(title=f"Default Embed", description="",).set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        self.embed = discord.Embed(title=f"Error Occured :(", description="Default Error Message",).set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         self.embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         self.embed.colour = colors.default
         self.embed.clear_fields()
         
         gif_url = 'https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif'
         super().__init__(title=title,
-                         description='Error Occured :(\n'+str(error_message) , 
+                         description=str(error_message), 
                          image_url=gif_url,  
                          footer=footer_message
                          )
 class OffseasonEmbed(Embed):
     def __init__(self):
-        self.embed = discord.Embed(title=f"Default Embed", description="",).set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
+        self.embed = discord.Embed(title=f"Offseason Embed", description="",).set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         self.embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         self.embed.colour = colors.default
         self.embed.clear_fields()

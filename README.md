@@ -43,15 +43,15 @@ And more!!
 
 ## Changelog
 - fixed fiadoc wrong order of images
+- added year input check function to wdc/wcc
 
 ## To-do
-- [ ] IMPORTANT fl is completely broken, 2020 doesnt work
 - [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
-- [ ] create a input checking function in common
+- [x] create a input checking function in common
 - [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
 - [ ] speed is excessively long, convert to use embed class
 - [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
 - [ ] fix outlier calculation for consistency
 
 ## Bugs
-- [x] all old ones fixed
+- [ ] IMPORTANT fl is completely broken, 2020 doesnt work
