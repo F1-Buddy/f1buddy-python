@@ -112,8 +112,8 @@ def get_schedule():
             title_string = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
             
             # get track image
-            url_formats = (f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace(' ', '_')}/Circuit.html",
-                           f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html"
+            url_formats = ( f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html"
+                            f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace(' ', '_')}/Circuit.html",
                            )
             for url in url_formats:
                 if (schedule.loc[next_event,'Country'] == 'Abu Dhabi'):
