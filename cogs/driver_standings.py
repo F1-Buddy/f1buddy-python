@@ -24,7 +24,6 @@ def get_driver_standings(self, year):
         year = cm.check_year(year)
         print(year)
     except cm.YearNotValidException as e:
-        print("bad year")
         return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
     except:
         return em.ErrorEmbed(error_message=traceback.format_exc()).embed
