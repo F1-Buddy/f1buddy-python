@@ -109,8 +109,9 @@ def get_schedule():
             
             # time_until = schedule.loc[next_event, "Session5DateUtc"].tz_localize("UTC").tz_convert('America/New_York') - now
             race_ts = int((converted_session_times.get(f":checkered_flag: Race") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
-            quali_ts = int((converted_session_times.get(f":stopwatch: Qualifying") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
-            description_string = f'Race is in <t:{race_ts}:R>!'
+            # quali ts was used to show "qualifying in 3 days..." but not all weekends have the same qualifying naming scheme so dictionary get breaks
+            # quali_ts = int((converted_session_times.get(f":stopwatch: Qualifying") - pd.Timestamp("1970-01-01").tz_localize('UTC')) / pd.Timedelta('1s'))
+            description_string = f'Race is <t:{race_ts}:R>!'
             title_string = "Race Schedule for "+emoji+"**" + race_name + "**" + emoji
             
             # get track image

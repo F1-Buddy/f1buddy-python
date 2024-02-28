@@ -120,9 +120,6 @@ def get_constructor_info(self, year):
             
             # print(string)
             dc_embed = em.Embed(title=title, description=description_string, )
-            # message_embed = discord.Embed(title=f"Constructor Information", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-            # message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-            # message_embed.colour = colors.default
             dc_embed.embed.add_field(name="Team", value=string, inline=True)
             dc_embed.embed.add_field(name = "Nationality", value = '\n'.join(constructor_nationality),inline = True)
             dc_embed.embed.add_field(name = "Championships", value = '\n'.join(constructor_championships),inline = True)

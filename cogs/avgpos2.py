@@ -205,11 +205,6 @@ class AveragePos(commands.Cog):
     @app_commands.choices(category=[app_commands.Choice(name="Drivers", value="Drivers"), app_commands.Choice(name="Teams", value="Teams"),])
     @app_commands.describe(year = "Year")
     async def positions(self, interaction: discord.Interaction, category: app_commands.Choice[str],session_type: app_commands.Choice[str], year: typing.Optional[int]):
-        # message_embed = discord.Embed(title=f"Average Finishing Gap between Teams", description="")
-        # message_embed.colour = colors.default
-        # message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-        # message_embed.set_thumbnail(
-        # url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
         dc_embed, file = await loop.run_in_executor(None, get_embed_and_image, year, session_type, category)

@@ -23,9 +23,9 @@ def get_constructor_standings(self, year):
     try:
         year = cm.check_year(year)
     except cm.YearNotValidException as e:
-        return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+        return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e)
     except:
-        return em.ErrorEmbed(error_message=traceback.format_exc()).embed
+        return em.ErrorEmbed(error_message=traceback.format_exc())
     
     constructor_standings = ergast.get_constructor_standings(season=year).content[0]
     for index in range(len(constructor_standings)):
@@ -44,9 +44,7 @@ def get_constructor_standings(self, year):
         except:
             team_names.append(name)
     
-    message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-    message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-    message_embed.colour = colors.default
+    dc_embed = em.Embed(title=f"{year} Constructor Standings")
     
     # Sets McLaren's position to EX, due to their disqualification in the 2007 constructor's championship. 
     if (year == 2007):
@@ -57,10 +55,10 @@ def get_constructor_standings(self, year):
     team_names = '\n'.join(team_names)
     team_points = '\n'.join(map(str, team_points))
     
-    message_embed.add_field(name="Position", value=team_position,inline=True)
-    message_embed.add_field(name="Team Name", value=team_names,inline=True)
-    message_embed.add_field(name="Points", value=team_points,inline=True)
-    return message_embed
+    dc_embed.embed.add_field(name="Position", value=team_position,inline=True)
+    dc_embed.embed.add_field(name="Team Name", value=team_names,inline=True)
+    dc_embed.embed.add_field(name="Points", value=team_points,inline=True)
+    return dc_embed
         
 class constructor_standings(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -76,9 +74,8 @@ class constructor_standings(commands.Cog):
         loop = asyncio.get_running_loop()
         # run query and build embed
         constructor_standings_embed = await loop.run_in_executor(None, get_constructor_standings, self, year)
-        constructor_standings_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         # send embed
-        await interaction.followup.send(embed = constructor_standings_embed)
+        await interaction.followup.send(embed = constructor_standings_embed.embed)
         loop.close()
 
 async def setup(bot):
