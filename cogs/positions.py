@@ -1,4 +1,4 @@
-import json
+import traceback
 import discord
 import asyncio
 import fastf1
@@ -7,12 +7,15 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from matplotlib.ticker import (MultipleLocator)
+import repeated.common as cm
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -28,38 +31,34 @@ def positions_result(round, year):
     f1plt.setup_mpl()
     f1plt.setup_mpl(misc_mpl_mods=False)
     fig, ax = plt.subplots(figsize=(8.0, 4.9))
-    plt.ylabel("Position")
-    plt.xlabel("Lap")
+    plt.ylabel("Position",fontproperties=regular_font, labelpad=10)
+    plt.xlabel("Lap",fontproperties=regular_font, labelpad=10)
     plt.tight_layout()
     plt.subplots_adjust(right=0.85,top = 0.89)
+    fig.set_facecolor('black')
     ax.set_facecolor('black')
     ax.set_ylim([21, 0])
     ax.set_yticks(range(1,21))
     # get current time
     now = pd.Timestamp.now()
 
+# fix for offseason
+# rewrite
     try:
         # year given is invalid
-        try:
-            year = int(year)
-        except:
-            year = now.year
-        if (year > now.year | year < 2018):
-            try:
-                race = fastf1.get_session(now.year, round, 'R')
-            except:
-                race = fastf1.get_session(now.year, (int)(round), 'R')
-            race.load()
-            racename = '' + str(race.date.year)+' '+str(race.event.EventName)
-        
-        # use given year
+        if (year is None) or ((year > now.year) or (year < 2018)):
+            event_year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                event_year -= 1
         else:
-            try:
-                race = fastf1.get_session(year, round, 'R')
-            except:
-                race = fastf1.get_session(year, (int)(round), 'R')
-            race.load()
-            racename = '' + str(race.date.year)+' '+str(race.event.EventName)
+            event_year = year
+        try:
+            event_round = int(round)
+        except ValueError:
+            event_round = round
+        race = fastf1.get_session(event_year, event_round, 'R')
+        race.load(laps=True,telemetry=False,weather=False,messages=False)
+        racename = '' + str(race.date.year)+' '+str(race.event.EventName)
 
         # check if graph already exists, if not create it
         message_embed.description = racename
@@ -84,18 +83,37 @@ def positions_result(round, year):
                         # absolute and utter failure
                         except Exception as e:
                             print(e)
+                            traceback.print_exc()
                 except:
                     # mazepin has no data
                     print("no info for this driver")
+                    traceback.print_exc()
 
             # pyplot setup
-            ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2)
+            ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2, prop=bold_font)
             ax.minorticks_off()
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
-            plt.title('Position Changes during '+racename)
+            
+            plt.title('Position Changes During '+racename, fontproperties=bold_font)
             plt.grid(visible=False, which='both')
             plt.rcParams['savefig.dpi'] = 300
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontproperties(regular_font)
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                fig.set_figheight(6.5)
+                fig.set_figwidth(10.6)
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.075,1.1), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+                # add text next to it
+                ax.text(-0.04,1.095, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=10,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
+                traceback.print_exc()
             # save plot
             plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
             # clear plot
@@ -110,10 +128,12 @@ def positions_result(round, year):
         
         except Exception as e:
             print(e)
-            message_embed.set_footer(text=e)
+            traceback.print_exc()
+            message_embed.description = traceback.format_exc()
     # 
     except Exception as e:
         print(e)
+        traceback.print_exc()
         message_embed.set_footer(text = e)
 
 class Positions(commands.Cog):
@@ -139,6 +159,7 @@ class Positions(commands.Cog):
             message_embed.set_image(url='attachment://image.png')
             await interaction.followup.send(embed=message_embed,file=file)
         except:
+            message_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             message_embed.description = "Error Occured :("            
             await interaction.followup.send(embed=message_embed)
         loop.close()

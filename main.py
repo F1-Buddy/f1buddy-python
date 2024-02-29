@@ -1,4 +1,4 @@
-import fastf1
+# import fastf1
 import discord
 import config
 import os
@@ -6,7 +6,7 @@ import asyncio
 from discord.ext import commands
 
 
-fastf1.Cache.enable_cache('cache/')
+# fastf1.Cache.enable_cache('cache/')
 # basic bot setup
 ########################################
 # token = open('token.txt').readline()
@@ -28,6 +28,9 @@ async def load():
     for file in os.listdir('./cogs'):
         if file.endswith('.py'):
             await bot.load_extension(f'cogs.{file[:-3]}')
+    # for file in os.listdir('./cogsmotogp'):
+    #     if file.endswith('.py'):
+    #         await bot.load_extension(f'cogsmotogp.{file[:-3]}')
 
 
 async def main():

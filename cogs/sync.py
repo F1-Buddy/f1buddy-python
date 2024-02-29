@@ -1,4 +1,4 @@
-# sync all commands
+# sync all commands2
 import discord
 from discord.ext import commands
 
@@ -15,16 +15,21 @@ class Sync(commands.Cog):
     @commands.command()
     async def sync(self, ctx) -> None:
         # check if user ids are me anurag or jubayer
-        if (ctx.message.author.id == 235835251052642315) | (ctx.message.author.id == 308274708262944769) | (ctx.message.author.id == 403699636612890624):
+        if (ctx.message.author.id == 235835251052642315) or (ctx.message.author.id == 308274708262944769) or (ctx.message.author.id == 403699636612890624):
             # update status
-            activity=discord.Activity(type=discord.ActivityType.listening, name=f"V10s | {len(self.bot.guilds)} servers")
+            activity=discord.Activity(type=discord.ActivityType.listening, name=f"V10s or /help or {len(self.bot.guilds)} servers")
             await self.bot.change_presence(activity=activity)
+            # change nickname
+            await self.bot.user.edit(username='F1Buddy')
+            print("Changed name and status")
             # sync commands
             fmt = await ctx.bot.tree.sync()
             commands = len(fmt)
+            print("Synced commands")
             user = self.bot.get_user(ctx.message.author.id)
             # send message
-            await ctx.send(f'{user} synced {commands} commands')
+            await ctx.send(f'{user.mention} synced {commands} commands')
+            print("Replied")
         # other user tries to sync
         else:
             user = self.bot.get_user(ctx.message.author.id)
