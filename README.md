@@ -42,12 +42,13 @@ And more!!
 
 
 ## Changelog
+- added automatic fiadocs
 - fixed fiadoc wrong order of images
 - added year input check function to wdc/wcc
 
 ## To-do
-- [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
 - [x] create a input checking function in common
+- [ ] fix scenario where >1 fiadoc posted while asleep
 - [ ] convert following commands to new em.Embed: 
     - [x] `constructor_standings.py`
     - [ ] `driver.py`

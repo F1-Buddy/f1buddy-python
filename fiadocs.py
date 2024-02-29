@@ -45,15 +45,15 @@ async def getLatest():
     else:
         # print('already got, skipping')
         return None, None
-    return images, fileName    
+    return images, fileName[:-4], ('https://www.fia.com/' + document.replace(" ","%20"))
     
 async def threadMain(bot):
     channel_id = 1212636200217878528
     channel = bot.get_channel(channel_id)
     while (True):
-        images,docName = await getLatest()
+        images,docName, doc_url = await getLatest()
         if images:
-            message = await channel.send(embed=em.Embed(title='Latest FIA Doc',description=docName).embed,files=images)
+            message = await channel.send(embed=em.Embed(title='Latest FIA Doc',description=f"[{docName}]({doc_url})").embed,files=images)
             await message.publish()
             # print(images)
         await asyncio.sleep(10)
