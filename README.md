@@ -42,6 +42,7 @@ And more!!
 
 
 ## Changelog
+- added parameter to fiadoc
 - fixed fiadoc wrong order of images
 - added year input check function to wdc/wcc
 
@@ -59,6 +60,8 @@ And more!!
     - [ ] `qualigap.py`
     - [ ] `speed.py`
     - [ ] `strategy.py`
+- [ ] add year parameter to fiadoc
+- [ ] create running changelog file
 - [ ] fix outlier calculation for consistency, currently awful
 - [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
 - [ ] speed is excessively long, convert to use embed class
