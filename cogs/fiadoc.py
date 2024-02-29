@@ -1,6 +1,7 @@
 import asyncio
 import requests
 import discord
+import typing
 from bs4 import BeautifulSoup
 import pandas as pd
 from discord import app_commands
@@ -8,6 +9,7 @@ from discord.ext import commands
 from lib.colors import colors
 import fitz
 import os
+import repeated.embed as em
 
 now = pd.Timestamp.now()
         
@@ -16,16 +18,31 @@ message_embed = discord.Embed(title=f"Latest FIA Document", description="").set_
 message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
 message_embed.colour = colors.default        
 
-def get_fia_doc():
+def get_fia_doc(doc = None):
+    message_embed.title = f"FIA Document {doc}"
+
+    if doc is None:
+        doc = 0
+        message_embed.title = f"Latest FIA Document"
+
     # get fia site
     url = 'https://www.fia.com/documents/championships/fia-formula-one-world-championship-14/season/season-2024-2043'
     html = requests.get(url=url)
     s = BeautifulSoup(html.content, 'html.parser')
     # get latest document
-    results = s.find(class_='document-row').find('a')['href']
-    doc_url = 'https://www.fia.com/' + results
+    results = s.find_all(class_='document-row') #.find_all('a')
+    documents = []
+    for result in results:
+        documents.append(result.find('a')['href'])
+    if doc > len(documents):
+        raise IndexError("womp womp")
+    # print(documents)
+    doc_url = 'https://www.fia.com/' + documents[doc]
     # create a file path for it
-    fileName = results[results.index('/sites/default/files/decision-document/')+len('/sites/default/files/decision-document/'):]
+    # fileName = results[results.index('/sites/default/files/decision-document/')+len('/sites/default/files/decision-document/'):]
+    # print(documents[doc])
+    fileName = documents[doc][documents[doc].index('/sites/default/files/decision-document/')+len('/sites/default/files/decision-document/'):]
+    # print(fileName)
     message_embed.description = fileName[:-4]
     filePath = f"cogs/fiaDocs/{fileName[:-4]}"
     images = []    
@@ -56,7 +73,7 @@ def get_fia_doc():
     else:
         for image in os.listdir(filePath):
             images.append(discord.File(f"{filePath}/{image}", filename=f"{image}"))
-        print("Already got this document")
+        # print("Already got this document")
     return images
         
 class fia_doc(commands.Cog):
@@ -66,15 +83,19 @@ class fia_doc(commands.Cog):
     async def on_ready(self):
         print('FIA Docs cog loaded')
     @app_commands.command(name='fiadoc', description='Get latest FIA Document')
+    @app_commands.describe(doc = "Go back X documents")
     # @app_commands.describe(year = "Standings year")
     
-    async def driver_standings(self, interaction: discord.InteractionMessage):
+    async def driver_standings(self, interaction: discord.InteractionMessage, doc: typing.Optional[int]):
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
         # run query and build embed
-        fia_doc_images = await loop.run_in_executor(None, get_fia_doc)
+        try:
+            fia_doc_images = await loop.run_in_executor(None, get_fia_doc, doc)
+            await interaction.followup.send(embed = message_embed, files = fia_doc_images)
+        except IndexError:
+            await interaction.followup.send(embed = em.ErrorEmbed(title="Document doesn't exist!").embed)
         # send embed
-        await interaction.followup.send(embed = message_embed, files = fia_doc_images)
         loop.close()
 
 async def setup(bot):

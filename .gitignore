@@ -1,8 +1,6 @@
 token.txt
 config.py
-test.py
-test2.py
-test3.py
+test*.py
 .DS_Store
 # cache/
 /cache/*
