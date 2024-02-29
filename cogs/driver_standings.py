@@ -1,5 +1,5 @@
 import asyncio
-import datetime
+import traceback
 import discord
 import typing
 import pandas as pd
@@ -8,19 +8,33 @@ from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from lib.colors import colors
+# import fastf1
+import repeated.common as cm
+import repeated.embed as em
 
-now = pd.Timestamp.now()
+now = pd.Timestamp.now().tz_localize('America/New_York')
         
 def get_driver_standings(self, year):
     driver_name, driver_position, driver_points = [], [], []
     ergast = Ergast()
-    year = datetime.datetime.now().year if (year == None) or (year < 1957) or (year >= now.year) else year # set year depending on input
-            
+    
+    # fixed not working during new year off season but still not great
+    # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
+    try:
+        year = cm.check_year(year)
+    except cm.YearNotValidException as e:
+        return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+    except:
+        return em.ErrorEmbed(error_message=traceback.format_exc()).embed
+    
     # go through each
     driver_standings = ergast.get_driver_standings(season=year).content[0]
     for index in range(len(driver_standings)):
         position = driver_standings.iloc[index]['position']
-        name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']}"
+        if index == 0 and year != now.year:
+            name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']} :crown:"
+        else:
+            name = f"{driver_standings.iloc[index]['givenName']} {driver_standings.iloc[index]['familyName']}"
         points = (driver_standings.iloc[index]['points'])
         if points == int(points):
             points = int(points)
@@ -29,6 +43,9 @@ def get_driver_standings(self, year):
         constructor_name = driver_standings.iloc[index]['constructorNames']
         # if driver has drove for multiple teams
         constructor_name = constructor_name[0]
+        
+        # COME UP WITH A BETTER SYSTEM
+        # maybe store names in list instead, check if too long and edit list from there, create string after
         try:
             # discord runs out of character space after 21 drivers
             if (len(driver_standings) <= 22):

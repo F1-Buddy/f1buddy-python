@@ -1,3 +1,4 @@
+import traceback
 import discord
 import asyncio
 import fastf1
@@ -6,6 +7,7 @@ import typing
 from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
@@ -13,6 +15,7 @@ from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
 from matplotlib.ticker import (MultipleLocator)
+import repeated.common as cm
 
 fastf1.Cache.enable_cache('cache/')
 
@@ -39,15 +42,16 @@ def positions_result(round, year):
     # get current time
     now = pd.Timestamp.now()
 
+# fix for offseason
+# rewrite
     try:
         # year given is invalid
-        if year == None:
+        if (year is None) or ((year > now.year) or (year < 2018)):
             event_year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                event_year -= 1
         else:
-            if (year > now.year | year < 2018):
-                event_year = now.year
-            else:
-                event_year = year
+            event_year = year
         try:
             event_round = int(round)
         except ValueError:
@@ -79,9 +83,11 @@ def positions_result(round, year):
                         # absolute and utter failure
                         except Exception as e:
                             print(e)
+                            traceback.print_exc()
                 except:
                     # mazepin has no data
                     print("no info for this driver")
+                    traceback.print_exc()
 
             # pyplot setup
             ax.legend(bbox_to_anchor=(1.0, 1.02), fontsize=9.2, prop=bold_font)
@@ -94,6 +100,20 @@ def positions_result(round, year):
             plt.rcParams['savefig.dpi'] = 300
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontproperties(regular_font)
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                fig.set_figheight(6.5)
+                fig.set_figwidth(10.6)
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.075,1.1), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+                # add text next to it
+                ax.text(-0.04,1.095, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=10,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
+                traceback.print_exc()
             # save plot
             plt.savefig("cogs/plots/positions/"+race.date.strftime('%Y-%m-%d_%I%M')+"_positions"+'.png')
             # clear plot
@@ -108,10 +128,12 @@ def positions_result(round, year):
         
         except Exception as e:
             print(e)
-            message_embed.set_footer(text=e)
+            traceback.print_exc()
+            message_embed.description = traceback.format_exc()
     # 
     except Exception as e:
         print(e)
+        traceback.print_exc()
         message_embed.set_footer(text = e)
 
 class Positions(commands.Cog):

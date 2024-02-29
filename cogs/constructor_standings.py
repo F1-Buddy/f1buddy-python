@@ -1,20 +1,31 @@
 import asyncio
-import datetime
 import discord
 import typing
 import pandas as pd
 from fastf1.ergast import Ergast
+import fastf1
 from discord import app_commands
 from discord.ext import commands
 from lib.emojiid import team_emoji_ids
 from lib.colors import colors
+import repeated.common as cm
+import repeated.embed as em
+import traceback
 
-now = pd.Timestamp.now()
+now = pd.Timestamp.now().tz_localize('America/New_York')
 
 def get_constructor_standings(self, year):
     ergast = Ergast()
     team_names, team_position, team_points = [], [], []
-    year = datetime.datetime.now().year if (year == None) or (year < 1957) or (year >= now.year) else year # set year depending on input
+
+    # fixed not working during new year off season but still not great
+    # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
+    try:
+        year = cm.check_year(year)
+    except cm.YearNotValidException as e:
+        return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e)
+    except:
+        return em.ErrorEmbed(error_message=traceback.format_exc())
     
     constructor_standings = ergast.get_constructor_standings(season=year).content[0]
     for index in range(len(constructor_standings)):
@@ -24,15 +35,16 @@ def get_constructor_standings(self, year):
             points = int(points)
         team_position.append(position)
         team_points.append(points)
-        names = constructor_standings.iloc[index]['constructorName']
+        name = constructor_standings.iloc[index]['constructorName']
         try:
-            team_names.append((str)(self.bot.get_emoji(team_emoji_ids[names])) + ' ' + names)
+            emoji = (str)(self.bot.get_emoji(team_emoji_ids[name]))
+            if (now.year != year and index == 0):
+                name = f"{constructor_standings.iloc[index]['constructorName']} :crown:"
+            team_names.append(emoji + ' ' + name)
         except:
-            team_names.append(names)
+            team_names.append(name)
     
-    message_embed = discord.Embed(title=f"{year} Constructor Standings", description="").set_thumbnail(url='https://cdn.discordapp.com/attachments/884602392249770087/1059464532239581204/f1python128.png')
-    message_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-    message_embed.colour = colors.default
+    dc_embed = em.Embed(title=f"{year} Constructor Standings")
     
     # Sets McLaren's position to EX, due to their disqualification in the 2007 constructor's championship. 
     if (year == 2007):
@@ -43,10 +55,10 @@ def get_constructor_standings(self, year):
     team_names = '\n'.join(team_names)
     team_points = '\n'.join(map(str, team_points))
     
-    message_embed.add_field(name="Position", value=team_position,inline=True)
-    message_embed.add_field(name="Team Name", value=team_names,inline=True)
-    message_embed.add_field(name="Points", value=team_points,inline=True)
-    return message_embed
+    dc_embed.embed.add_field(name="Position", value=team_position,inline=True)
+    dc_embed.embed.add_field(name="Team Name", value=team_names,inline=True)
+    dc_embed.embed.add_field(name="Points", value=team_points,inline=True)
+    return dc_embed
         
 class constructor_standings(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -62,9 +74,8 @@ class constructor_standings(commands.Cog):
         loop = asyncio.get_running_loop()
         # run query and build embed
         constructor_standings_embed = await loop.run_in_executor(None, get_constructor_standings, self, year)
-        constructor_standings_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
         # send embed
-        await interaction.followup.send(embed = constructor_standings_embed)
+        await interaction.followup.send(embed = constructor_standings_embed.embed)
         loop.close()
 
 async def setup(bot):

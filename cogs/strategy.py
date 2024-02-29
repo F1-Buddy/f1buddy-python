@@ -9,11 +9,13 @@ from discord import app_commands
 from typing import Dict, List
 from discord.ext import commands
 from matplotlib import pyplot as plt
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from lib.colors import colors
 import pandas as pd
 import fastf1.plotting as f1plt
 from lib.f1font import regular_font, bold_font
 from matplotlib.ticker import (MultipleLocator)
+import repeated.common as cm
 
 # get current time
 now = pd.Timestamp.now()
@@ -76,11 +78,13 @@ def tire_strategy(round, year):
     
     try:
         # year given is invalid
-        if year == None:
+        if year is None:
             event_year = now.year
         else:
-            if (year > now.year | year < 2018):
+            if (year > now.year or year < 2018):
                 event_year = now.year
+                if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                    event_year -= 1
             else:
                 event_year = year
         try:
@@ -139,6 +143,17 @@ def tire_strategy(round, year):
                 label.set_fontsize(15)
             ax.tick_params(axis='y', pad=8)
             plt.subplots_adjust(top = 0.91)
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.06,-0.06), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+                # add text next to it
+                ax.text(-0.025,-0.07, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=13,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
             # save plot
             plt.savefig("cogs/plots/strategy/"+race.date.strftime('%Y-%m-%d_%I%M')+"_strategy"+'.png')
             # plt.show()

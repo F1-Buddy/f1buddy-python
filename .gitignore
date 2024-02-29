@@ -1,8 +1,6 @@
 token.txt
 config.py
-test.py
-test2.py
-test3.py
+test*.py
 .DS_Store
 # cache/
 /cache/*
@@ -10,6 +8,8 @@ test3.py
 
 /__pycache__/
 /cogs/__pycache__/
+/repeated/__pycache__/
+/cogsmotogp/__pycache__/
 /lib/__pycache__/
 /lib/colors.py
 
@@ -39,6 +39,8 @@ test3.py
 
 /cogs/plots/avgpos/*
 !/cogs/plots/avgpos/.gitkeep 
+
+/cogs/plots/h2h/*
 
 /cogs/plots/consistency/*
 !/cogs/plots/consistency/.gitkeep 

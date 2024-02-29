@@ -7,11 +7,13 @@ from discord import app_commands
 from discord.ext import commands
 from matplotlib import pyplot as plt
 import matplotlib
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 matplotlib.use('agg')
 from lib.colors import colors
 import pandas as pd
 from lib.f1font import regular_font, bold_font
 import fastf1.plotting as f1plt
+import repeated.common as cm
 fastf1.Cache.enable_cache('cache/')
 
 # setup embed
@@ -48,13 +50,12 @@ def quali_gap(round, year):
     event_round = None
     try:
         # year given is invalid
-        if year == None:
+        if (year is None) or ((year > now.year) or (year < 2018)):
             event_year = now.year
+            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+                    event_year -= 1
         else:
-            if (year > now.year | year < 2018):
-                event_year = now.year
-            else:
-                event_year = year
+            event_year = year
         try:
             event_round = int(round)
         except ValueError:
@@ -127,6 +128,18 @@ def quali_gap(round, year):
             for label in ax.get_yticklabels():
                 label.set_fontproperties(bold_font)
             plt.rcParams['savefig.dpi'] = 300
+            watermark_img = plt.imread('botPics/f1pythoncircular.png') # set directory for later use
+            try:
+                # add f1buddy pfp
+                watermark_box = OffsetImage(watermark_img, zoom=0.1) 
+                ab = AnnotationBbox(watermark_box, (-0.115,1.205), xycoords='axes fraction', frameon=False)
+                ax.add_artist(ab)
+                # add text next to it
+                ax.text(-0.07,1.195, 'Made by F1Buddy Discord Bot', transform=ax.transAxes,
+                        fontsize=10,fontproperties=bold_font)
+            except Exception as e:
+                print(e)
+            # save plot
             # save plot
             plt.savefig("cogs/plots/qualigap/"+race.date.strftime('%Y-%m-%d_%I%M')+"_QualiGap"+'.png')
             # plt.show()

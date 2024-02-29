@@ -1,11 +1,13 @@
-<img src="/botPics/f1python192.png">
+<a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=139586816064&scope=bot">
+    <img src="/botPics/f1python192.png">
+</a>
 
 # f1buddy-python
 
 A discord bot with all kinds F1 statistics and tools!
 Invite it to your server!
 
-<a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=2147798016&scope=bot">
+<a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=139586816064&scope=bot">
     <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="79" height="56">
 </a>
 
@@ -40,23 +42,32 @@ And more!!
 
 
 ## Changelog
-
-- updated help command and readme images
-- added multiple new commands since last main merge, consistency, fl, h2h, fiadoc, avgpos, strategy
-- fixed all graph aesthetics
-
+- added parameter to fiadoc
+- fixed fiadoc wrong order of images
+- added year input check function to wdc/wcc
 
 ## To-do
-- [ ] add watermark to all graphs? 
-- [ ] add error handling embed for consistency when can't find race (e.g. 2018)
-- [ ] fix consistency bugging out when session occurs, but no data for session
-- [ ] (low priority) (maybe) make round an optional input for laptime and positions
-- [ ] (low priority) fix hardcoded removal of DEV vs RIC comparison in h2h & hardcoded position values for RIC in avgpos
+- [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
+- [x] create a input checking function in common
+- [ ] convert following commands to new em.Embed: 
+    - [x] `constructor_standings.py`
+    - [ ] `driver.py`
+    - [ ] `driver_standings.py`
+    - [ ] `fiadoc.py`
+    - [ ] `help.py`
+    - [ ] `laptimes.py`
+    - [ ] `positions.py`
+    - [ ] `qualigap.py`
+    - [ ] `speed.py`
+    - [ ] `strategy.py`
+- [ ] add year parameter to fiadoc
+- [ ] create running changelog file
+- [ ] fix outlier calculation for consistency, currently awful
+- [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
+- [ ] speed is excessively long, convert to use embed class
+- [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
+- [ ] fix outlier calculation for consistency
 
 ## Bugs
-- [ ] 2020 season data is odd (example styrian gp, 2020 round 2)
-- [ ] telemetry will bug out and display nothing or very weird outputs for a graph if called upon multiple times in quick succession
-- [ ] if lap time data cannot be loaded from ergast (e.g. just after race results) for latest round, consistency will get stuck when calling without round/year args
-- [x] may need to call /fl a couple of times after first call to get output (seems to work just fine, cannot reproduce this bug)
-- [x] calling consistency more than once with the same args throws an error (seems to work just fine, cannot reproduce this bug)
-- [x] /avgpos will not generate a new graph after the race has occurred, if previously generated on same race weekend (e.g. generated on quali day, but will not update even after the race has occurred) (fixed, probably)
+- [ ] IMPORTANT fl is completely broken, 2020 doesnt work
+- [ ] /consistency ver 2018

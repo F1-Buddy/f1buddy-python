@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib import pyplot as plt
+matplotlib.use('agg')
 import pandas as pd
 from discord import app_commands
 from discord.ext import commands
@@ -16,7 +17,9 @@ from lib.drivernames import driver_names
 from datetime import datetime
 from lib.f1font import regular_font, bold_font
 import fastf1.plotting as f1plt
-current_year = datetime.now().year
+
+
+current_year = 2023
 now = pd.Timestamp.now()
 fastf1.Cache.enable_cache('cache/')
 message_embed = discord.Embed(title=f"Average Positions", description="Average Positions") # boilerplate/initalization for global scope
@@ -102,7 +105,7 @@ def plot_team_positions(year,sessiontype):
             ax.set_facecolor('black')
 
             plt.title(f"Average {sessiontype.value} Gap Between Teams",fontproperties=bold_font, pad=20)
-            plt.barh(df['TeamName'], df['AveragePos'],.9,color = df['TeamColor'])
+            plt.barh(df['TeamName'], df['AveragePos'],color = df['TeamColor'])
             # plt.xlim(left=min(df['AveragePos'])-.5)
             plt.xlim(right=20)
             plt.xlabel(f"Average {sessiontype.value} Position",fontproperties=regular_font)
@@ -234,7 +237,6 @@ def plot_avg_positions(event):
             # set blackground
             ax.set_facecolor('black')    
             fig.set_facecolor('black')
-
             try:
                 # add f1buddy pfp
                 watermark_box = OffsetImage(watermark_img, zoom=0.2) 
