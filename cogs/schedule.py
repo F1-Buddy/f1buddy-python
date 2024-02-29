@@ -144,7 +144,7 @@ def get_schedule():
             time_to_race = converted_session_times.get(":checkered_flag: Race")-now
             race_within_3days = time_to_race.total_seconds() < 259200
             if (race_within_3days):
-                weather_string, precip_string = get_weather_data(f"{schedule.loc[next_event, "Location"]}, {schedule.loc[next_event, "Country"]}")
+                weather_string, precip_string = get_weather_data(f"{schedule.loc[next_event, 'Location']}, {schedule.loc[next_event, 'Country']}")
                 days = "Friday\nSaturday\nSunday"
                 dc_embed.embed.add_field(name="Weather Forecast:", value="",inline=False)
                 dc_embed.embed.add_field(name="Day", value=days,inline=True)
