@@ -67,5 +67,6 @@ And more!!
 - [ ] fix outlier calculation for consistency
 
 ## Bugs
+- [ ] fiadoc thread dying? unsure of why
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018

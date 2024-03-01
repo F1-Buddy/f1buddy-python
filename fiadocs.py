@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 import requests
 import os
 import threading
@@ -51,12 +52,15 @@ async def threadMain(bot):
     channel_id = 1212636200217878528
     channel = bot.get_channel(channel_id)
     while (True):
-        images,docName, doc_url = await getLatest()
-        if images:
-            message = await channel.send(embed=em.Embed(title='Latest FIA Doc',description=f"[{docName}]({doc_url})").embed,files=images)
-            await message.publish()
-            # print(images)
-        await asyncio.sleep(10)
+        try:
+            images,docName, doc_url = await getLatest()
+            if images:
+                message = await channel.send(embed=em.Embed(title='Latest FIA Doc',description=f"[{docName}]({doc_url})").embed,files=images)
+                await message.publish()
+                # print(images)
+            await asyncio.sleep(10)
+        except Exception as e:
+            traceback.print_exc()
         
 async def createDocThread(bot):
     thread = threading.Thread(await threadMain(bot))
