@@ -45,7 +45,7 @@ async def getLatest():
         os.remove(f"{filePath}/{fileName}")
     else:
         # print('already got, skipping')
-        return None, None
+        return None, None, None
     return images, fileName[:-4], ('https://www.fia.com/' + document.replace(" ","%20"))
     
 async def threadMain(bot):
