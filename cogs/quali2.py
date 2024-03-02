@@ -1,3 +1,4 @@
+import traceback
 import discord
 import asyncio
 import fastf1
@@ -22,13 +23,14 @@ def quali_results(self,year,round):
             year = year
         else:
             year = now.year
-            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+            if (cm.latest_quali_completed_index(now.year) == 0):
                 year -= 1
             
         if (round == None):
-            # get latest completed session by starting from the end of calendar and going back towards beginning of season
-            result_session = fastf1.get_session(year, cm.latest_completed_index(year), 'Race')
-            # most recent session found, load it
+            latest_quali_index = cm.latest_quali_completed_index(year) - 1
+            if (latest_quali_index == 0):
+                latest_quali_index += 1
+            result_session = fastf1.get_session(year, latest_quali_index, 'Qualifying')
             result_session.load(laps=False, telemetry=False, weather=False, messages=False)
         else:
             event_round = None
@@ -50,13 +52,6 @@ def quali_results(self,year,round):
         # status_string = ""
         if (resultsTable.empty):
             return em.ErrorEmbed(title="Session data not found!")
-        
-        # idk why this is here its been too long
-        try:
-            total_positions = 0
-            num_races = 0
-        except: 
-            print("Error at 0.")
         
         for i in (resultsTable.DriverNumber.values):
             try:
@@ -98,6 +93,7 @@ def quali_results(self,year,round):
         dc_embed.embed.add_field(name = "Time", value = time_string,inline = True)
         return dc_embed.embed, video_url
     except Exception as e:
+        traceback.print_exc()
         return em.ErrorEmbed(error_message=f'{str(type(e))}: {str(e)}'), None
         
     

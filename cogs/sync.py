@@ -17,7 +17,7 @@ class Sync(commands.Cog):
         # check if user ids are me anurag or jubayer
         if (ctx.message.author.id == 235835251052642315) or (ctx.message.author.id == 308274708262944769) or (ctx.message.author.id == 403699636612890624):
             # update status
-            activity=discord.Activity(type=discord.ActivityType.listening, name=f"V10s or /help or {len(self.bot.guilds)} servers")
+            activity=discord.Activity(type=discord.ActivityType.listening, name=f"V10s | /help | {len(self.bot.guilds)} servers")
             await self.bot.change_presence(activity=activity)
             # change nickname
             await self.bot.user.edit(username='F1Buddy')

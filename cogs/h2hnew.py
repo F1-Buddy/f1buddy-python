@@ -218,7 +218,7 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
 def get_embed(self, year, session_type):
     try:
         try:
-            year = cm.check_year(year)
+            year = cm.check_year(year,False,False)
         except cm.YearNotValidException as e:
             return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
         except:

@@ -162,7 +162,7 @@ def get_embed_and_image(year, session_type, category):
     try:
         # now = pd.Timestamp.now()
         try:
-            year = cm.check_year(year)
+            year = cm.check_year(year,False,session_type == 'q')
         except cm.YearNotValidException as e:
             return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
         except:

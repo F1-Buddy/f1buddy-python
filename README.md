@@ -42,6 +42,7 @@ And more!!
 
 
 ## Changelog
+- fixed quali not working for 2024
 - added automatic fiadocs
 - fixed fiadoc wrong order of images
 - added year input check function to wdc/wcc

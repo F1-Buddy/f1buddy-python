@@ -33,7 +33,7 @@ consistency_embed = discord.Embed(title="Laptime Consistency", description="")
 def laptime_consistency(driver, year, round):
     try:
         try:
-            year = cm.check_year(year,True)
+            year = cm.check_year(year,True,False)
         except cm.YearNotValidException as e:
             return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
         except:
