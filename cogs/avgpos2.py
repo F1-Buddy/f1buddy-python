@@ -24,13 +24,17 @@ def get_event_data(session_type,year,category):
     # schedule = fastf1.get_event_schedule(year=year)
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
     first_index = schedule.index[0]
-    max_index = cm.latest_completed_index(year)
+    if (session_type.value == 'q'):
+        max_index = cm.latest_quali_completed_index(year)
+    else:
+        max_index = cm.latest_completed_index(year)
+    
     first_round = schedule.loc[first_index,'RoundNumber']
     last_round = schedule.loc[max_index,'RoundNumber']
     # print(first_index)
-    # print(max_index)
-    # print(first_round)
-    # print(last_round)
+    print(max_index)
+    print(first_round)
+    print(last_round)
     
     # event = fastf1.get_session(year,first_round,session_type)
     # event.load()
@@ -40,42 +44,45 @@ def get_event_data(session_type,year,category):
     driver_colors = {}
     driver_racesParticipated = {}
     
-    for i in range(first_round,last_round+1):
-        event = fastf1.get_session(year,i,session_type)
-        event.load(laps=False, telemetry=False, weather=False, messages=False)
-        results = event.results
-        # print(results)
-        
-        for driver in event.drivers:
-            if (category.name == 'Drivers'):
-                currDriver_abbreviation = results.loc[driver,'Abbreviation']
-            else:
-                currDriver_abbreviation = results.loc[driver,'TeamName']
+    for i in range(first_round,last_round + 1):
+        try:
+            event = fastf1.get_session(year,i,session_type.value)
+            event.load(laps=False, telemetry=False, weather=False, messages=False)
+            results = event.results
+            # print(results)
             
-            if driver_positions.get(currDriver_abbreviation) is None:
-                driver_positions.update({currDriver_abbreviation:0})
-
-            if driver_racesParticipated.get(currDriver_abbreviation) is None:
-                driver_racesParticipated.update({currDriver_abbreviation:0})
-            
-            if session_type == 'r':
-                currDriver_position = results.loc[driver,'ClassifiedPosition']
-            else:
-                currDriver_position = results.loc[driver,'Position']
-
+            for driver in event.drivers:
+                if (category.name == 'Drivers'):
+                    currDriver_abbreviation = results.loc[driver,'Abbreviation']
+                else:
+                    currDriver_abbreviation = results.loc[driver,'TeamName']
                 
-            currDriver_total = driver_positions.get(currDriver_abbreviation)
-            
-            if (type(currDriver_position) is str):
-                if (currDriver_position.isnumeric()):
+                if driver_positions.get(currDriver_abbreviation) is None:
+                    driver_positions.update({currDriver_abbreviation:0})
+
+                if driver_racesParticipated.get(currDriver_abbreviation) is None:
+                    driver_racesParticipated.update({currDriver_abbreviation:0})
+                
+                if session_type.value == 'r':
+                    currDriver_position = results.loc[driver,'ClassifiedPosition']
+                else:
+                    currDriver_position = results.loc[driver,'Position']
+
+                    
+                currDriver_total = driver_positions.get(currDriver_abbreviation)
+                
+                if (type(currDriver_position) is str):
+                    if (currDriver_position.isnumeric()):
+                        driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
+                        driver_positions.update({currDriver_abbreviation:currDriver_total+int(currDriver_position)})
+                else:
                     driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
-                    driver_positions.update({currDriver_abbreviation:currDriver_total+int(currDriver_position)})
-            else:
-                driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
-                driver_positions.update({currDriver_abbreviation:currDriver_total+(currDriver_position)})
-            
+                    driver_positions.update({currDriver_abbreviation:currDriver_total+(currDriver_position)})
                 
-            driver_colors.update({currDriver_abbreviation:results.loc[driver,'TeamColor']})
+                    
+                driver_colors.update({currDriver_abbreviation:results.loc[driver,'TeamColor']})
+        except KeyError:
+            print("session not completed")
     # print(driver_positions)
     # print(driver_colors)     
     # print(driver_racesParticipated)   
@@ -162,11 +169,11 @@ def get_embed_and_image(year, session_type, category):
     try:
         # now = pd.Timestamp.now()
         try:
-            year = cm.check_year(year,False,session_type == 'q')
+            year = cm.check_year(year,False,session_type.value == 'q')
         except cm.YearNotValidException as e:
-            return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
+            return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e), None
         except:
-            return em.ErrorEmbed(error_message=traceback.format_exc()).embed
+            return em.ErrorEmbed(error_message=traceback.format_exc()), None
         latest_event_index = cm.latest_completed_index(year)
         folder_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}'
         file_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}/{latest_event_index}.png'
@@ -176,7 +183,7 @@ def get_embed_and_image(year, session_type, category):
         if not (os.path.exists(file_path)):
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
-            pos,colors = get_event_data(session_type=session_type.value,year=year, category=category)
+            pos,colors = get_event_data(session_type=session_type,year=year, category=category)
             # catch any drawing errors
             try:
                 plot_avg(pos,colors,session_type,year,category,file_path)
@@ -206,12 +213,15 @@ class AveragePos(commands.Cog):
     @app_commands.describe(year = "Year")
     async def positions(self, interaction: discord.Interaction, category: app_commands.Choice[str],session_type: app_commands.Choice[str], year: typing.Optional[int]):
         await interaction.response.defer()
-        loop = asyncio.get_running_loop()
-        dc_embed, file = await loop.run_in_executor(None, get_embed_and_image, year, session_type, category)
-        if file != None:
-            await interaction.followup.send(embed=dc_embed.embed,file=file)
-        else:
-            await interaction.followup.send(embed=dc_embed.embed)
+        try:
+            loop = asyncio.get_running_loop()
+            dc_embed, file = await loop.run_in_executor(None, get_embed_and_image, year, session_type, category)
+            if file != None:
+                await interaction.followup.send(embed=dc_embed.embed,file=file)
+            else:
+                await interaction.followup.send(embed=dc_embed.embed)
+        except:
+            traceback.print_exc()
         loop.close()
 
 async def setup(bot):
