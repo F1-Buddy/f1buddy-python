@@ -41,7 +41,7 @@ def quali_results(self,year,round):
             result_session = fastf1.get_session(year, event_round, 'Qualifying')
             # inputs were valid, but the Qualifying hasnt happened yet
             if (now - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
-                return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + (str)(event_round) + "\" not found")
+                return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + (str)(event_round) + "\" not found"), None
             
         result_session.load(laps=False, telemetry=False, weather=False, messages=False)
         resultsTable = result_session.results
@@ -51,7 +51,7 @@ def quali_results(self,year,round):
         time_string = ""
         # status_string = ""
         if (resultsTable.empty):
-            return em.ErrorEmbed(title="Session data not found!")
+            return em.ErrorEmbed(title="Session data not found!"), None
         
         for i in (resultsTable.DriverNumber.values):
             try:
@@ -110,14 +110,16 @@ class Quali2(commands.Cog):
     @app_commands.describe(round = "Round name or number (Australia or 3)")
     async def Quali2(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[str]):  
         await interaction.response.defer()
-        loop = asyncio.get_running_loop()
-        # run results query and build embed
-        results_embed,video_url = await loop.run_in_executor(None, quali_results, self, year, round)
-        results_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-        # send embed
-        await interaction.followup.send(embed = results_embed)
-        if not (video_url == None):
-            await interaction.followup.send(video_url)
+        try:
+            loop = asyncio.get_running_loop()
+            # run results query and build embed
+            results_embed,video_url = await loop.run_in_executor(None, quali_results, self, year, round)
+            # send embed
+            await interaction.followup.send(embed = results_embed)
+            if not (video_url == None):
+                await interaction.followup.send(video_url)
+        except:
+            await interaction.followup.send(embed = em.ErrorEmbed(error_message=traceback.format_exc()).embed)
         loop.close()
 
 async def setup(bot):
