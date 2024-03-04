@@ -42,13 +42,19 @@ And more!!
 
 
 ## Changelog
-- added parameter to fiadoc
+Rakib -
+- fixed quali not working for 2024
+- added automatic fiadocs
 - fixed fiadoc wrong order of images
 - added year input check function to wdc/wcc
 
+Jubayer -
+- added parameter to fiadoc
+
+
 ## To-do
-- [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
 - [x] create a input checking function in common
+- [ ] fix scenario where >1 fiadoc posted while asleep
 - [ ] convert following commands to new em.Embed: 
     - [x] `constructor_standings.py`
     - [ ] `driver.py`
@@ -69,5 +75,6 @@ And more!!
 - [ ] fix outlier calculation for consistency
 
 ## Bugs
+- [ ] fiadoc thread dying? unsure of why
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018

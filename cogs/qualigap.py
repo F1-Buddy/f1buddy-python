@@ -52,7 +52,7 @@ def quali_gap(round, year):
         # year given is invalid
         if (year is None) or ((year > now.year) or (year < 2018)):
             event_year = now.year
-            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+            if (cm.currently_offseason()[0]) or (cm.latest_quali_completed_index(now.year) == 0):
                     event_year -= 1
         else:
             event_year = year
