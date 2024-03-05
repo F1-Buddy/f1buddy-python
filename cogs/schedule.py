@@ -59,7 +59,7 @@ def get_schedule():
         else:
             # get next event
             # print(f'latest completed is: {cm.latest_completed_index(year=now.year)}')
-            next_event = cm.latest_completed_index(year=now.year)
+            next_event = cm.latest_completed_index(year=now.year)+1
             if next_event == 0:
                 next_event += 1 
 

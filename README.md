@@ -75,6 +75,7 @@ Jubayer -
 - [ ] fix outlier calculation for consistency
 
 ## Bugs
+- [ ] latest_completed_index gives next index not latest completed, fix and fix implementations
 - [ ] fiadoc thread dying? unsure of why
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018
