@@ -41,7 +41,7 @@ def latest_completed_index(year):
         next_event += 1
         curr_event_date = schedule.loc[next_event,'Session5DateUtc'].tz_localize("UTC")
     # print(schedule.loc[next_event,'EventName'])
-    return next_event
+    return next_event - 1
 
 def latest_quali_completed_index(year):
     now = pd.Timestamp.now().tz_localize('America/New_York')
@@ -62,7 +62,7 @@ def latest_quali_completed_index(year):
         next_event += 1
         curr_event_date = schedule.loc[next_event,'Session4DateUtc'].tz_localize("UTC")
     # print(schedule.loc[next_event,'EventName'])
-    return next_event
+    return next_event - 1
 
 # create function for input checking (year/round)
 def check_year(year,data=None,quali=False):

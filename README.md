@@ -43,6 +43,8 @@ And more!!
 
 ## Changelog
 Rakib -
+- fixed all commands breaking due to wrong index (trying to get results from next (future) event instead of past event)
+- fixed fl embed error with only 1 embed
 - fixed quali not working for 2024
 - added automatic fiadocs
 - fixed fiadoc wrong order of images
@@ -72,10 +74,9 @@ Jubayer -
 - [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
 - [ ] speed is excessively long, convert to use embed class
 - [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
-- [ ] fix outlier calculation for consistency
 
 ## Bugs
-- [ ] latest_completed_index gives next index not latest completed, fix and fix implementations
+- [x] latest_completed_index gives next index not latest completed, fix and fix implementations
 - [ ] fiadoc thread dying? unsure of why
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018

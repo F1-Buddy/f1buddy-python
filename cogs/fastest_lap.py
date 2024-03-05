@@ -184,13 +184,13 @@ class fastest_lap(commands.Cog):
             fastest_lap_embeds = [em.ErrorEmbed()]
         try:
             # fastest_lap_embeds.remove(None)
-            await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds])
+            await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds if dcembed is not None])
             
         except Exception as e:
             traceback.print_exc()
             # fastest_lap_embed.set_image(url='https://media.tenor.com/lxJgp-a8MrgAAAAd/laeppa-vika-half-life-alyx.gif')
             # fastest_lap_embed.description = f"Error Occured :( {e}" 
-            await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds])
+            await interaction.followup.send(embeds=[dcembed.embed for dcembed in fastest_lap_embeds if dcembed is not None])
             print(e)
         loop.close()
         

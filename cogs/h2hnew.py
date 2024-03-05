@@ -43,7 +43,11 @@ def get_data(year, session_type):
     driver_country = {}
     outstring = ''
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
-    for c in range(min(schedule.index), max(schedule.index)+1):
+    if (session_type.value == 'q'):
+        max_index = cm.latest_quali_completed_index(year)
+    else:
+        max_index = cm.latest_completed_index(year)
+    for c in range(min(schedule.index), max_index+1):
     # for c in range(min(schedule.index),min(schedule.index)+5):
         session = fastf1.get_session(year, schedule.loc[c,'RoundNumber'], session_type.value)
         session.load(laps=False, telemetry=False, weather=False, messages=False)
