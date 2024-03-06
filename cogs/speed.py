@@ -230,7 +230,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
             file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d1_name+'vs'+d2_name+'.png', filename="image.png")
             message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
             message_embed.set_footer(text='')
-            print('found file')
+            # print('found file')
             return file
         
         except Exception as e:
@@ -239,7 +239,7 @@ def speed_results(driver1: str, driver2: str, round:str, year: typing.Optional[i
                 file = discord.File("cogs/plots/speed/"+race.date.strftime('%Y-%m-%d_%I%M')+f"_{sessiontype.name}_"+"_speed_"+d2_name+'vs'+d1_name+'.png', filename="image.png")
                 message_embed.description = '' + str(race.date.year)+' '+str(race.event.EventName)+ '\n' + driver1+" vs "+driver2
                 message_embed.set_footer(text='')
-                print("Swapped drivers around and found a file")
+                # print("Swapped drivers around and found a file")
                 return file
             # file does not exist and could not be created
             except:
