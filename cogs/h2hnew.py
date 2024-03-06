@@ -11,7 +11,6 @@ from matplotlib import pyplot as plt
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import matplotlib.patheffects as pe
 import matplotlib.image as mpim
-import numpy as np
 from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
@@ -22,6 +21,7 @@ import pandas as pd
 import fastf1.plotting as f1plt
 import repeated.common as cm
 import repeated.embed as em
+from PIL import Image
 
 
 # get current time
@@ -162,9 +162,9 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
             ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
             try:
                 # team logo
-                img = mpim.imread(f'lib/cars/logos/{team}.webp')
-                zoom = .2
-                imagebox = OffsetImage(img, zoom=zoom)
+                img = Image.open(f'lib/cars/logos/{team}.webp')
+                img.thumbnail((64,64))
+                imagebox = OffsetImage(mpim.pil_to_array(img), zoom=0.5)
                 ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
                 ax.add_artist(ab)
             except:

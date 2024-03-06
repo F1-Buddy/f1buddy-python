@@ -35,7 +35,7 @@ class lightsoutgame(commands.Cog):
             lights3 = ":red_circle: :red_circle: :red_circle: :black_circle: :black_circle:\n:red_circle: :red_circle: :red_circle: :black_circle: :black_circle:"
             lights4 = ":red_circle: :red_circle: :red_circle: :red_circle: :black_circle:\n:red_circle: :red_circle: :red_circle: :red_circle: :black_circle:"
             lights5 = ":red_circle: :red_circle: :red_circle: :red_circle: :red_circle:\n:red_circle: :red_circle: :red_circle: :red_circle: :red_circle:"
-            dc_embed = em.Embed(title="Lights out!",description=f"Wait for the lights and react the fastest!\n\n{lights0}")
+            dc_embed = em.Embed(title="Lights out!",description=f"Wait for the lights and react the fastest!\n\n{lights0}\n\n\n\n:red_square:      :race_car:")
             await interaction.followup.send(embed=dc_embed.embed)
             
             
@@ -43,28 +43,28 @@ class lightsoutgame(commands.Cog):
             await msg.add_reaction("🏎️")
             
             await asyncio.sleep(1)
-            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights1}"
+            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights1}\n\n\n\n:red_square:      :race_car:"
             await interaction.edit_original_response(embed=dc_embed.embed)
             await asyncio.sleep(1)
-            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights2}"
+            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights2}\n\n\n\n:red_square:      :race_car:"
             await interaction.edit_original_response(embed=dc_embed.embed)
             await asyncio.sleep(1)
-            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights3}"
+            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights3}\n\n\n\n:red_square:      :race_car:"
             await interaction.edit_original_response(embed=dc_embed.embed)
             await asyncio.sleep(1)
-            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights4}"
+            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights4}\n\n\n\n:red_square:      :race_car:"
             await interaction.edit_original_response(embed=dc_embed.embed)
             await asyncio.sleep(1)
-            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights5}"
+            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights5}\n\n\n\n:red_square:      :race_car:"
             await interaction.edit_original_response(embed=dc_embed.embed)
             
             await asyncio.sleep(delay)
-            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights0}"
+            dc_embed.embed.description = f"Wait for the lights and react the fastest!\n\n{lights0}\n\n\n\n:green_square:      :race_car::dash:"
             await interaction.edit_original_response(embed=dc_embed.embed)
             
             reaction, user = await self.bot.wait_for('reaction_add', check=lambda reaction, user: reaction.emoji == '🏎️')
             dc_embed.embed.title = "And away we go!"
-            dc_embed.embed.description = f"{user.mention} got away the fastest!\n\n{lights0}"
+            dc_embed.embed.description = f"{user.mention} got away the fastest!\n\n{lights0}\n\n\n\n:checkered_flag:      :race_car:"
             dc_embed.embed.set_footer(text=f"Lights held for {delay} seconds")  
                                         
             await interaction.edit_original_response(embed=dc_embed.embed)

@@ -70,7 +70,8 @@ def get_fastest_lap(self, round, year):
     except ValueError:
         traceback.print_exc()
         round = round
-        
+    if (round > cm.latest_completed_index(year)):
+        return [em.ErrorEmbed(error_message=f"Round {round} hasn't occured yet!",title='Bad Round')]  
     driver_name, driver_laptime, tyre_age, grand_prix, emoji_list = [],[],[],[],[]
     year_sched = fastf1.get_event_schedule(year, include_testing=False)
     num_rounds = year_sched.shape[0]

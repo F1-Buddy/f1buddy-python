@@ -43,6 +43,8 @@ And more!!
 
 ## Changelog
 Rakib -
+- added 2024 team logos for h2h
+- added error checking for fl round (thanks anurag)
 - fixed all commands breaking due to wrong index (trying to get results from next (future) event instead of past event)
 - fixed fl embed error with only 1 embed
 - fixed quali not working for 2024
