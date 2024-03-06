@@ -43,6 +43,7 @@ And more!!
 
 ## Changelog
 Rakib -
+- fixed fl not working for 2020 or blank round
 - added 2024 team logos for h2h
 - added error checking for fl round (thanks anurag)
 - fixed all commands breaking due to wrong index (trying to get results from next (future) event instead of past event)
@@ -79,6 +80,6 @@ Jubayer -
 
 ## Bugs
 - [x] latest_completed_index gives next index not latest completed, fix and fix implementations
-- [ ] fiadoc thread dying? unsure of why
-- [ ] IMPORTANT fl is completely broken, 2020 doesnt work
+- [x] fiadoc thread dying? unsure of why
+- [x] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018
