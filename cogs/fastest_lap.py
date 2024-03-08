@@ -65,38 +65,19 @@ def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_ag
     
     
 def get_fastest_lap(self, round, year):
-    try:
-        round = int(round)
-    except ValueError:
-        traceback.print_exc()
-        round = round
-    if (round > cm.latest_completed_index(year)):
+    if (round is not None and round > cm.latest_completed_index(year)):
         return [em.ErrorEmbed(error_message=f"Round {round} hasn't occured yet!",title='Bad Round')]  
     driver_name, driver_laptime, tyre_age, grand_prix, emoji_list = [],[],[],[],[]
-    year_sched = fastf1.get_event_schedule(year, include_testing=False)
-    num_rounds = year_sched.shape[0]
+    # year_sched = fastf1.get_event_schedule(year, include_testing=False)
     
-    # ???
-    if round == 999: # round==999 when user input for round is none, get all fastest laps
-        try: 
-            for round_num in range(1, num_rounds + 1):
-                try:
-                    sessionTime = year_sched.loc[round_num, "Session4Date"].tz_convert('America/New_York') if year_sched.loc[round_num, "EventFormat"] == 'conventional' else year_sched.loc[round_num, "Session2Date"].tz_convert('America/New_York')
-                except Exception as e:
-                    traceback.print_exc()
-                    print(f"Error: {e}")
-
-                if now.tz_localize('America/New_York') < sessionTime:
-                    break
-                try:
-                    driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix, emoji_list)
-                except Exception as e:
-                    traceback.print_exc()
-                    print(f"An error occurred in round {round_num}: {e}")
-                    continue
-        except Exception as e:
-            traceback.print_exc()
-            return [em.ErrorEmbed(error_message=traceback.format_exc())]
+    if round == None: 
+        for round_num in range(1, cm.latest_completed_index(year) + 1):
+            try:
+                driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_age, grand_prix, emoji_list)
+            except Exception as e:
+                traceback.print_exc()
+                print(f"An error occurred in round {round_num}: {e}")
+                continue
     else: # if round not none, get lap for that round
         try:
             driver_name, driver_laptime, tyre_age, grand_prix = fastest_lap_info(self, round, year,driver_name, driver_laptime, tyre_age, grand_prix, emoji_list)
@@ -152,26 +133,14 @@ class fastest_lap(commands.Cog):
         # fastest_lap_embed.colour = colors.default
         loop = asyncio.get_running_loop()
         fastest_lap_embeds = None
-        if round is None:
-            round = 999
         if (year is None):
             year = now.year
             if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
                 year -= 1
+        
         try:
             if (year < 2018) or (year > current_year):
                 raise YearNotValidException(f"Year cannot be before 2018 or after {current_year}!")
-            try:
-                event_round = int(round)
-            except ValueError:
-                traceback.print_exc()
-                pass
-            try:
-                if event_round:
-                    if (event_round < 0) or (event_round > 30 and event_round != 999):
-                        raise RoundNotValidException(f"Enter a valid round number.")
-            except:
-                pass
             fastest_lap_embeds = await loop.run_in_executor(None, get_fastest_lap, self, round, year)
             # print(fastest_lap_embeds)
         # except YearNotValidException as ynve:

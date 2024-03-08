@@ -5,7 +5,7 @@
 # f1buddy-python
 
 A discord bot with all kinds F1 statistics and tools!
-Invite it to your server!
+[Invite it to your server!](https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=139586816064&scope=bot)
 
 <a href="https://discord.com/api/oauth2/authorize?client_id=1059405703116242995&permissions=139586816064&scope=bot">
     <img src="https://logodownload.org/wp-content/uploads/2017/11/discord-logo-01.png" width="79" height="56">
@@ -43,6 +43,7 @@ And more!!
 
 ## Changelog
 Rakib -
+- fixed fl not working for 2020 or blank round
 - added 2024 team logos for h2h
 - added error checking for fl round (thanks anurag)
 - fixed all commands breaking due to wrong index (trying to get results from next (future) event instead of past event)
@@ -80,6 +81,6 @@ Jubayer -
 ## Bugs
 - [ ] quali laptimes not loading unless session.load() is run without args
 - [x] latest_completed_index gives next index not latest completed, fix and fix implementations
-- [ ] fiadoc thread dying? unsure of why
-- [ ] IMPORTANT fl is completely broken, 2020 doesnt work
+- [x] fiadoc thread dying? unsure of why
+- [x] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018
