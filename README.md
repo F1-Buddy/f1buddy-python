@@ -78,6 +78,7 @@ Jubayer -
 - [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
 
 ## Bugs
+- [ ] quali laptimes not loading unless session.load() is run without args
 - [x] latest_completed_index gives next index not latest completed, fix and fix implementations
 - [ ] fiadoc thread dying? unsure of why
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work

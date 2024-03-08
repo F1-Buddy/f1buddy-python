@@ -31,7 +31,6 @@ def quali_results(self,year,round):
             if (latest_quali_index == 0):
                 latest_quali_index += 1
             result_session = fastf1.get_session(year, latest_quali_index, 'Qualifying')
-            result_session.load(laps=False, telemetry=False, weather=False, messages=False)
         else:
             event_round = None
             try:
@@ -43,7 +42,7 @@ def quali_results(self,year,round):
             if (now - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
                 return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + (str)(event_round) + "\" not found"), None
             
-        result_session.load(laps=False, telemetry=False, weather=False, messages=False)
+        result_session.load()
         resultsTable = result_session.results
         
         driver_names = ""
