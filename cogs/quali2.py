@@ -27,7 +27,7 @@ def quali_results(self,year,round):
                 year -= 1
             
         if (round == None):
-            latest_quali_index = cm.latest_quali_completed_index(year) - 1
+            latest_quali_index = cm.latest_quali_completed_index(year)
             if (latest_quali_index == 0):
                 latest_quali_index += 1
             result_session = fastf1.get_session(year, latest_quali_index, 'Qualifying')
