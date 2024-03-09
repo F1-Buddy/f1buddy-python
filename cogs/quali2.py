@@ -40,7 +40,7 @@ def quali_results(self,year,round):
             result_session = fastf1.get_session(year, event_round, 'Qualifying')
             # inputs were valid, but the Qualifying hasnt happened yet
             if (now - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
-                return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + (str)(event_round) + "\" not found"), None
+                return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + str(event_round) + "\" not found"), None
             
         result_session.load()
         resultsTable = result_session.results
@@ -54,36 +54,40 @@ def quali_results(self,year,round):
         
         for i in (resultsTable.DriverNumber.values):
             try:
-                driver_names += ((str)(self.bot.get_emoji(team_emoji_ids[resultsTable.loc[i,'TeamName']]))) + " " + resultsTable.loc[i,'FullName'] + "\n"
+                driver_names += (str(self.bot.get_emoji(team_emoji_ids[resultsTable.loc[i,'TeamName']]))) + " " + resultsTable.loc[i,'FullName'] + "\n"
             except:
                 driver_names += resultsTable.loc[i,'FullName'] + "\n"
-            temp = (str)(resultsTable.loc[i,'Position'])
+            temp = str(resultsTable.loc[i,'Position'])
             position_string += temp[0:temp.index('.')] + "\n"
             
             # get best lap time from furthest session driver made it to (Q3? -> Q2? -> Q1)
-            time = (str)(resultsTable.loc[i,'Q3'])
+            
+            time = str(resultsTable.loc[i,'Q3'])
             q = 3
             if ('NaT' in time):
-                time = (str)(resultsTable.loc[i,'Q2'])
+                time = str(resultsTable.loc[i,'Q2'])
                 q = 2
                 if ('NaT' in time):
-                    time = (str)(resultsTable.loc[i,'Q1'])
+                    time = str(resultsTable.loc[i,'Q1'])
                     q = 1
+                    if ('NaT' in time):
+                        time = "No Time"
                 
-            # print(time)
-            try:
-                time = time[11:((str)(time)).index('.')+4]
-            except:
-                time = time[11:] + ".000"
-            time = "Q" +(str)(q)+": " + time 
+            
+            if time != 'No Time':
+                try:
+                    time = time[11:(str(time)).index('.')+4]
+                except:
+                    time = time[11:] + ".000"
+            time = "Q" +str(q)+": " + time 
             time_string += time + "\n"
 
         # print(driver_names)
         raceName = result_session.event.EventName
 
-        s = Search((str)(year) + " " + raceName + " Qualifying")
+        s = Search(str(year) + " " + raceName + " Qualifying")
         video_url = 'https://www.youtube.com/watch?v='
-        t = (str)(s.results[0])
+        t = str(s.results[0])
         video_url += (t[t.index('videoId=')+8:-1])
 
         dc_embed = em.Embed(title=f"{year} {raceName} Qualifying Results", footer="*Highlights video link below may not be accurate")
