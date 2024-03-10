@@ -30,7 +30,10 @@ def get_event_data(session_type,year,category):
         max_index = cm.latest_completed_index(year)
     
     first_round = schedule.loc[first_index,'RoundNumber']
-    last_round = schedule.loc[max_index,'RoundNumber']
+    if (session_type.value == 'r'):
+        last_round = cm.latest_completed_index(year)
+    else:
+        last_round = cm.latest_quali_completed_index(year)
     # print(first_index)
     print(max_index)
     print(first_round)
