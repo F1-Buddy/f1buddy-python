@@ -65,8 +65,12 @@ def fastest_lap_info(self, round_num, year, driver_name, driver_laptime, tyre_ag
     
     
 def get_fastest_lap(self, round, year):
-    if (round is not None and round > cm.latest_completed_index(year)):
-        return [em.ErrorEmbed(error_message=f"Round {round} hasn't occured yet!",title='Bad Round')]  
+    try:
+        round = int(round)
+        if (round is not None and int(round) > cm.latest_completed_index(year)):
+            return [em.ErrorEmbed(error_message=f"Round {round} hasn't occured yet!",title='Bad Round')]  
+    except:
+        round = round
     driver_name, driver_laptime, tyre_age, grand_prix, emoji_list = [],[],[],[],[]
     # year_sched = fastf1.get_event_schedule(year, include_testing=False)
     
