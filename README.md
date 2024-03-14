@@ -43,6 +43,7 @@ And more!!
 
 ## Changelog
 Rakib -
+- fixed fiadocs missing docs while sleeping
 - fixed fl not working for 2020 or blank round
 - added 2024 team logos for h2h
 - added error checking for fl round (thanks anurag)
@@ -59,7 +60,7 @@ Jubayer -
 
 ## To-do
 - [x] create a input checking function in common
-- [ ] fix scenario where >1 fiadoc posted while asleep
+- [x] fix scenario where >1 fiadoc posted while asleep
 - [ ] convert following commands to new em.Embed: 
     - [x] `constructor_standings.py`
     - [ ] `driver.py`
