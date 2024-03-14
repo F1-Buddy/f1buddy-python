@@ -52,20 +52,23 @@ async def getLatest():
         discord_embeds.append(em.Embed(title='Latest FIA Doc',description=f"[{doc_names[i][:-4]}]({doc_urls[i]})").embed)
         # delete the pdf
         os.remove(f"cogs/fiaDocs/{doc_names[i]}")
+        asyncio.sleep(5)
     return discord_embeds,discord_files
     
 async def threadMain(bot):
+    loop = asyncio.get_running_loop()
     channel_id = 1212636200217878528
     channel = bot.get_channel(channel_id)
     while (True):
         try:
-            dc_embeds, dc_files = await getLatest()
+            dc_embeds, dc_files = await loop.run_in_executor(None, getLatest)
             for i in range(len(dc_embeds)):
                 message = await channel.send(embed=dc_embeds[i],files=dc_files[i])
                 await message.publish()
             await asyncio.sleep(300)
         except Exception as e:
             traceback.print_exc()
+    loop.close()
         
 async def createDocThread(bot):
     thread = threading.Thread(await threadMain(bot))
