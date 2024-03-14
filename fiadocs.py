@@ -43,7 +43,7 @@ async def getLatest():
                 pix = page.get_pixmap(matrix=(fitz.Matrix(300 / 72, 300 / 72)))
                 output = f"{doc_paths[i]}/{page_num}.png"
                 pix.save(output)
-                images.append(discord.File(f"{filePath}/{page_num}.png", filename=f"{page_num}.png"))
+                images.append(discord.File(f"{doc_paths[i]}/{page_num}.png", filename=f"{page_num}.png"))
                 page_num += 1
         except ValueError:
             pass
