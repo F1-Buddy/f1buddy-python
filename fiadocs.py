@@ -63,7 +63,7 @@ async def threadMain(bot):
             for i in range(len(dc_embeds)):
                 message = await channel.send(embed=dc_embeds[i],files=dc_files[i])
                 await message.publish()
-            await asyncio.sleep(10)
+            await asyncio.sleep(300)
         except Exception as e:
             traceback.print_exc()
         
