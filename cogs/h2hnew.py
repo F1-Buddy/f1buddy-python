@@ -68,6 +68,8 @@ def get_data(year, session_type):
         
         for i in results['TeamId']:
             team_results = results.loc[lambda df: df['TeamId'] == i]
+            if len(team_results.index) < 2:
+                break
             # testing
             # if (i == "Ferrari"):
             #     print(team_results)
