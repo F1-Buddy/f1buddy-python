@@ -58,7 +58,7 @@ async def threadMain(bot):
                 message = await channel.send(embed=em.Embed(title='Latest FIA Doc',description=f"[{docName}]({doc_url})").embed,files=images)
                 await message.publish()
                 # print(images)
-            await asyncio.sleep(10)
+            await asyncio.sleep(30)
         except Exception as e:
             traceback.print_exc()
         
