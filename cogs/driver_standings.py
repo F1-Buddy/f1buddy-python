@@ -21,7 +21,7 @@ def get_driver_standings(self, year):
     # fixed not working during new year off season but still not great
     # prefer if (year <= 1957) or (year >= now.year) created a separate error embed asking for valid input
     try:
-        year = cm.check_year(year)
+        year = cm.check_year(year,False,False)
     except cm.YearNotValidException as e:
         return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
     except:

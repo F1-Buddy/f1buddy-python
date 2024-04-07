@@ -42,13 +42,25 @@ And more!!
 
 
 ## Changelog
-- added parameter to fiadoc
+Rakib -
+- fixed fiadocs missing docs while sleeping
+- fixed fl not working for 2020 or blank round
+- added 2024 team logos for h2h
+- added error checking for fl round (thanks anurag)
+- fixed all commands breaking due to wrong index (trying to get results from next (future) event instead of past event)
+- fixed fl embed error with only 1 embed
+- fixed quali not working for 2024
+- added automatic fiadocs
 - fixed fiadoc wrong order of images
 - added year input check function to wdc/wcc
 
+Jubayer -
+- added parameter to fiadoc
+
+
 ## To-do
-- [x] IMPORTANT fl is slightly broken, make it only use 1 embed for rounds completed < 10
 - [x] create a input checking function in common
+- [x] fix scenario where >1 fiadoc posted while asleep
 - [ ] convert following commands to new em.Embed: 
     - [x] `constructor_standings.py`
     - [ ] `driver.py`
@@ -66,8 +78,11 @@ And more!!
 - [ ] qualigap, laptimes, fl, and both standings commands are just bad. fix input checking to be less terrible
 - [ ] speed is excessively long, convert to use embed class
 - [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
-- [ ] fix outlier calculation for consistency
 
 ## Bugs
+- [ ] quali laptimes not loading unless session.load() is run without args
+- [x] latest_completed_index gives next index not latest completed, fix and fix implementations
+- [x] fiadoc thread dying? unsure of why
+- [x] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] IMPORTANT fl is completely broken, 2020 doesnt work
 - [ ] /consistency ver 2018

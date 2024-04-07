@@ -1,8 +1,8 @@
-# import fastf1
 import discord
 import config
 import os
 import asyncio
+import fiadocs as fia
 from discord.ext import commands
 
 
@@ -20,8 +20,8 @@ bot = commands.Bot(command_prefix='f1$', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-
-
+    # create thread to check for new fia documents
+    await fia.createDocThread(bot)
 
 @bot.event
 async def load():
@@ -31,7 +31,7 @@ async def load():
     # for file in os.listdir('./cogsmotogp'):
     #     if file.endswith('.py'):
     #         await bot.load_extension(f'cogsmotogp.{file[:-3]}')
-
+  
 
 async def main():
     await load()

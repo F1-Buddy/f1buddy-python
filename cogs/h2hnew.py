@@ -11,7 +11,6 @@ from matplotlib import pyplot as plt
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import matplotlib.patheffects as pe
 import matplotlib.image as mpim
-import numpy as np
 from lib.f1font import regular_font, bold_font
 import matplotlib
 matplotlib.use('agg')
@@ -22,6 +21,7 @@ import pandas as pd
 import fastf1.plotting as f1plt
 import repeated.common as cm
 import repeated.embed as em
+from PIL import Image
 
 
 # get current time
@@ -43,7 +43,11 @@ def get_data(year, session_type):
     driver_country = {}
     outstring = ''
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
-    for c in range(min(schedule.index), max(schedule.index)+1):
+    if (session_type.value == 'q'):
+        max_index = cm.latest_quali_completed_index(year)
+    else:
+        max_index = cm.latest_completed_index(year)
+    for c in range(min(schedule.index), max_index+1):
     # for c in range(min(schedule.index),min(schedule.index)+5):
         session = fastf1.get_session(year, schedule.loc[c,'RoundNumber'], session_type.value)
         session.load(laps=False, telemetry=False, weather=False, messages=False)
@@ -64,6 +68,8 @@ def get_data(year, session_type):
         
         for i in results['TeamId']:
             team_results = results.loc[lambda df: df['TeamId'] == i]
+            if len(team_results.index) < 2:
+                break
             # testing
             # if (i == "Ferrari"):
             #     print(team_results)
@@ -158,9 +164,9 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
             ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
             try:
                 # team logo
-                img = mpim.imread(f'lib/cars/logos/{team}.webp')
-                zoom = .2
-                imagebox = OffsetImage(img, zoom=zoom)
+                img = Image.open(f'lib/cars/logos/{team}.webp')
+                img.thumbnail((64,64))
+                imagebox = OffsetImage(mpim.pil_to_array(img), zoom=0.5)
                 ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
                 ax.add_artist(ab)
             except:
@@ -218,7 +224,7 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
 def get_embed(self, year, session_type):
     try:
         try:
-            year = cm.check_year(year)
+            year = cm.check_year(year,False,False)
         except cm.YearNotValidException as e:
             return em.ErrorEmbed(title=f"Invalid Input: {year}",error_message=e).embed
         except:

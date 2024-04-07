@@ -1,3 +1,4 @@
+import traceback
 import discord
 import asyncio
 import fastf1
@@ -22,14 +23,14 @@ def quali_results(self,year,round):
             year = year
         else:
             year = now.year
-            if (cm.currently_offseason()[0]) or (cm.latest_completed_index(now.year) == 0):
+            if (cm.latest_quali_completed_index(now.year) == 0):
                 year -= 1
             
         if (round == None):
-            # get latest completed session by starting from the end of calendar and going back towards beginning of season
-            result_session = fastf1.get_session(year, cm.latest_completed_index(year), 'Race')
-            # most recent session found, load it
-            result_session.load(laps=False, telemetry=False, weather=False, messages=False)
+            latest_quali_index = cm.latest_quali_completed_index(year)
+            if (latest_quali_index == 0):
+                latest_quali_index += 1
+            result_session = fastf1.get_session(year, latest_quali_index, 'Qualifying')
         else:
             event_round = None
             try:
@@ -39,9 +40,9 @@ def quali_results(self,year,round):
             result_session = fastf1.get_session(year, event_round, 'Qualifying')
             # inputs were valid, but the Qualifying hasnt happened yet
             if (now - result_session.date.tz_localize('America/New_York')).total_seconds() < 0:
-                return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + (str)(event_round) + "\" not found")
+                return em.ErrorEmbed(title="Qualifying not found!", error_message="Round \"" + str(event_round) + "\" not found"), None
             
-        result_session.load(laps=False, telemetry=False, weather=False, messages=False)
+        result_session.load()
         resultsTable = result_session.results
         
         driver_names = ""
@@ -49,47 +50,44 @@ def quali_results(self,year,round):
         time_string = ""
         # status_string = ""
         if (resultsTable.empty):
-            return em.ErrorEmbed(title="Session data not found!")
-        
-        # idk why this is here its been too long
-        try:
-            total_positions = 0
-            num_races = 0
-        except: 
-            print("Error at 0.")
+            return em.ErrorEmbed(title="Session data not found!"), None
         
         for i in (resultsTable.DriverNumber.values):
             try:
-                driver_names += ((str)(self.bot.get_emoji(team_emoji_ids[resultsTable.loc[i,'TeamName']]))) + " " + resultsTable.loc[i,'FullName'] + "\n"
+                driver_names += (str(self.bot.get_emoji(team_emoji_ids[resultsTable.loc[i,'TeamName']]))) + " " + resultsTable.loc[i,'FullName'] + "\n"
             except:
                 driver_names += resultsTable.loc[i,'FullName'] + "\n"
-            temp = (str)(resultsTable.loc[i,'Position'])
+            temp = str(resultsTable.loc[i,'Position'])
             position_string += temp[0:temp.index('.')] + "\n"
             
             # get best lap time from furthest session driver made it to (Q3? -> Q2? -> Q1)
-            time = (str)(resultsTable.loc[i,'Q3'])
+            
+            time = str(resultsTable.loc[i,'Q3'])
             q = 3
             if ('NaT' in time):
-                time = (str)(resultsTable.loc[i,'Q2'])
+                time = str(resultsTable.loc[i,'Q2'])
                 q = 2
                 if ('NaT' in time):
-                    time = (str)(resultsTable.loc[i,'Q1'])
+                    time = str(resultsTable.loc[i,'Q1'])
                     q = 1
+                    if ('NaT' in time):
+                        time = "No Time"
                 
-            # print(time)
-            try:
-                time = time[11:((str)(time)).index('.')+4]
-            except:
-                time = time[11:] + ".000"
-            time = "Q" +(str)(q)+": " + time 
+            
+            if time != 'No Time':
+                try:
+                    time = time[11:(str(time)).index('.')+4]
+                except:
+                    time = time[11:] + ".000"
+            time = "Q" +str(q)+": " + time 
             time_string += time + "\n"
 
         # print(driver_names)
         raceName = result_session.event.EventName
 
-        s = Search((str)(year) + " " + raceName + " Qualifying")
+        s = Search(str(year) + " " + raceName + " Qualifying")
         video_url = 'https://www.youtube.com/watch?v='
-        t = (str)(s.results[0])
+        t = str(s.results[0])
         video_url += (t[t.index('videoId=')+8:-1])
 
         dc_embed = em.Embed(title=f"{year} {raceName} Qualifying Results", footer="*Highlights video link below may not be accurate")
@@ -98,6 +96,7 @@ def quali_results(self,year,round):
         dc_embed.embed.add_field(name = "Time", value = time_string,inline = True)
         return dc_embed.embed, video_url
     except Exception as e:
+        traceback.print_exc()
         return em.ErrorEmbed(error_message=f'{str(type(e))}: {str(e)}'), None
         
     
@@ -114,14 +113,16 @@ class Quali2(commands.Cog):
     @app_commands.describe(round = "Round name or number (Australia or 3)")
     async def Quali2(self, interaction: discord.Interaction, year: typing.Optional[int], round: typing.Optional[str]):  
         await interaction.response.defer()
-        loop = asyncio.get_running_loop()
-        # run results query and build embed
-        results_embed,video_url = await loop.run_in_executor(None, quali_results, self, year, round)
-        results_embed.set_author(name='f1buddy',icon_url='https://raw.githubusercontent.com/F1-Buddy/f1buddy-python/main/botPics/f1pythonpfp.png')
-        # send embed
-        await interaction.followup.send(embed = results_embed)
-        if not (video_url == None):
-            await interaction.followup.send(video_url)
+        try:
+            loop = asyncio.get_running_loop()
+            # run results query and build embed
+            results_embed,video_url = await loop.run_in_executor(None, quali_results, self, year, round)
+            # send embed
+            await interaction.followup.send(embed = results_embed)
+            if not (video_url == None):
+                await interaction.followup.send(video_url)
+        except:
+            await interaction.followup.send(embed = em.ErrorEmbed(error_message=traceback.format_exc()).embed)
         loop.close()
 
 async def setup(bot):
