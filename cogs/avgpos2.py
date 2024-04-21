@@ -76,8 +76,10 @@ def get_event_data(session_type,year,category):
                 
                 if (type(currDriver_position) is str):
                     if (currDriver_position.isnumeric()):
-                        driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
-                        driver_positions.update({currDriver_abbreviation:currDriver_total+int(currDriver_position)})
+                        # print(f"status for driver {driver} is {results.loc[driver,'Status']}")
+                        if ('finished' in results.loc[driver,'Status'].lower() or '+' in results.loc[driver,'Status'].lower()):
+                            driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
+                            driver_positions.update({currDriver_abbreviation:currDriver_total+int(currDriver_position)})
                 else:
                     driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
                     driver_positions.update({currDriver_abbreviation:currDriver_total+(currDriver_position)})
