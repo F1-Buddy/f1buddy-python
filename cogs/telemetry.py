@@ -19,6 +19,10 @@ import repeated.embed as em
 import pandas as pd
 import fastf1.plotting as f1plt
 
+from PIL import Image
+import config
+import google.generativeai as genai
+
 # get current time
 now = pd.Timestamp.now()
 
@@ -144,7 +148,7 @@ def plot_telem(driver_list, lap_number: typing.Optional[int], event_round, event
     plt.savefig(file_path)
     
 
-def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype):
+def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype,ai_analysis):
     
     if (year > now.year) or (year < 2018):
         return em.ErrorEmbed(error_message="Enter a valid year from 2018 to now"), None
@@ -188,6 +192,18 @@ def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype):
                 return em.ErrorEmbed(error_message=str(e)),None
         file = discord.File(file_path,filename="image.png")
         description = open(file_path[:-3]+'txt').read()
+        if (ai_analysis.value == 'True'):
+            genai.configure(api_key = config.GEMINI_KEY)
+            model = genai.GenerativeModel('gemini-1.5-pro-latest')
+            image = Image.open(file_path)
+            text = f"Analyze this image. It is a graph showcasing the car telemetry during Round {round_num} of the {event_year} F1 season. \
+            The number of drivers in the graph is given at the top right legend. \
+            If there is more than one driver, give insights to the drivers styles and the different team's car performance.\
+            Otherwise provide insight on the single driver's performance and car around the lap."
+            prompt = [image,text]
+            response = model.generate_content(prompt)
+            description += f"\n\nAI Analysis: {response.text}"
+            
         return em.Embed(title=title,description=description,image_url='attachment://image.png'), file   
     except Exception as e:
         traceback.print_exc()
@@ -209,6 +225,11 @@ class Telemetry(commands.Cog):
         app_commands.Choice(name="Qualifying", value="Q"),
         app_commands.Choice(name="Race", value="R"),
         ])
+    @app_commands.describe(ai_analysis='Enable or disable AI analysis')
+    @app_commands.choices(ai_analysis=[
+        app_commands.Choice(name="True", value="True"),
+        app_commands.Choice(name="False", value="False")
+        ])
     # inputs
     @app_commands.describe(driver1='3 Letter Code for Driver 1')
     @app_commands.describe(driver2='3 Letter Code for Driver 2')
@@ -216,10 +237,9 @@ class Telemetry(commands.Cog):
     @app_commands.describe(year = "Year")
     
     # command
-    async def telemetry(self, interaction: discord.Interaction, driver1: str, driver2: typing.Optional[str], lap_number: typing.Optional[int], round:str, year: int, sessiontype: app_commands.Choice[str]):
+    async def telemetry(self, interaction: discord.Interaction, driver1: str, ai_analysis: app_commands.Choice[str], driver2: typing.Optional[str], lap_number: typing.Optional[int], round:str, year: int, sessiontype: app_commands.Choice[str]):
         # defer reply for later
         await interaction.response.defer()
-            
         driver1 = driver1.upper()
         if not (driver2 == None):
             driver2 = driver2.upper()
@@ -228,7 +248,7 @@ class Telemetry(commands.Cog):
                 return
         loop = asyncio.get_running_loop()
         # run results query and build embed
-        dc_embed,file = await loop.run_in_executor(None, get_embed_and_image, driver1, driver2, year, round, lap_number, sessiontype)
+        dc_embed,file = await loop.run_in_executor(None, get_embed_and_image, driver1, driver2, year, round, lap_number, sessiontype,ai_analysis)
         # send embed
         if file != None:
             await interaction.followup.send(embed=dc_embed.embed,file=file)

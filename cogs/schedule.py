@@ -101,6 +101,7 @@ def get_schedule():
             # country_name = session.session_info['Meeting']['Country']['Name']
             # alpha_2 = pycountry.countries.search_fuzzy(country_name)[0].alpha_2
             # emoji = f":flag_{alpha_2.lower()}:"
+            emoji = ''
             alpha2 = (coco.convert(names=schedule.loc[next_event, "Country"], to='ISO2')).lower()
             if not ('not found' in alpha2):
                 emoji = f":flag_{alpha2}:"
