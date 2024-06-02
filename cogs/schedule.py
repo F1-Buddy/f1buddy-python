@@ -117,12 +117,13 @@ def get_schedule():
             
             # get track image
             url_formats = ( f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html",
-                            f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace(' ', '_')}/Circuit.html"
+                            f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace('-','').replace(' ', '_')}/Circuit.html"
                            )
             for url in url_formats:
                 if (schedule.loc[next_event,'Country'] == 'Abu Dhabi'):
                     url = f"https://www.formula1.com/en/racing/{now.year}/United_Arab_Emirates/Circuit.html"
                 response = requests.get(url)
+                print(url)
                 soup = BeautifulSoup(response.content, 'html.parser')
                 image = soup.find_all(class_='f1-external-link--no-image')
                 if (len(image) > 0):

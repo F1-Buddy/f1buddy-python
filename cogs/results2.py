@@ -87,8 +87,9 @@ def results_result(self, year, round):
         
         temp_points = (str)(resultsTable.loc[i,'Points'])
         # if full points were awarded, remove .0 from points
-        if temp_points[temp_points.index('.'):] == '.0':
-            temp_points = temp_points[:temp_points.index('.')]
+        if '.0' in temp_points:
+            if temp_points[temp_points.index('.'):] == '.0':
+                temp_points = temp_points[:temp_points.index('.')]
         points_string += temp_points + "\n"
 
     raceName = result_session.event.EventName
