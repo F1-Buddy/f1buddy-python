@@ -271,8 +271,8 @@ class h2hnew(commands.Cog):
     @app_commands.choices(session_type=[app_commands.Choice(name="Race", value="r"), 
                                  app_commands.Choice(name="Qualifying", value="q"),])
     @app_commands.describe(ignore_dnfs='Ignore DNFs')
-    @app_commands.choices(ignore_dnfs=[app_commands.Choice(name="Yes", value='True'),
-                                        app_commands.Choice(name="No", value='False')])
+    @app_commands.choices(ignore_dnfs=[app_commands.Choice(name="Yes", value="True"), 
+                                        app_commands.Choice(name="No", value="False"),])
     
     async def h2hnew(self, interaction: discord.Interaction, year: typing.Optional[int], session_type: app_commands.Choice[str], ignore_dnfs: app_commands.Choice[bool]):  
         await interaction.response.defer()
