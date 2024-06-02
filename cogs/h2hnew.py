@@ -241,8 +241,8 @@ def get_embed(self, year, session_type, ignore_dnfs):
         except:
             return em.ErrorEmbed(error_message=traceback.format_exc()).embed
         
-        folder_path = f'./cogs/plots/h2h/{year}/{session_type.name}'
-        file_path = f'./cogs/plots/h2h/{year}/{session_type.name}/{cm.latest_completed_index(year)}.png'
+        folder_path = f'./cogs/plots/h2h/{year}/{session_type.name}/{ignore_dnfs}'
+        file_path = f'./cogs/plots/h2h/{year}/{session_type.name}/{ignore_dnfs}/{cm.latest_completed_index(year)}.png'
         title = f'{year} {session_type.name} Head to Head'
         if not (os.path.exists(file_path)):
             if not os.path.exists(folder_path):
