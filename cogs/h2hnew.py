@@ -253,7 +253,9 @@ def get_embed(self, year, session_type, ignore_dnfs):
             except:
                 return em.ErrorEmbed('Error while drawing', error_message=traceback.format_exc()), None
         file = discord.File(file_path,filename="image.png")
-        return em.Embed(title=title,image_url='attachment://image.png',footer='All retirements excluded'), file
+        if (ignore_dnfs == 'True'):
+            return em.Embed(title=title,image_url='attachment://image.png',footer='All retirements excluded'), file
+        return em.Embed(title=title,image_url='attachment://image.png',footer='Retirements Included'), file
     except:
         traceback.print_exc()
     
