@@ -228,7 +228,12 @@ def get_embed_and_image(year, session_type, category, ignore_dnfs):
                 traceback.print_exc()
                 return em.ErrorEmbed(error_message=e),None
         file = discord.File(file_path,filename="image.png")
-        description = "DNF/DNS excluded from calculation"
+        if (ignore_dnfs == 'True'):
+            description = "DNF/DNS excluded from calculation"
+        elif (ignore_dnfs == 'Mechanical'):
+            description = "Mechanical DNFs excluded from calculation"
+        else:
+            description = "DNFs included in calculation"
         title = f"Average {category.name} {session_type.name} Finish Position {year}"
         return em.Embed(title=title,description=description,image_url='attachment://image.png'), file  
     except Exception as e:
