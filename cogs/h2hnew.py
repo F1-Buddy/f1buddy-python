@@ -232,7 +232,7 @@ def make_plot(data, colors, year, session_type, team_names, filepath):
     # plt.show()
     plt.savefig(filepath)
   
-def get_embed(self, year, session_type):
+def get_embed(self, year, session_type, ignore_dnfs):
     try:
         try:
             year = cm.check_year(year,False,False)
@@ -248,7 +248,7 @@ def get_embed(self, year, session_type):
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
             try:
-                data,colors,names = get_data(year, session_type)
+                data,colors,names = get_data(year, session_type,ignore_dnfs)
                 make_plot(data,colors,year,session_type,names,file_path)    
             except:
                 return em.ErrorEmbed('Error while drawing', error_message=traceback.format_exc()), None
