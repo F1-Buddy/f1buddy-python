@@ -20,7 +20,7 @@ import repeated.embed as em
 
 fastf1.Cache.enable_cache('cache/')
 
-def get_event_data(session_type,year,category):
+def get_event_data(session_type,year,category, ignore_dnfs):
     # schedule = fastf1.get_event_schedule(year=year)
     schedule = fastf1.get_event_schedule(year=year,include_testing=False)
     first_index = schedule.index[0]
@@ -60,6 +60,7 @@ def get_event_data(session_type,year,category):
                 else:
                     currDriver_abbreviation = results.loc[driver,'TeamName']
                 
+                # default value to 0 if not in dictionary
                 if driver_positions.get(currDriver_abbreviation) is None:
                     driver_positions.update({currDriver_abbreviation:0})
 
@@ -70,22 +71,42 @@ def get_event_data(session_type,year,category):
                     currDriver_position = results.loc[driver,'ClassifiedPosition']
                 else:
                     currDriver_position = results.loc[driver,'Position']
-
                     
                 currDriver_total = driver_positions.get(currDriver_abbreviation)
                 
-                if (type(currDriver_position) is str):
-                    if (currDriver_position.isnumeric()):
-                        # print(f"status for driver {driver} is {results.loc[driver,'Status']}")
-                        if ('finished' in results.loc[driver,'Status'].lower() or '+' in results.loc[driver,'Status'].lower()):
-                            driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
-                            driver_positions.update({currDriver_abbreviation:currDriver_total+int(currDriver_position)})
-                else:
-                    driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
-                    driver_positions.update({currDriver_abbreviation:currDriver_total+(currDriver_position)})
-                
+                if isinstance(currDriver_position,str) and currDriver_position.isnumeric():
+                    currDriver_position = int(currDriver_position)
+
+                # filter based on ignore_dnfs input
+                skip_driver = False
+                if ignore_dnfs == 'True':
+                    if not ('finished' in results.loc[driver,'Status'].lower() or '+' in results.loc[driver,'Status'].lower()):
+                        skip_driver = True
+                elif ignore_dnfs == 'Mechanical':
+                    # ignore mechanical retirement statuses like Gearbox, Engine, Brakes, etc
+                    # **** Unknown if there are other statuses that are mechanical failures, these are just the ones I know of ****
+                    mechanical_failure_reasons = ["Gearbox", "Engine", "Brakes", "Rear wing"]
+                    if (results.loc[driver,'Status'] in mechanical_failure_reasons):
+                        skip_driver = True
                     
+                # add race if not to be skipped
+                if not skip_driver:
+                    if isinstance(currDriver_position,str):
+                        currDriver_position = results.loc[driver,'Position']
+                    # stroll 2023 singapore solution (withdrew, position = numpy nan, classified = W)
+                    if str(currDriver_position) != "nan":
+                        driver_racesParticipated.update({currDriver_abbreviation:driver_racesParticipated.get(currDriver_abbreviation)+1})
+                        driver_positions.update({currDriver_abbreviation:currDriver_total+currDriver_position})
+
+                # was messing with current driver colors --> Looks ugly and makes it hard to compare teammates
+                # if u find it hard to read, skill issue
+                
+                # now = pd.Timestamp.now()
+                # if year == now.year:
+                #     driver_colors.update({currDriver_abbreviation:fastf1.plotting.driver_color(currDriver_abbreviation)})
+                # else:
                 driver_colors.update({currDriver_abbreviation:results.loc[driver,'TeamColor']})
+                
         except KeyError:
             print("session not completed")
     # print(driver_positions)
@@ -95,11 +116,11 @@ def get_event_data(session_type,year,category):
         try:
             driver_average.update({key:driver_positions.get(key)/driver_racesParticipated.get(key)})
         except:
-            print('div by 0')
+            traceback.print_exc()
     return driver_average,driver_colors
     # print(driver_colors)
 
-def plot_avg(driver_positions, driver_colors,session_type,year,category,filepath):
+def plot_avg(driver_positions, driver_colors,session_type,year,category,filepath,ignore_dnfs):
     # latest_event_index = cm.latest_completed_index(year)
     plt.clf()
     driver_positions = dict(sorted(driver_positions.items(), key=lambda x: x[1]))
@@ -112,7 +133,14 @@ def plot_avg(driver_positions, driver_colors,session_type,year,category,filepath
     
     # setting x-axis label, title
     ax.set_xlabel("Position", fontproperties=regular_font, fontsize=20, labelpad=20)
-    ax.set_title(f"Average {category.name} {session_type.name} Finish Position {year}", fontproperties=bold_font, fontsize=20, pad=20)
+    title_string = f"Average {category.name} {session_type.name} Finish Position {year}"
+    if ignore_dnfs == 'True':
+        title_string += " (DNF/DNS Excluded)"
+    elif ignore_dnfs == 'Mechanical':
+        title_string += " (Mechanical DNFs Excluded)"
+    else:
+        title_string += " (DNFS Included)"
+    ax.set_title(title_string, fontproperties=bold_font, fontsize=20, pad=20)
     
     # space between limits for the y-axis and x-axis
     ax.set_ylim(-0.8, len(driver_positions.keys())-0.25)
@@ -149,7 +177,10 @@ def plot_avg(driver_positions, driver_colors,session_type,year,category,filepath
         # print(curr_color)
         # print(curr_color == 'nan')
         if ((curr_color != 'nan') and (curr_color != '')):
-            plt.barh(driver, driver_positions.get(driver),color = f'#{curr_color}')
+            if ("#" in curr_color):
+                plt.barh(driver, driver_positions.get(driver),color = curr_color)
+            else:
+                plt.barh(driver, driver_positions.get(driver),color = f'#{curr_color}')
         else:
             if not annotated:
                 plt.figtext(0.91, 0.01, "*Some color data is unavailable", ha="center", fontproperties=regular_font)
@@ -168,9 +199,10 @@ def plot_avg(driver_positions, driver_colors,session_type,year,category,filepath
         ax.text(position + 0.1, i, f"   {str(round(position,2))}", va='center', fontproperties=regular_font, fontsize=20)
     
     plt.rcParams['savefig.dpi'] = 300
+    # plt.show()
     plt.savefig(filepath)
 
-def get_embed_and_image(year, session_type, category):
+def get_embed_and_image(year, session_type, category, ignore_dnfs):
     try:
         # now = pd.Timestamp.now()
         try:
@@ -180,19 +212,20 @@ def get_embed_and_image(year, session_type, category):
         except:
             return em.ErrorEmbed(error_message=traceback.format_exc()), None
         latest_event_index = cm.latest_completed_index(year)
-        folder_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}'
-        file_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}/{latest_event_index}.png'
+        folder_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}/{ignore_dnfs}'
+        file_path = f'./cogs/plots/avgpos/{year}/{session_type.name}/{category.name}/{ignore_dnfs}/{latest_event_index}.png'
         
         # for testing
         # now = pd.Timestamp(year=2020, month=12, day=6).tz_localize('America/New_York')
         if not (os.path.exists(file_path)):
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
-            pos,colors = get_event_data(session_type=session_type,year=year, category=category)
+            pos,colors = get_event_data(session_type=session_type,year=year, category=category, ignore_dnfs=ignore_dnfs)
             # catch any drawing errors
             try:
-                plot_avg(pos,colors,session_type,year,category,file_path)
+                plot_avg(pos,colors,session_type,year,category,file_path,ignore_dnfs)
             except Exception as e:
+                traceback.print_exc()
                 return em.ErrorEmbed(error_message=e),None
         file = discord.File(file_path,filename="image.png")
         description = "DNF/DNS excluded from calculation"
@@ -201,7 +234,6 @@ def get_embed_and_image(year, session_type, category):
     except Exception as e:
         traceback.print_exc()
         return em.ErrorEmbed(error_message=e), None
- 
 class AveragePos(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -215,12 +247,17 @@ class AveragePos(commands.Cog):
     @app_commands.choices(session_type=[app_commands.Choice(name="Qualifying", value="q"), app_commands.Choice(name="Race", value="r"),])
     @app_commands.describe(category='Choose between Teams or Drivers')
     @app_commands.choices(category=[app_commands.Choice(name="Drivers", value="Drivers"), app_commands.Choice(name="Teams", value="Teams"),])
+    @app_commands.describe(ignore_dnfs='Ignore DNFs')
+    @app_commands.choices(ignore_dnfs=[app_commands.Choice(name="All", value="True"), 
+                                        app_commands.Choice(name="Mechanical", value="Mechanical"),
+                                        app_commands.Choice(name="No", value="False"),])
     @app_commands.describe(year = "Year")
-    async def positions(self, interaction: discord.Interaction, category: app_commands.Choice[str],session_type: app_commands.Choice[str], year: typing.Optional[int]):
+    
+    async def positions(self, interaction: discord.Interaction, category: app_commands.Choice[str],session_type: app_commands.Choice[str], ignore_dnfs: app_commands.Choice[str],year: typing.Optional[int]):
         await interaction.response.defer()
         try:
             loop = asyncio.get_running_loop()
-            dc_embed, file = await loop.run_in_executor(None, get_embed_and_image, year, session_type, category)
+            dc_embed, file = await loop.run_in_executor(None, get_embed_and_image, year, session_type, category, ignore_dnfs.value)
             if file != None:
                 await interaction.followup.send(embed=dc_embed.embed,file=file)
             else:
