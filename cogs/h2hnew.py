@@ -34,7 +34,7 @@ class session_type:
         self.name = name
         self.value = value
 
-def get_data(year, session_type):
+def get_data(year, session_type,ignore_dnfs):
     # the code for this is kinda bad and complicated so imma leave comments for when i forget what any of this does
     team_list = {}
     color_list = {}
@@ -102,13 +102,14 @@ def get_data(year, session_type):
             
             # figure out which races to ignore
             both_drivers_finished = True
-            if (session_type.value == 'r'):
-                dnf = ['D','E','W','F','N']
-                for driver in team_results.index:
-                    if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) or (not ((team_results.loc[driver,'Status'] == 'Finished') or ('+' in team_results.loc[driver,'Status']))):
-                        # for testing
-                        # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
-                        both_drivers_finished = False
+            if (ignore_dnfs):
+                if (session_type.value == 'r'):
+                    dnf = ['D','E','W','F','N']
+                    for driver in team_results.index:
+                        if ((team_results.loc[driver,'ClassifiedPosition']) in dnf) or (not ((team_results.loc[driver,'Status'] == 'Finished') or ('+' in team_results.loc[driver,'Status']))):
+                            # for testing
+                            # outstring += (f'{pairing}: Skipping {session}\nReason: {team_results.loc[driver,'Abbreviation']} did ({team_results.loc[driver,'ClassifiedPosition']},{team_results.loc[driver,'Status']})\n')
+                            both_drivers_finished = False
             
             # if (team_list.get(i).get(pairing).get(curr_abbr) is None):
             #     team_list.get(i).get(pairing).update({curr_abbr:0})
@@ -140,54 +141,63 @@ def h2h_embed(self,data,year,session_type):
         description += f'{self.bot.get_emoji(emoji.team_emoji_ids.get(team))}\n'
     print(description)
     
-def make_plot(data,colors,year,session_type, team_names, filepath):
+def make_plot(data, colors, year, session_type, team_names, filepath):
     plt.clf()
     f1plt.setup_mpl()
-    fig, ax = plt.subplots(1, figsize=(13,9))
+    fig, ax = plt.subplots(1, figsize=(13, 9))
     fig.set_facecolor('black')
     ax.set_facecolor('black')
-    fig.suptitle(f'{year} {session_type.name} Head to Head',fontproperties=bold_font,size=20,y=0.95)
+    fig.suptitle(f'{year} {session_type.name} Head to Head', fontproperties=bold_font, size=20, y=0.95)
     offset = 0
     driver_names = []
     y_ticks = []
+    
     for team in data.keys():
         for pairing in data.get(team).keys():
             y_ticks.append(team_names.get(team))
             drivers = list(data.get(team).get(pairing).keys())
             driver_wins = list(data.get(team).get(pairing).values())
-            # flip second driver to draw back to back
+            
+            # Sort drivers by the absolute values of their wins in descending order
+            sorted_indices = sorted(range(len(driver_wins)), key=lambda i: abs(driver_wins[i]), reverse=True)
+            driver_wins = [driver_wins[i] for i in sorted_indices]
+            drivers = [drivers[i] for i in sorted_indices]
+            
+            # Flip the second driver's value to draw back to back
             driver_wins[1] = -1 * driver_wins[1]
-            # team color
+            
+            # Team color
             color = ''
             if not ((colors.get(team).lower() == 'nan') or (colors.get(team).lower() == '')):
                 color = f'#{colors.get(team).lower()}'
-            ax.barh(pairing, driver_wins, color = color,)# edgecolor = 'black')
+            ax.barh(pairing, driver_wins, color=color)
+            
             try:
-                # team logo
+                # Team logo
                 img = Image.open(f'lib/cars/logos/{team}.webp')
-                img.thumbnail((64,64))
+                img.thumbnail((64, 64))
                 imagebox = OffsetImage(mpim.pil_to_array(img), zoom=0.5)
                 ab = AnnotationBbox(imagebox, (0, offset), frameon=False)
                 ax.add_artist(ab)
             except:
-                ax.text(0,offset,team,ha='center',fontsize=10, fontproperties=regular_font, path_effects=[pe.withStroke(linewidth=2, foreground="black")])
+                ax.text(0, offset, team, ha='center', fontsize=10, fontproperties=regular_font, path_effects=[pe.withStroke(linewidth=2, foreground="black")])
                 traceback.print_exc()
             
-            
-            # label the bars
+            # Label the bars
             for i in range(len(drivers)):
                 if driver_wins[i] <= 0:
-                    driver_name = f'{list(data.get(team).get(pairing).keys())[i]}'
+                    driver_name = drivers[i]
                     driver_names.append(driver_name)
-                    wins_string = f'{-1*driver_wins[i]}'
-                    ax.text(min(driver_wins[i] - 0.6,-1.2), offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+                    wins_string = f'{-1 * driver_wins[i]}'
+                    ax.text(min(driver_wins[i] - 0.6, -1.2), offset - 0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='right', path_effects=[pe.withStroke(linewidth=4, foreground="black")])
                 else:
-                    driver_name = f'{list(data.get(team).get(pairing).keys())[i]}'
+                    driver_name = drivers[i]
                     driver_names.append(driver_name)
                     wins_string = f'{driver_wins[i]}'
-                    ax.text(driver_wins[i] + 0.6, offset-0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+                    ax.text(driver_wins[i] + 0.6, offset - 0.2, wins_string, fontproperties=regular_font, fontsize=20, horizontalalignment='left', path_effects=[pe.withStroke(linewidth=4, foreground="black")])
             offset += 1
-    # plot formatting
+    
+    # Plot formatting
     left = min(fig.subplotpars.left, 1 - fig.subplotpars.right)
     bottom = min(fig.subplotpars.bottom, 1 - fig.subplotpars.top)
     fig.subplots_adjust(left=left, right=1 - left, bottom=bottom, top=1 - bottom)
@@ -199,26 +209,27 @@ def make_plot(data,colors,year,session_type, team_names, filepath):
     ax.spines['bottom'].set_visible(False)
     ax.spines['left'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    xabs_max = abs(max(ax.get_xlim(), key=abs))+7
+    xabs_max = abs(max(ax.get_xlim(), key=abs)) + 7
     
-    # watermark
+    # Watermark
     watermark_img = plt.imread('botPics/f1pythoncircular.png')
-    watermark_box = OffsetImage(watermark_img, zoom=0.22) 
-    ab = AnnotationBbox(watermark_box, (-0.06,1.05), xycoords='axes fraction', frameon=False)
+    watermark_box = OffsetImage(watermark_img, zoom=0.22)
+    ab = AnnotationBbox(watermark_box, (-0.06, 1.05), xycoords='axes fraction', frameon=False)
     ax.add_artist(ab)
-    ax.text(0.1,1.03, 'Made by\nF1Buddy Discord Bot', transform=ax.transAxes,
-            fontsize=13,fontproperties=bold_font, ha='center')
+    ax.text(0.1, 1.03, 'Made by\nF1Buddy Discord Bot', transform=ax.transAxes, fontsize=13, fontproperties=bold_font, ha='center')
     
     ax.set_xlim(xmin=-xabs_max, xmax=xabs_max)
     offset = 0
-    # label drivers
+    # Label drivers
     for i in range(len(driver_names)):
         if (i % 2) == 0:
-            ax.text(xabs_max, offset-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='right',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+            ax.text(xabs_max, offset - 0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='right', path_effects=[pe.withStroke(linewidth=4, foreground="black")])
         else:
-            ax.text(-xabs_max, math.floor(offset)-0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='left',path_effects=[pe.withStroke(linewidth=4, foreground="black")])
-        offset+=0.5
+            ax.text(-xabs_max, math.floor(offset) - 0.2, driver_names[i], fontproperties=bold_font, fontsize=20, horizontalalignment='left', path_effects=[pe.withStroke(linewidth=4, foreground="black")])
+        offset += 0.5
+    
     plt.rcParams['savefig.dpi'] = 300
+    # plt.show()
     plt.savefig(filepath)
   
 def get_embed(self, year, session_type):
@@ -259,12 +270,15 @@ class h2hnew(commands.Cog):
     @app_commands.describe(session_type='Choose between Qualifying or Race')
     @app_commands.choices(session_type=[app_commands.Choice(name="Race", value="r"), 
                                  app_commands.Choice(name="Qualifying", value="q"),])
+    @app_commands.describe(ignore_dnfs='Ignore DNFs')
+    @app_commands.choices(ignore_dnfs=[app_commands.Choice(name="Yes", value=True),
+                                        app_commands.Choice(name="No", value=False)])
     
-    async def h2hnew(self, interaction: discord.Interaction, year: typing.Optional[int], session_type: app_commands.Choice[str]):  
+    async def h2hnew(self, interaction: discord.Interaction, year: typing.Optional[int], session_type: app_commands.Choice[str], ignore_dnfs: app_commands.Choice[bool]):  
         await interaction.response.defer()
         loop = asyncio.get_running_loop()
         # await interaction.followup.send(content='h2h')
-        dc_embed, file = await loop.run_in_executor(None, get_embed, self, year, session_type)
+        dc_embed, file = await loop.run_in_executor(None, get_embed, self, year, session_type, ignore_dnfs)
         
         if not (file is None):
             await interaction.followup.send(embed = dc_embed.embed, file=file)
