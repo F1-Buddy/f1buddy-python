@@ -267,15 +267,15 @@ def make_plot(data, colors, year, session_type, team_names, filepath, ignore_dnf
     watermark_img = plt.imread("botPics/f1pythoncircular.png")
     watermark_box = OffsetImage(watermark_img, zoom=0.22)
     ab = AnnotationBbox(
-        watermark_box, (-0.06, 1.05), xycoords="axes fraction", frameon=False
+        watermark_box, (-0.06, -0.0325), xycoords="axes fraction", frameon=False
     )
     ax.add_artist(ab)
     ax.text(
-        0.1,
-        1.03,
-        "Made by\nF1Buddy Discord Bot",
+        0.235,
+        -0.0525,
+        "Made by F1Buddy Discord Bot",
         transform=ax.transAxes,
-        fontsize=13,
+        fontsize=20,
         fontproperties=bold_font,
         ha="center",
     )
