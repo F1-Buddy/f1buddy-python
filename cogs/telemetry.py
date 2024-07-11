@@ -196,7 +196,7 @@ def get_embed_and_image(driver1, driver2, year, round, lap_number, sessiontype,a
             genai.configure(api_key = config.GEMINI_KEY)
             model = genai.GenerativeModel('gemini-1.5-pro-latest')
             image = Image.open(file_path)
-            text = f"Analyze this image. It is a graph showcasing the car telemetry during Round {round_num} of the {event_year} F1 season. \
+            text = f"Analyze this image as if you are an F1 Race Engineer. Do not dumb things down and do not be afraid to use F1 lingo, you can assume the reader is familiar with F1 terms. It is a graph showcasing the car telemetry during the F1 {race}. \
             The number of drivers in the graph is given at the top right legend. \
             If there is more than one driver, give insights to the drivers styles and the different team's car performance.\
             Otherwise provide insight on the single driver's performance and car around the lap."
