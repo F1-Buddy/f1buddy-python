@@ -47,6 +47,10 @@ def get_driver(driver):
             message_embed.set_image(url='https://avatars.githubusercontent.com/u/100985214?v=4')
             message_embed.title = 'friend anurag'
             return message_embed
+        if driver == 'saul':
+            message_embed.set_image(url='https://i.kym-cdn.com/entries/icons/original/000/040/009/3dsaulcover.jpg')
+            message_embed.title = 'saul'
+            return message_embed
         
             
         url = 'https://en.wikipedia.org/wiki/List_of_Formula_One_drivers'
