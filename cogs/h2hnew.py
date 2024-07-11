@@ -271,7 +271,7 @@ def make_plot(data, colors, year, session_type, team_names, filepath, ignore_dnf
     )
     ax.add_artist(ab)
     ax.text(
-        0.235,
+        0.23,
         -0.0525,
         "Made by F1Buddy Discord Bot",
         transform=ax.transAxes,
