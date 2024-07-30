@@ -171,10 +171,9 @@ def get_schedule():
                 for el in image:
                     image = el.get("src")
                     if "circuit" in image.lower():
-                        track_url = image
+                        track_url = image.replace(" ", "%20")
                     if "flag" in image.lower():
-                        flag_url = image
-
+                        flag_url = image.replace(" ", "%20")
             # add final fields to embed
             dc_embed = em.Embed(
                 title=title_string, description=description_string, image_url=track_url
