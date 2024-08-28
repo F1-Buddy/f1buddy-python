@@ -67,8 +67,12 @@ def get_driver(driver):
         url = "https://en.wikipedia.org/wiki/List_of_Formula_One_drivers"
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
-        table = soup.find("table", {"class": "wikitable sortable"})
+        # table = soup.find(
+        #     "table", {"class": "wikitable sortable"}
+        # )
+        table = soup.findAll("tbody")[2]
         # print(table)
+        # print(url)
 
         driver_data = []
 
@@ -79,8 +83,8 @@ def get_driver(driver):
                 if flags:
                     nationality = flags["src"]
                 if columns:
-                    print(columns)
-                    print(len(columns))
+                    # print(columns)
+                    # print(len(columns))
                     driver_dict = {
                         "name": parse_driver_name(columns[0].text.strip()),
                         "nationality": nationality,
@@ -96,7 +100,9 @@ def get_driver(driver):
                     }
                     driver_data.append(driver_dict)
         except Exception as e:
-            message_embed.set_footer(f"Error getting data! {e}")
+            error_message = f"Error getting data: {e}"
+            message_embed.description = error_message
+            message_embed.set_footer(text="Error getting data! ")
 
         normalized_input = unidecode(driver).casefold()
         # img_url = unidecode(driver).title()

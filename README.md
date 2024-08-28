@@ -14,35 +14,40 @@ A discord bot with all kinds F1 statistics and tools!
 Preview a few of our commands below:
 
 # Command Previews
+
 <details><summary><b>General Commands</b></summary>
     
 Schedule             |  Standings|  Driver|  
 :-------------------------:|:-------------------------:|:-------------------------:
-![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|  
+![](/images/schedule.png)  |  ![](/images/wdcwcc.png)|  ![](/images/driver.png)|
 
-Race Results             |  Quali Results |  FIA Document|  
-:-------------------------:|:-------------------------:|:-------------------------:
-![](/images/results.png)|    ![](/images/quali.png)|  ![](/images/fiadoc.png)|  
+|       Race Results       |     Quali Results      |      FIA Document       |
+| :----------------------: | :--------------------: | :---------------------: |
+| ![](/images/results.png) | ![](/images/quali.png) | ![](/images/fiadoc.png) |
 
 And more!!
+
 </details>
 
 <details><summary><b>Data/Telemetry Commands</b></summary>
     
 Telemetry             |  Track Dominance |  Position Changes|  
 :-------------------------:|:-------------------------:|:-------------------------:
-![](/images/telemetry.png)  |  ![](/images/trackdominance.png)|  ![](/images/positions.png)|  
+![](/images/telemetry.png)  |  ![](/images/trackdominance.png)|  ![](/images/positions.png)|
 
-Qualifying Gap             |  Laptime Consistency |  Laptimes |  
-:-------------------------:|:-------------------------:|:-------------------------:
-![](/images/qualigap.png)|    ![](/images/consistency.png)|  ![](/images/laptimes.png)|  
+|      Qualifying Gap       |     Laptime Consistency      |         Laptimes          |
+| :-----------------------: | :--------------------------: | :-----------------------: |
+| ![](/images/qualigap.png) | ![](/images/consistency.png) | ![](/images/laptimes.png) |
 
 And more!!
+
 </details>
 
-
 ## Changelog
+
 Rakib -
+
+- fixed driver getting wrong table (by country instead of by name (temporary (LOL)))
 - fixed fiadocs missing docs while sleeping
 - fixed fl not working for 2020 or blank round
 - added 2024 team logos for h2h
@@ -55,23 +60,24 @@ Rakib -
 - added year input check function to wdc/wcc
 
 Jubayer -
+
 - added parameter to fiadoc
 
-
 ## To-do
+
 - [x] create a input checking function in common
 - [x] fix scenario where >1 fiadoc posted while asleep
-- [ ] convert following commands to new em.Embed: 
-    - [x] `constructor_standings.py`
-    - [ ] `driver.py`
-    - [ ] `driver_standings.py`
-    - [ ] `fiadoc.py`
-    - [ ] `help.py`
-    - [ ] `laptimes.py`
-    - [ ] `positions.py`
-    - [ ] `qualigap.py`
-    - [ ] `speed.py`
-    - [ ] `strategy.py`
+- [ ] convert following commands to new em.Embed:
+  - [x] `constructor_standings.py`
+  - [ ] `driver.py`
+  - [ ] `driver_standings.py`
+  - [ ] `fiadoc.py`
+  - [ ] `help.py`
+  - [ ] `laptimes.py`
+  - [ ] `positions.py`
+  - [ ] `qualigap.py`
+  - [ ] `speed.py`
+  - [ ] `strategy.py`
 - [ ] add year parameter to fiadoc
 - [ ] create running changelog file
 - [ ] fix outlier calculation for consistency, currently awful
@@ -80,6 +86,7 @@ Jubayer -
 - [ ] use newer folder structure instead of string for old commands like speed,laptimes,etc.
 
 ## Bugs
+
 - [ ] quali laptimes not loading unless session.load() is run without args
 - [x] latest_completed_index gives next index not latest completed, fix and fix implementations
 - [x] fiadoc thread dying? unsure of why
