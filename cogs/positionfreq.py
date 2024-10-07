@@ -84,7 +84,7 @@ class position_freqeuency(commands.Cog):
         print("Position Frequency cog loaded")
 
     @app_commands.command(
-        name="positionfrequency",
+        name="positionfreq",
         description="Find out who has been in each position the most",
     )
     @app_commands.describe(year="Year")
