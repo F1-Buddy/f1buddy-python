@@ -156,7 +156,7 @@ def plot_avg(
     # latest_event_index = cm.latest_completed_index(year)
     plt.clf()
     driver_positions = dict(sorted(driver_positions.items(), key=lambda x: x[1]))
-    f1plt._enable_fastf1_color_scheme()
+    # f1plt._enable_fastf1_color_scheme()
     f1plt.setup_mpl(misc_mpl_mods=False)
     watermark_img = plt.imread(
         "botPics/f1pythoncircular.png"
