@@ -78,9 +78,10 @@ async def threadMain(bot):
                 )
                 await message.publish()
                 # print(images)
-            await asyncio.sleep(30)
+            await asyncio.sleep(60)
         except Exception as e:
             traceback.print_exc()
+            continue
 
 
 async def createDocThread(bot):

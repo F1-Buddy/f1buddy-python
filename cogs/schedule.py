@@ -156,17 +156,26 @@ def get_schedule():
 
             # get track image
             url_formats = (
+                f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event]['Location'].replace(' ', '_')}/Circuit.html", # for countries that host more than 1 (US: COTA, LV, Miami)
+                f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '-')}/Circuit.html", # looks like f1 changed urls
                 f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'EventName'][:-11].replace(' ', '_')}/Circuit.html",
                 f"https://www.formula1.com/en/racing/{now.year}/{schedule.loc[next_event,'Country'].replace('-','').replace(' ', '_')}/Circuit.html",
+                
             )
             track_url = ""
+            images = []
 
             for url in url_formats:
+                print(url)
                 if schedule.loc[next_event, "Country"] == "Abu Dhabi":
                     url = f"https://www.formula1.com/en/racing/{now.year}/United_Arab_Emirates/Circuit.html"
+                # print(schedule.loc[next_event]["Location"])
                 response = requests.get(url)
                 soup = BeautifulSoup(response.content, "html.parser")
                 image = soup.find_all(class_="f1-c-image")
+                # print(image)
+                if len(image)>0:
+                    break
             if len(image) > 0:
                 for el in image:
                     image = el.get("src")
