@@ -37,14 +37,16 @@ def schedule_sync(year):
     return df
 
 
-def load_sync(year, round, name, **flags):
-    """A loaded session. Concurrent calls for the same session share one download."""
+def load_sync(year, round, name, fresh=False, **flags):
+    """A loaded session. Concurrent calls for the same session share one download.
+
+    `fresh` skips the in-memory copy, for results that may have been incomplete last time."""
     key = (year, round, name)
     want = {f: bool(flags.get(f)) for f in FLAGS}
     with _guard:
         lock = _locks.setdefault(key, threading.Lock())
     with lock:
-        hit = _sessions.get(key)
+        hit = None if fresh else _sessions.get(key)
         if hit and all(hit[0][f] or not want[f] for f in FLAGS):
             _sessions.move_to_end(key)
             return hit[1]

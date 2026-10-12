@@ -11,7 +11,7 @@ from discord.ext import commands
 from .. import util
 from ..render import embeds
 
-CATEGORIES = ["Information", "Plots", "FIA documents", "Reminders", "Predictions", "Live", "Other"]
+CATEGORIES = ["Information", "Plots", "FIA documents", "Reminders", "Predictions", "Live", "Setup", "Other"]
 HELP_DIR = util.ASSETS / "help"
 LINKS = ("If you are having any issues or want to provide feedback, please open a new issue on "
          "[GitHub](https://github.com/F1-Buddy/f1buddy-python/issues)\n"

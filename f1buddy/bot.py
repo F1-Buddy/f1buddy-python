@@ -11,7 +11,7 @@ from .render import embeds
 from .sources import fastf1_src
 
 log = logging.getLogger(__name__)
-COGS = ["info", "plots", "fia", "watcher", "predictions", "live", "misc"]
+COGS = ["info", "plots", "fia", "watcher", "predictions", "live", "setup", "misc"]
 
 
 def error_message(error: Exception) -> str:
