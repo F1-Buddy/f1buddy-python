@@ -61,7 +61,7 @@ tests/
   fixtures/          recorded API responses, HTML pages, PDFs
 specs/
 Dockerfile
-compose.yaml
+docker-compose.yaml
 requirements.txt
 ```
 
@@ -184,7 +184,7 @@ No test needs a Discord token or network access.
 ## Deployment
 
 - `Dockerfile`: `python:3.12-slim`, install `requirements.txt`, copy the package, run `python -m f1buddy` as a non-root user.
-- `compose.yaml`: one service, `env_file: .env`, a named volume mounted at `/data`, `restart: unless-stopped`.
+- `docker-compose.yaml`: one service, `env_file: .env`, a named volume mounted at `/data`, `restart: unless-stopped`.
 - Update procedure for the host: `git pull && docker compose up -d --build`.
 - Slash commands are synced by `f1$sync` (kept), not automatically at start-up.
 

@@ -83,23 +83,33 @@ These screenshots are from the original bot; the rewrite keeps the same layouts.
 
 You need Docker and a Discord bot token.
 
-1. **Create the bot** in the [Discord Developer Portal](https://discord.com/developers/applications). Under *Bot*, turn on the **Message Content Intent** (it is only used for the `f1$sync` command below).
-2. **Configure it:**
+1. **Create the bot** in the [Discord Developer Portal](https://discord.com/developers/applications). Under *Bot*, turn on the **Message Content Intent** (it is only used for the `f1$sync` command below). Leave the other two privileged intents off.
+2. **Configure it:** copy `.env.example` to `.env` and fill in `DISCORD_TOKEN`. `ADMIN_USER_IDS` already lists the two bot admins.
+3. **Start it**, either from the published image or from source:
    ```bash
-   cp .env.example .env
-   ```
-   Fill in `DISCORD_TOKEN`. `ADMIN_USER_IDS` already lists the two bot admins.
-3. **Start it:**
-   ```bash
+   # published image (replace yourname with the Docker Hub account)
+   F1BUDDY_IMAGE=yourname/f1buddy:latest docker compose up -d
+
+   # or build from source
    docker compose up -d --build
    ```
 4. **Invite the bot** to a server with the `bot` and `applications.commands` scopes and these permissions: Send Messages, Embed Links, Attach Files, Add Reactions and Read Message History.
 5. **Publish the slash commands.** An admin types `f1$sync` in any channel the bot can read. Do this once, and again whenever commands change.
 6. **Set up the automatic features** you want, per server: `/setup fia`, `/setup reminders`, `/setup weekend`.
 
-To update: `git pull && docker compose up -d --build`.
+Logs: `docker compose logs -f`. All state (database, caches) lives in the `f1buddy-data` volume, so it survives updates.
 
-Logs: `docker compose logs -f`. All state (database, caches) lives in the `f1buddy-data` volume.
+Run only one copy of the bot per token. Two copies answer every command twice.
+
+### Deploying as a Komodo stack
+
+1. Create a stack and point it at this repository (branch `main`), or paste in `docker-compose.yaml`.
+2. In the stack's **Environment**, add the variables from `.env.example`, plus `F1BUDDY_IMAGE=yourname/f1buddy:latest`. Komodo writes these to `.env` beside the compose file, which is where the container reads them from.
+3. Deploy. To update later, redeploy with "pull images" enabled.
+
+### Publishing the image
+
+Every push to `main` runs the tests and, if they pass, publishes `<DOCKERHUB_USERNAME>/f1buddy:latest` to Docker Hub (`.github/workflows/docker-publish.yml`). A tag such as `v2.0.0` publishes that version as well. The workflow needs two repository secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (a Docker Hub access token with write access).
 
 ### Configuration
 

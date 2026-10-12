@@ -1,0 +1,15 @@
+services:
+  f1buddy:
+    # Set F1BUDDY_IMAGE to the published image (for example yourname/f1buddy:latest) to run
+    # that instead of building from source.
+    image: ${F1BUDDY_IMAGE:-f1buddy:local}
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - f1buddy-data:/data
+    restart: unless-stopped
+
+volumes:
+  f1buddy-data:
