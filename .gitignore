@@ -50,3 +50,5 @@ test*.py
 
 /cogs/fiaDocs/*
 !/cogs/fiaDocs/.gitkeep 
+
+.env
