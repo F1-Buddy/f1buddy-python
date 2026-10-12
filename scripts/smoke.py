@@ -39,6 +39,26 @@ async def info():
     v = await step("driver senna", I.driver_profile("Ayrton Senna")); v and show(E.driver(v))
     v = await step("constructors", I.constructors(None)); v and show(E.constructors(*v))
 
+async def plots():
+    from f1buddy.data import plots as P
+    out = pathlib.Path("data/smoke"); out.mkdir(exist_ok=True)
+    jobs = {
+        "laptimes": P.laptimes("VER", "nor", "5", 2024),
+        "positions": P.positions("5", 2024),
+        "strategy": P.strategy("5", 2024),
+        "qualigap": P.qualigap("5", 2024),
+        "consistency": P.consistency("leclerc", "5", 2024),
+        "telemetry": P.telemetry("VER", "NOR", "5", "Qualifying", 2024, None),
+        "trackdominance": P.trackdominance("VER", "NOR", "5", None, 2024),
+        "avgpos": P.avgpos("Drivers", "Race", "mechanical", 2024),
+        "avgpos_teams_1990": P.avgpos("Teams", "Race", "none", 1990),
+        "h2h": P.h2h("Qualifying", False, 2024),
+    }
+    for name, coro in jobs.items():
+        r = await step(name, coro)
+        if r:
+            (out / f"{name}.png").write_bytes(r[0]); print("  ", len(r[0]) // 1024, "KB", r[1])
+
 if __name__ == "__main__":
     boot()
     asyncio.run(globals()[sys.argv[1]]())
