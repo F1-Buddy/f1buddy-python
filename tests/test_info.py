@@ -576,9 +576,11 @@ async def test_sync_admin_only():
             synced.append(1)
             return ["a", "b", "c"]
 
-    async def change_presence(activity):
-        assert "V10s | /help | 2 servers" == activity.name
-    bot = SimpleNamespace(config=ctx.config, tree=Tree(), guilds=[1, 2], change_presence=change_presence)
+    shown = []
+
+    async def show_status():
+        shown.append(1)
+    bot = SimpleNamespace(config=ctx.config, tree=Tree(), guilds=[1, 2], show_status=show_status)
     cog = misc.Misc(bot)
     said = []
 
@@ -589,4 +591,17 @@ async def test_sync_admin_only():
     await cog.sync.callback(cog, context(2))
     assert said == ["bob is not a bot admin! Can't sync :("] and not synced
     await cog.sync.callback(cog, context(1))
-    assert said[-1] == "<@1> synced 3 commands" and synced == [1]
+    assert said[-1] == "<@1> synced 3 commands" and synced == [1] and shown == [1]
+
+
+async def test_status_is_a_listening_activity():
+    import discord
+    from f1buddy.bot import F1Buddy
+    seen = []
+
+    async def change_presence(self, activity):
+        seen.append(activity)
+    bot = SimpleNamespace(guilds=[1, 2, 3])
+    bot.change_presence = lambda activity: change_presence(bot, activity)
+    await F1Buddy.show_status(bot)
+    assert seen[0].type == discord.ActivityType.listening and seen[0].name == "V10s | /help | 3 servers"

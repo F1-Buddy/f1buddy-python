@@ -23,6 +23,8 @@ def init(data_dir):
     cache.mkdir(parents=True, exist_ok=True)
     fastf1.Cache.enable_cache(str(cache))
     fastf1.set_log_level("WARNING")
+    # FastF1 also logs full tracebacks at DEBUG (for example when next year's calendar isn't out yet)
+    logging.getLogger("fastf1").setLevel(logging.WARNING)
 
 
 def schedule_sync(year):

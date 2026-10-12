@@ -77,6 +77,12 @@ class F1Buddy(commands.Bot):
     async def on_ready(self):
         embeds.AVATAR_URL = self.user.display_avatar.url
         log.info("logged in as %s in %d servers", self.user, len(self.guilds))
+        await self.show_status()
+
+    async def show_status(self):
+        """Shown under the bot's name as: Listening to V10s | /help | N servers"""
+        await self.change_presence(activity=discord.Activity(
+            type=discord.ActivityType.listening, name=f"V10s | /help | {len(self.guilds)} servers"))
 
     async def alert(self, message: str):
         """Operational alert to the owner's channel, if one is configured."""

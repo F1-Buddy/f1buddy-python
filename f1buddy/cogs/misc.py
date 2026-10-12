@@ -145,8 +145,7 @@ class Misc(commands.Cog):
         if ctx.author.id not in self.bot.config.admin_ids:
             await ctx.send(f"{ctx.author.display_name} is not a bot admin! Can't sync :(")
             return
-        await self.bot.change_presence(activity=discord.Activity(
-            type=discord.ActivityType.listening, name=f"V10s | /help | {len(self.bot.guilds)} servers"))
+        await self.bot.show_status()
         synced = await self.bot.tree.sync()
         await ctx.send(f"{ctx.author.mention} synced {len(synced)} commands")
 
