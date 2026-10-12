@@ -1,6 +1,6 @@
 .env
-config.py
-token.txt
+/config.py
+/token.txt
 .DS_Store
 __pycache__/
 .pytest_cache/
