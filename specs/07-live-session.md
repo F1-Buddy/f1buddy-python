@@ -2,19 +2,11 @@
 
 New feature, and the least certain one: it depends on a live data source, and the free options are limited. **A decision is needed from you before this is built** (question 1).
 
-## Open questions
+## Decisions
 
-1. **Which live source?**
-
-   | Option | Cost | What I know |
-   |---|---|---|
-   | **A. OpenF1 paid tier** (recommended if you want live data) | €9.90 per month | Documented REST, MQTT and WebSocket access to live data, about 3 seconds behind the track. Needs an account; 6 requests per second and 60 per minute. |
-   | **B. F1's own live-timing feed**, read with FastF1's live-timing client | Free | Undocumented and unsupported by F1. I have not confirmed that it is currently reachable without an F1 account, or that reading it in real time is within its terms. Needs a short test during a real session before any commitment. |
-   | **C. Post-session only** | Free | Drop "live". OpenF1's free tier and FastF1 both provide weather, track status and race control messages after a session ends. `/live` becomes a session recap. |
-
-   The spec below is written against a small interface so A or B can be swapped without touching the commands. With no source configured, the feature degrades to C on its own.
-
-2. **Channel feed.** Proposed: optional per-server channel that receives race control messages as they happen (flags, safety car, penalties). This can be busy: a race produces 50 to 100 messages. Batching is specified below. Want it, or only the on-demand `/live` command?
+- **Built as a recap only (option C).** `/live` shows the most recent finished session from OpenF1's free tier, and when the next session starts. During a session it says live data isn't enabled.
+- **Not built:** live polling, the `LiveSource` interface, the channel feed and `/setup live`. The sections below describing them are kept as the design for a later version, should a live data source be paid for.
+- Acceptance criteria 2, 3 and 4 apply to what was built.
 
 ## Source interface
 

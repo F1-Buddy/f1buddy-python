@@ -2,11 +2,12 @@
 
 `/fiadoc`, the automatic poster, and the admin command that sets where it posts. This is the only feature that scrapes HTML, so the design goal is: when fia.com changes, the breakage is confined to one function, detected within an hour, and fixable by editing that function against a new recorded page.
 
-## Open questions
+## Decisions
 
-1. **Is the FIA channel an announcement channel?** If so the bot publishes each post to followers, as the old one tried to. The spec handles both cases; this only affects what to test manually.
-2. **Scope of polling.** The FIA landing page lists the documents of the most recent event only. Documents added late to an earlier event (rare) would be missed. Proposed: accept this for the first version. The alternative is polling each event's own list page as well, which multiplies requests and parser surface.
-3. **Page limit.** Proposed: post at most 20 pages per document (two messages), then link to the PDF. Some documents (technical directives, entry lists with annexes) run longer. OK?
+- **Announcement channel:** unknown until a server exists. Posts are published automatically when the channel is an announcement channel; nothing else changes.
+- **Scope of polling:** the landing page only (the most recent event's documents).
+- **Page limit:** 20 pages per document, then a link to the PDF.
+- **Channel from config:** `FIA_CHANNEL_ID` in the environment sets the channel without running `/setup fia`.
 
 ## What the site looks like (checked 2026-10-12)
 

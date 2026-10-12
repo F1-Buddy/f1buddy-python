@@ -2,11 +2,20 @@
 
 Applies to every other spec. Current behaviour of the old bot is in `legacy-inventory.md`.
 
-## Open questions
+## Decisions
 
-1. **Embed colour.** `lib/colors.py` is lost. Proposed default: `#E10600` (F1 red). Do you have the old file, or a preferred colour?
-2. **Custom emoji artwork.** Which server owns the current team and tyre emojis? The images need exporting once so they can be re-uploaded as application emojis (see "Emojis").
-3. **Admin ids.** The three hardcoded admin user ids move to config. Are all three still admins?
+- **Embed colour:** F1 red, `#E10600` (`render/embeds.py`). The old `lib/colors.py` was not recovered.
+- **Custom emojis:** built without artwork. Drop images into `f1buddy/assets/emojis/` and run `scripts/upload_emojis.py`; until then embeds show no team or tyre emojis.
+- **Admins:** `ADMIN_USER_IDS` in the environment; the two confirmed ids are in `.env.example`.
+
+## As built: differences from this spec
+
+- **Tests use hand-built data, not a committed FastF1 cache.** Data functions take plain pandas frames, so tests build small frames by hand. This keeps megabytes of cache out of the repo. Real FastF1 data is exercised by `pytest -m live` and `scripts/smoke.py`.
+- **Plot modules are grouped** into `render/plots/race.py`, `telemetry.py` and `season.py`, not one file per plot.
+- **`/setup` lives in one cog** (`cogs/setup.py`) with the subcommands `fia`, `reminders` and `weekend`.
+- **`FIA_CHANNEL_ID`** was added to the environment variables. It has the same effect as running `/setup fia` in that channel's server.
+- **`OPENF1_USERNAME` / `OPENF1_PASSWORD` are not used**: spec 07 was built as a recap only.
+- **Error replies after a deferred response:** the deferred reply is deleted and the error is sent as an ephemeral follow-up.
 
 ## Goals
 

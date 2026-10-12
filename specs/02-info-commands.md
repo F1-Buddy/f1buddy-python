@@ -4,11 +4,16 @@
 
 Shared parameter rules (`year`, `round`, `driver`), error handling and embed defaults are in spec 00. "AC" = acceptance criteria; all are automated and offline unless marked manual.
 
-## Open questions
+## Decisions
 
-1. **`/driver` easter eggs.** The "anurag" and "saul" responses are kept as they are. Say if you'd prefer them removed.
-2. **Offseason `/schedule`.** Proposed: when next season's calendar is already published, show its first event; only show the "off season" embed when it isn't. The old bot always showed the off-season embed. OK?
-3. **`/schedule` circuit image.** Drawn by the bot from the previous year's lap data, so a brand-new circuit has no image in its first year. Acceptable?
+- **`/driver` easter eggs:** kept.
+- **Off-season `/schedule`:** shows next season's first event when its calendar is published; the off-season embed otherwise.
+- **`/schedule` circuit image:** drawn by the bot from an earlier season's qualifying lap. A circuit with no earlier data has no image.
+
+## As built: differences from this spec
+
+- **`/driver` nationality** is a flag emoji in the title. The thumbnail stays the bot's avatar, since there is no flag image source.
+- **`/lightsout`** also names jump-starters and shows the winner's reaction time.
 
 ---
 

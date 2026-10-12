@@ -4,11 +4,17 @@
 
 Shared parameter rules, caching and error handling are in spec 00. Exact figure sizes, colours and titles of the old plots are in `legacy-inventory.md` section 1.3 and are kept unless this spec says otherwise.
 
-## Open questions
+## Decisions
 
-1. **`/telemetry` x-axis.** The old plot uses "percentage of the lap by sample index", which misaligns two drivers at corners. Proposed: distance along the lap in metres, so braking points line up. This changes how the plot looks. OK?
-2. **`/h2h` with more than two drivers in a team** (mid-season swaps). Proposed: one bar per pairing that shared at least one session, so a team can have two or three bars. The old plot assumed exactly two drivers and failed otherwise.
-3. **Sprint sessions.** `/telemetry` and `/trackdominance` gain Sprint and Sprint Qualifying as session choices. `/laptimes`, `/positions`, `/strategy` and `/consistency` stay race-only as today. Want a `session` option (Race or Sprint) on those four as well?
+- **`/telemetry` x-axis:** distance along the lap in metres.
+- **`/h2h` with more than two drivers in a team:** one bar per pairing that shared at least one round.
+- **Sprint sessions:** `/telemetry` and `/trackdominance` offer every session type. `/laptimes`, `/positions`, `/strategy` and `/consistency` stay race-only.
+
+## As built: differences from this spec
+
+- **Mechanical DNFs can't be told apart in recent seasons.** Jolpica reports every retirement from about 2024 as "Retired". With `exclude_dnfs: Mechanical only`, those count as mechanical, so for recent seasons the option behaves like "All" except that DNS and DSQ are kept. Older seasons, which have specific statuses such as "Engine" or "Collision", work as specified.
+- **Team colours** for `/avgpos` and `/h2h` come from FastF1 and exist from 2018. Earlier seasons draw white bars with the "*Some color data is unavailable" note.
+- **AI analysis** is cached by the plot image, and the default model is `gemini-2.5-flash` (`GEMINI_MODEL`). It has not been run against the real API: no key was available.
 
 ---
 

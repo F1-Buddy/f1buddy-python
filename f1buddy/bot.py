@@ -71,7 +71,7 @@ class F1Buddy(commands.Bot):
         try:
             for emoji in await self.fetch_application_emojis():
                 embeds.EMOJIS[emoji.name] = str(emoji)
-        except discord.HTTPException:
+        except Exception:
             log.warning("could not fetch application emojis; continuing without them")
 
     async def on_ready(self):

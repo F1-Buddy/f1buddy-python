@@ -2,9 +2,17 @@
 
 One module per source in `f1buddy/sources/`. Nothing outside `sources/` makes a network call. Each module exposes plain functions returning dataclasses or FastF1 objects, and raises `SourceError` on failure.
 
-## Open questions
+## Decisions
 
-1. **Fastest laps before 2004.** Jolpica has fastest-lap data only from 2004, so `/driver` would show the "Fastest Laps" count as "n/a" for careers that ended earlier, and as a 2004+ count for careers spanning it. The old Wikipedia scrape had complete numbers. Acceptable, or should that one line be dropped?
+- **Fastest laps before 2004:** accepted. `/driver` shows "n/a" for careers that ended before 2004.
+
+## As built: differences from this spec
+
+- **Jolpica is called directly with `httpx`**, not through `fastf1.ergast`. This makes it async, cacheable in SQLite and testable with a mock transport.
+- **Jolpica requires a season for standings**, so there is no all-time standings query. Championship counts are built from one cached request per season (constructors: about 68 requests the first time `/constructors` is used; `scripts/warm_cache.py` does this ahead of time).
+- **Rate limiting:** one request every 0.5 s, and a 429 response is waited out (up to three times) before failing. Jolpica throttled a burst at the documented 4 requests per second during development.
+- **OpenF1:** free tier only, for finished sessions (spec 07).
+- **Status strings changed in recent seasons.** Jolpica now reports every retirement as "Retired", so the cause of a retirement is unknown from 2024 or so onwards (see spec 03, `/avgpos`).
 
 ## Summary
 

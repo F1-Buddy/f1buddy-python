@@ -2,12 +2,12 @@
 
 New feature. Members of a server predict pole and the podium for each race; the bot scores them and keeps a season leaderboard per server.
 
-## Open questions
+## Decisions
 
-1. **Scoring.** Proposed below (maximum 25 per race). Change any value you like; they are constants. Because the podium can be predicted with the grid known, podium scores will bunch up; raising the pole value is one way to offset that.
-2. **Sprints.** Proposed: Grand Prix only. Sprint predictions would double the commands on sprint weekends for little gain.
-3. **Visibility.** Proposed: each part of a prediction is private until that part locks, then everyone's are visible. This stops copying.
-4. **Late penalties.** Proposed: scores use the result at the time the race post goes out, and an admin can run a rescore if the classification changes later. The alternative is automatic rescoring whenever the official result changes, which is more moving parts.
+- **Scoring:** as below (maximum 25). The values are constants at the top of `data/predictions.py`.
+- **Sprints:** Grand Prix only.
+- **Visibility:** each part is private until it locks.
+- **Late penalties:** scored when the race result arrives; `/predictions-rescore` recomputes a round on request.
 
 ## Rules
 

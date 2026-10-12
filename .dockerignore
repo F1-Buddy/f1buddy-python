@@ -1,0 +1,11 @@
+.git
+.venv
+.env
+data
+tests
+specs
+botPics
+**/__pycache__
+.pytest_cache
+.agents
+.claude

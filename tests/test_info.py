@@ -466,8 +466,11 @@ async def test_help_lists_every_command_once_with_descriptions():
     for cmd in cmds:
         assert text.count(f"`/{cmd.qualified_name}` —") == 1, cmd.qualified_name
         assert cmd.description and cmd.description != "…", cmd.qualified_name
+        assert len(cmd.description) <= 100, cmd.qualified_name          # Discord's limit
         for p in cmd.parameters:
             assert p.description and p.description != "…", f"{cmd.qualified_name}.{p.name}"
+            assert len(p.description) <= 100, f"{cmd.qualified_name}.{p.name}"
+    assert len(bot.tree.get_commands()) <= 100
     names = {c.qualified_name for c in cmds}
     legacy = {"schedule", "wdc", "wcc", "constructors", "driver", "results", "qualifying", "fl", "fiadoc",
               "laptimes", "positions", "strategy", "qualigap", "consistency", "telemetry", "trackdominance",

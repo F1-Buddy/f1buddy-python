@@ -1,0 +1,12 @@
+discord.py==2.7.1
+fastf1==3.8.3
+httpx==0.28.1
+matplotlib==3.11.2
+numpy==2.5.4
+pandas==2.3.3
+PyMuPDF==1.28.2
+beautifulsoup4==4.15.0
+pillow==12.3.0
+tzdata==2026.5
+# optional: only used when GEMINI_API_KEY is set
+google-genai==2.29.0

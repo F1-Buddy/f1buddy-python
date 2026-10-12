@@ -2,11 +2,11 @@
 
 New features. Both run from one background task that watches the schedule.
 
-## Open questions
+## Decisions
 
-1. **Reminder scope.** Proposed: both a per-server channel reminder (set by an admin, optionally pinging a role) and personal DM reminders any user can turn on. If you only want one of these, the other can be cut.
-2. **Lead time.** Proposed choices: 15, 30 or 60 minutes before a session; default 30.
-3. **Weekend post set.** Proposed: a weekend preview on Thursday, the qualifying result, the race result, and a standings update. Sprint results are posted on sprint weekends. Anything to add or remove?
+- **Reminder scope:** both personal DM reminders (`/remindme`) and a per-server channel reminder (`/setup reminders`).
+- **Lead time:** 15, 30 or 60 minutes; default 30.
+- **Weekend posts:** preview, sprint result (sprint weekends), qualifying result, race result, standings update, and prediction results for servers with predictions.
 
 ---
 
